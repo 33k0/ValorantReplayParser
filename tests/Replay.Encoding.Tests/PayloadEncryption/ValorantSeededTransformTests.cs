@@ -100,6 +100,18 @@ public class ValorantSeededTransformTests
         new("++Ares-Core+release-13.06", 65, "DFC9BE07A989BFEE00"),
         new("++Ares-Core+release-13.06", 287, "0AC9BEEAA93FA5EE74889B6D70458BE650E16FB5DE5EC1EF39F3B824CD43CD8E275E6451"),
         new("++Ares-Core+release-13.06", 288, "56C9BE0CA93F0BEE658E139847845307691928301673FB2B927F6E5ED1F9DEA83361858D"),
+        // Captured by invoking the 13.08 native routine at RVA 0x4539860 on private buffers.
+        new("++Ares-Core+release-13.08", 0, ""),
+        new("++Ares-Core+release-13.08", 1, "00"),
+        new("++Ares-Core+release-13.08", 7, "40"),
+        new("++Ares-Core+release-13.08", 8, "80"),
+        new("++Ares-Core+release-13.08", 31, "3514107E"),
+        new("++Ares-Core+release-13.08", 32, "FCE6D27C"),
+        new("++Ares-Core+release-13.08", 63, "AACB1D3BFE8B6B10"),
+        new("++Ares-Core+release-13.08", 64, "29FB1FEE2E5A5FBF"),
+        new("++Ares-Core+release-13.08", 65, "7E8AB6B0AD92F14F00"),
+        new("++Ares-Core+release-13.08", 287, "1FEE335A39DA29B773FED1DF6DCD7519C180BAA20B6F5B3045DC6EDC088C26A906195007"),
+        new("++Ares-Core+release-13.08", 288, "24E3E8FA9A9B3C1367196C6CEC3A9F25701BBC89558813AB5BBDD9A6864A07AF1919D37C"),
     ];
 
     [TestCaseSource(nameof(KnownTransformVectors))]
@@ -126,6 +138,7 @@ public class ValorantSeededTransformTests
     [TestCase("++Ares-Core+release-china-13.05", 64)]
     [TestCase("++Ares-Core+release-china-13.05", 65)]
     [TestCase("++Ares-Core+release-13.06", 65)]
+    [TestCase("++Ares-Core+release-13.08", 65)]
     public void Apply_WithExplicitBitCount_ConsumesOnlyRequestedPayloadBits(string replayVersion, int bitCount)
     {
         var bytes = Convert.FromHexString(PayloadHex);
@@ -196,6 +209,8 @@ public class ValorantSeededTransformTests
         var chinaTransform = registry.GetRequired("++Ares-Core+release-china-13.05");
         Assert.That(chinaTransform.GetType(), Is.Not.EqualTo(registry.GetRequired("++Ares-Core+release-13.05").GetType()));
         Assert.That(registry.GetRequired("++Ares-Core+release-13.06"), Is.Not.Null);
+        Assert.That(registry.GetRequired("++Ares-Core+release-13.08").SupportedReplayVersions,
+            Is.EqualTo(new[] { "++Ares-Core+release-13.08" }));
     }
 
     [Test]
@@ -208,6 +223,7 @@ public class ValorantSeededTransformTests
 
     [TestCase("++Ares-Core+release-china-13.04")]
     [TestCase("++Ares-Core+release-china-13.06")]
+    [TestCase("++Ares-Core+release-china-13.08")]
     [TestCase("++Ares-Core+release-China-13.05")]
     public void Registry_RejectsUnregisteredChinaBranches(string replayVersion)
     {

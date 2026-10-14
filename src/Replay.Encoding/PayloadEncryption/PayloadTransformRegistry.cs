@@ -48,6 +48,7 @@ public sealed class PayloadTransformRegistry
         new ValorantSeededTransform13_05(),
         new ValorantSeededTransformChina13_05(),
         new ValorantSeededTransform13_06(),
+        new ValorantSeededTransform13_08(),
     ]);
 
     public IPayloadTransform GetRequired(string replayVersion)

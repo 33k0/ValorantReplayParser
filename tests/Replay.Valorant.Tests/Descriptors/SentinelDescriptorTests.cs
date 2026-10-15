@@ -96,7 +96,7 @@ public sealed class SentinelDescriptorTests
         Assert.That(payload.Points[0].Position!.Value.Y, Is.EqualTo(-4488.8212890625).Within(0.001));
         Assert.That(payload.Points.All(p => p.HasDecoded(nameof(p.Position))), Is.True);
         Assert.That(payload.Pulling, Is.Null);
-        Assert.Throws<Replay.Models.Errors.InvalidReplayDataException>(() => ParseFunction(descriptor, raw, 2541));
+        Assert.Throws<Models.Errors.InvalidReplayDataException>(() => ParseFunction(descriptor, raw, 2541));
     }
 
     private static CableGeometryParameters ParseFunction(CableGeometryParameters descriptor, string raw, int bits)

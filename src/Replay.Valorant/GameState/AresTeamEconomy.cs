@@ -103,7 +103,7 @@ internal sealed class CompatibleAresTeamEconomyDecoder : IFieldDecoder
 
     public DecodedFieldValue Decode(ref FieldDecodeContext context, FBitArchive archive)
     {
-        string? fallbackReason = null;
+        string? fallbackReason;
         using (var checkpoint = archive.CreateCheckpoint())
         {
             try
@@ -123,7 +123,7 @@ internal sealed class CompatibleAresTeamEconomyDecoder : IFieldDecoder
         }
         context.Diagnostics?.Add(new ReplayDiagnostic(
             ReplayDiagnosticCode.RawPayloadFallback,
-            $"Field '{context.FieldName}' fell back to raw payload: {fallbackReason ?? "unsupported field layout"}",
+            $"Field '{context.FieldName}' fell back to raw payload: {fallbackReason}",
             context.CurrentPacketId,
             context.ChannelIndex,
             context.CurrentTimeSeconds,

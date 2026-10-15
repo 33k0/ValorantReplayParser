@@ -47,6 +47,7 @@ public sealed class LifeChangeRpcDecodingTests
     {
         var writer = new Bits(); writer.Packed(1); Entry(writer, 0, 1, 21, 0, -10); writer.Packed(0);
         var raw = writer.Raw(); using var archive = new BitArchiveReader(raw.Data, raw.BitCount);
+        
         var context = new FieldDecodeContext();
         var decoder = (IFieldDecoder)new MulticastSectionLifeChangeParameters().Fields.Single(f => f.Handle == 0).Decoder!;
         var entries = (SectionLifeChangeEvent?[])decoder.Decode(ref context, archive).ObjectValue!;
@@ -63,12 +64,14 @@ public sealed class LifeChangeRpcDecodingTests
         var sparse = new Bits(); sparse.Packed(2); sparse.Packed(2);
         sparse.Field(5, b => b.Bit(false)); sparse.Packed(0); sparse.Packed(0);
         var raw = sparse.Raw(); using var archive = new BitArchiveReader(raw.Data, raw.BitCount);
+        
         var context = new FieldDecodeContext(); var decoder = RepLayoutArrayDecoders.DynamicArray<HealLifeChangeEvent>();
         var entries = (HealLifeChangeEvent?[])decoder.Decode(ref context, archive).ObjectValue!;
         Assert.That(entries[0], Is.Null); Assert.That(entries[1]!.HasDecoded(nameof(HealLifeChangeEvent.LifeResult)), Is.False);
         var invalid = new Bits(); invalid.Packed(1); invalid.Packed(1);
         invalid.Field(3, b => { for (var i = 0; i < 31; i++) b.Bit(false); }); invalid.Packed(0); invalid.Packed(0);
         var bad = invalid.Raw(); using var malformed = new BitArchiveReader(bad.Data, bad.BitCount);
+        
         Assert.Throws<ArchiveReadException>(() => decoder.Decode(ref context, malformed));
     }
 

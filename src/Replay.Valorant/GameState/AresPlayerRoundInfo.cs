@@ -159,7 +159,7 @@ internal sealed class CompatibleAresPlayerRoundInfoDecoder : IFieldDecoder
 
     public DecodedFieldValue Decode(ref FieldDecodeContext context, FBitArchive archive)
     {
-        string? fallbackReason = null;
+        string? fallbackReason;
         using (var checkpoint = archive.CreateCheckpoint())
         {
             try
@@ -178,7 +178,7 @@ internal sealed class CompatibleAresPlayerRoundInfoDecoder : IFieldDecoder
         var data = archive.ReadBits(bitCount);
         context.Diagnostics?.Add(new ReplayDiagnostic(
             ReplayDiagnosticCode.RawPayloadFallback,
-            $"Field '{context.FieldName}' fell back to raw payload: {fallbackReason ?? "unsupported field layout"}",
+            $"Field '{context.FieldName}' fell back to raw payload: {fallbackReason}",
             context.CurrentPacketId,
             context.ChannelIndex,
             context.CurrentTimeSeconds,

@@ -41,7 +41,7 @@ public sealed class MapDoorDescriptorTests
         Assert.That(bound.Handle, Is.EqualTo(handle));
         Assert.That(bound.ExportName, Is.EqualTo(field));
         Assert.That(Decode(descriptor, field, [value], bits).UInt32Value, Is.EqualTo(value));
-        var payload = Parse(descriptor, Stream([(handle, bits, new byte[] { value })]));
+        var payload = Parse(descriptor, Stream([(handle, bits, [value])]));
         Assert.That(payload.HasDecoded(field), Is.True);
         Assert.That(payload.GetType().GetProperty(field)!.GetValue(payload), Is.EqualTo(value));
     }

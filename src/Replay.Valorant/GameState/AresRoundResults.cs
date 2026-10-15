@@ -208,7 +208,7 @@ internal sealed class CompatibleAresRoundResultsDecoder : IFieldDecoder
 
     public DecodedFieldValue Decode(ref FieldDecodeContext context, FBitArchive archive)
     {
-        string? fallbackReason = null;
+        string? fallbackReason;
         using (var checkpoint = archive.CreateCheckpoint())
         {
             try

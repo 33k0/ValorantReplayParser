@@ -15,7 +15,7 @@ public sealed class DescriptorCoveragePayloadTests
     public sealed record RecordedField(string Path, uint Handle, string Field, string Replay, string? Release, int Bits, string Data);
 
     private static RecordedField[] ReadFixtures(string file) => JsonSerializer.Deserialize<RecordedField[]>(
-        File.ReadAllText(System.IO.Path.Combine(TestContext.CurrentContext.TestDirectory,
+        File.ReadAllText(Path.Combine(TestContext.CurrentContext.TestDirectory,
             "Fixtures", "DescriptorCoverage", file)), new JsonSerializerOptions { PropertyNameCaseInsensitive = true })!;
 
     public static IEnumerable<TestCaseData> Fields() => ReadFixtures("fields.json").Select((field, index) =>
@@ -170,7 +170,7 @@ public sealed class DescriptorCoveragePayloadTests
         bytes[^1] = 5;
         // 32-bit byte count + 3115 movement bits + 16-bit absolute input boundary.
         const int inputMagicBit = 32 + 3115 + 16;
-        bytes[inputMagicBit / 8] ^= (byte)(1 << (inputMagicBit % 8));
+        bytes[inputMagicBit / 8] ^= 1 << (inputMagicBit % 8);
         using var invalidMagic = new BitArchiveReader(bytes, fixture.Bits);
         var error = Assert.Throws<ArchiveReadException>(() => ComponentDataStream.Decode(invalidMagic));
         Assert.That(error!.ErrorCode, Is.EqualTo(ArchiveErrorCode.InvalidData));

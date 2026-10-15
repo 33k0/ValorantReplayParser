@@ -261,11 +261,6 @@ internal sealed class ValorantFlashEventEnricher : IReplayEventSink
 
         foreach (var effect in effectManager.ServerActiveEffects)
         {
-            if (effect is null)
-            {
-                continue;
-            }
-
             TrackEffectData(
                 exportGroup.ActorNetGuid,
                 exportGroup.TimeSeconds,
@@ -345,11 +340,6 @@ internal sealed class ValorantFlashEventEnricher : IReplayEventSink
 
         foreach (var blind in blindManager.ActiveBlinds)
         {
-            if (blind is null)
-            {
-                continue;
-            }
-
             if (blind.EffectId is { } effectId)
             {
                 _authoritativeTargetEffects.Add(new TargetEffectKey(exportGroup.ActorNetGuid, effectId));

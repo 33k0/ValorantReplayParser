@@ -338,7 +338,7 @@ internal sealed class PartialBunchAccumulatorTests
     }
 
     private static FBitArchive Payload(int bitCount, byte value = 0) =>
-        new BitArchiveReader(bitCount == 0 ? ReadOnlyMemory<byte>.Empty : new byte[] { value }, bitCount);
+        new BitArchiveReader(bitCount == 0 ? ReadOnlyMemory<byte>.Empty : new[] { value }, bitCount);
 
     private static RawBunchHeader Header(
         uint channelIndex,

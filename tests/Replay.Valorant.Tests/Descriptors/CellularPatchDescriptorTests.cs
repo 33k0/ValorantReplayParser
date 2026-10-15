@@ -12,7 +12,7 @@ public sealed class CellularPatchDescriptorTests
 {
     private static readonly JsonSerializerOptions Options = new() { PropertyNameCaseInsensitive = true };
     private static RecordedGrid[] ReadGrids() => JsonSerializer.Deserialize<RecordedGrid[]>(File.ReadAllText(
-        System.IO.Path.Combine(TestContext.CurrentContext.TestDirectory, "Fixtures", "CellularPatch", "sage-node-grids.json")), Options)!;
+        Path.Combine(TestContext.CurrentContext.TestDirectory, "Fixtures", "CellularPatch", "sage-node-grids.json")), Options)!;
     public static IEnumerable<TestCaseData> RecordedGrids() => ReadGrids().Select(g =>
         new TestCaseData(g).SetName($"SageNodeGrid_Packet_{g.PacketId}"));
 

@@ -16,7 +16,6 @@ using Replay.Valorant.Descriptors;
 using Replay.Valorant.Flashes;
 using Replay.Valorant.Nearsights;
 using Replay.Valorant.Walls;
-using Replay.Valorant.Inventory;
 
 namespace Replay.Valorant;
 

@@ -1,9 +1,7 @@
-using NUnit.Framework;
 using Replay.Encoding.Archives;
 using Replay.Models.Descriptors;
 using Replay.Unreal.Parsing;
 using Replay.Valorant.Combat;
-using Replay.Valorant.Descriptors;
 using Bits = Replay.Valorant.Tests.Combat.DamageLifeChangeEventTests.Bits;
 
 namespace Replay.Valorant.Tests.Combat;

@@ -1,7 +1,6 @@
 using Replay.Models.Descriptors;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
-using Replay.Valorant.Descriptors;
 
 namespace Replay.Valorant.GameState;
 

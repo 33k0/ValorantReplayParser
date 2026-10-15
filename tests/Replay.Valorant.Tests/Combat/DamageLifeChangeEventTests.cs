@@ -1,4 +1,3 @@
-using NUnit.Framework;
 using Replay.Valorant.Combat;
 using Replay.Valorant.Descriptors;
 

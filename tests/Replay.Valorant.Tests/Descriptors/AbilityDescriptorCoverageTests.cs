@@ -1,8 +1,5 @@
 using Replay.Models.Descriptors;
-using Replay.Models.Unreal;
 using Replay.Valorant.Descriptors;
-using Replay.Valorant.Descriptors.Agents;
-using Replay.Valorant.Descriptors.Agents.Mage.TidalWave;
 using Replay.Valorant.Descriptors.Agents.Sequoia;
 
 namespace Replay.Valorant.Tests.Descriptors;

@@ -1,5 +1,3 @@
-using Replay.Unreal.Parsing;
-
 namespace Replay.Valorant.Descriptors.Agents.Gumshoe;
 
 public sealed class CageTrapProjectileDescriptor : GumshoeActorDescriptor

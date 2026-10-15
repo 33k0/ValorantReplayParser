@@ -223,12 +223,15 @@ public sealed class CombatRoundReportsDecoder : IFieldDecoder
             uint? armor = null;
             ReadFields(item, (handle, field) =>
             {
-                if (handle == regionHandle) region = ReadByte(field);
-                if (handle == regionHandle + 1) hits = ReadInt32(field);
-                if (handle == regionHandle + 2) damage = ReadFloat(field);
-                if (handle == regionHandle + 3) wallPen = ReadBool(field);
-                if (handle == regionHandle + 4) kill = ReadBool(field);
-                if (handle == regionHandle + 5) armor = ReadNetGuid(field);
+                switch (handle - regionHandle)
+                {
+                    case 0: region = ReadByte(field); break;
+                    case 1: hits = ReadInt32(field); break;
+                    case 2: damage = ReadFloat(field); break;
+                    case 3: wallPen = ReadBool(field); break;
+                    case 4: kill = ReadBool(field); break;
+                    case 5: armor = ReadNetGuid(field); break;
+                }
             });
             return new RegionalDamageInteractionUpdate(
                 index, region, hits, damage, wallPen, kill, armor);

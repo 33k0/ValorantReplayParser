@@ -27,12 +27,12 @@ public static class BountyHunterDescriptors
 
     public static IReadOnlyList<ClassNetCacheDescriptor> CreateClassNetCacheDescriptors() =>
     [
-        Rpc("/Game/Characters/BountyHunter/S0/Ability_4/Ability_BountyHunter_4_WolfHoundBendable.Ability_BountyHunter_4_WolfHoundBendable_C", "MulticastOnItemMovedToPersistentData", 1),
-        Rpc("/Game/Characters/BountyHunter/S0/Ability_E/Ability_E_BountyHunter_ReconDivebomb.Ability_E_BountyHunter_ReconDivebomb_C", "MulticastOnItemMovedToPersistentData", 2),
+        Rpc("/Game/Characters/BountyHunter/S0/Ability_4/Ability_BountyHunter_4_WolfHoundBendable.Ability_BountyHunter_4_WolfHoundBendable_C", MulticastOnItemMovedToPersistentData, 1),
+        Rpc("/Game/Characters/BountyHunter/S0/Ability_E/Ability_E_BountyHunter_ReconDivebomb.Ability_E_BountyHunter_ReconDivebomb_C", MulticastOnItemMovedToPersistentData, 2),
         Rpc("/Game/Characters/BountyHunter/S0/Ability_E/Projectile_E_BountyHunter_Divebomb.Projectile_E_BountyHunter_Divebomb_C", "HideProjectileMesh", 0),
-        Rpc("/Game/Characters/BountyHunter/S0/Ability_Q/Ability_Q_BountyHunter_TetherDivebomb.Ability_Q_BountyHunter_TetherDivebomb_C", "MulticastOnItemMovedToPersistentData", 2),
+        Rpc("/Game/Characters/BountyHunter/S0/Ability_Q/Ability_Q_BountyHunter_TetherDivebomb.Ability_Q_BountyHunter_TetherDivebomb_C", MulticastOnItemMovedToPersistentData, 2),
         Rpc("/Game/Characters/BountyHunter/S0/Ability_Q/Projectile_Q_BountyHunter_TetherGrenade_SphereExpansion.Projectile_Q_BountyHunter_TetherGrenade_SphereExpansion_C", "MulticastStopProjectile", 3),
-        Rpc("/Game/Characters/BountyHunter/S0/Ability_X/Ability_BountyHunter_X_WaveForm.Ability_BountyHunter_X_WaveForm_C", "MulticastOnItemMovedToPersistentData", 0),
-        Rpc("/Game/Characters/BountyHunter/S0/Passive/Ability_BountyHunter_Passive.Ability_BountyHunter_Passive_C", "MulticastOnItemMovedToPersistentData", 0),
+        Rpc("/Game/Characters/BountyHunter/S0/Ability_X/Ability_BountyHunter_X_WaveForm.Ability_BountyHunter_X_WaveForm_C", MulticastOnItemMovedToPersistentData, 0),
+        Rpc("/Game/Characters/BountyHunter/S0/Passive/Ability_BountyHunter_Passive.Ability_BountyHunter_Passive_C", MulticastOnItemMovedToPersistentData, 0),
     ];
 }

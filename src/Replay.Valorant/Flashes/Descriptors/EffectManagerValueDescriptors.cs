@@ -139,4 +139,8 @@ internal static class EffectManagerValueMapper
     public static EffectManagerObjectValue[] Map(ActiveEffectObjectValue[]? values) =>
         values?.OfType<ActiveEffectObjectValue>()
             .Select(value => new EffectManagerObjectValue(value.Name, value.Value)).ToArray() ?? [];
+
+    public static EffectManagerObjectValue[] Map(EffectManagerUpdateObjectValue[]? values) =>
+        values?.OfType<EffectManagerUpdateObjectValue>()
+            .Select(value => new EffectManagerObjectValue(value.Name, value.Value)).ToArray() ?? [];
 }

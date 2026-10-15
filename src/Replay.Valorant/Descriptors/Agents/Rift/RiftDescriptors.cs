@@ -36,10 +36,10 @@ public static class RiftDescriptors
     public static IReadOnlyList<ClassNetCacheDescriptor> CreateClassNetCacheDescriptors() =>
     [
         SmokeClassNetCacheDescriptors.CreateMovedToPersistentData(RiftSmokePaths.Ability, 0),
-        Rpc("/Game/Characters/Rift/S0/Ability_4/BlackHole/Ability_Rift_4_BlackHole.Ability_Rift_4_BlackHole_C", "MulticastOnItemMovedToPersistentData", 0),
-        Rpc("/Game/Characters/Rift/S0/Ability_Passive/Ability_Rift_Passive_RiftCharges.Ability_Rift_Passive_RiftCharges_C", "MulticastOnItemMovedToPersistentData", 0),
-        Rpc("/Game/Characters/Rift/S0/Ability_Q/Ability_Rift_Q_FlashBurst.Ability_Rift_Q_FlashBurst_C", "MulticastOnItemMovedToPersistentData", 0),
-        Rpc("/Game/Characters/Rift/S0/Ability_X/Ability_Rift_X_WorldTargetingStart.Ability_Rift_X_WorldTargetingStart_C", "MulticastOnItemMovedToPersistentData", 0),
+        Rpc("/Game/Characters/Rift/S0/Ability_4/BlackHole/Ability_Rift_4_BlackHole.Ability_Rift_4_BlackHole_C", MulticastOnItemMovedToPersistentData, 0),
+        Rpc("/Game/Characters/Rift/S0/Ability_Passive/Ability_Rift_Passive_RiftCharges.Ability_Rift_Passive_RiftCharges_C", MulticastOnItemMovedToPersistentData, 0),
+        Rpc("/Game/Characters/Rift/S0/Ability_Q/Ability_Rift_Q_FlashBurst.Ability_Rift_Q_FlashBurst_C", MulticastOnItemMovedToPersistentData, 0),
+        Rpc("/Game/Characters/Rift/S0/Ability_X/Ability_Rift_X_WorldTargetingStart.Ability_Rift_X_WorldTargetingStart_C", MulticastOnItemMovedToPersistentData, 0),
         Rpc("/Game/Characters/Rift/S0/Ability_X/GameObject_Rift_X_Markers.GameObject_Rift_X_Markers_C", "MulticastDeactivateRift", 0),
     ];
 }

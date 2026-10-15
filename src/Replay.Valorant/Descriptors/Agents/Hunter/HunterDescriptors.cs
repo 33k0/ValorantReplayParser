@@ -30,10 +30,10 @@ public static class HunterDescriptors
 
     public static IReadOnlyList<ClassNetCacheDescriptor> CreateClassNetCacheDescriptors() =>
     [
-        Rpc("/Game/Characters/Hunter/S0/Ability_4/Ability_Hunter_4_BoltExplosive.Ability_Hunter_4_BoltExplosive_C", "MulticastOnItemMovedToPersistentData", 0),
+        Rpc("/Game/Characters/Hunter/S0/Ability_4/Ability_Hunter_4_BoltExplosive.Ability_Hunter_4_BoltExplosive_C", MulticastOnItemMovedToPersistentData, 0),
         Rpc("/Game/Characters/Hunter/S0/Ability_4/Projectile_Hunter_4_ExplosiveBolt.Projectile_Hunter_4_ExplosiveBolt_C", "MulticastStopProjectile", 3),
-        Rpc("/Game/Characters/Hunter/S0/Ability_E/Drone/Ability_Hunter_E_DeployDrone.Ability_Hunter_E_DeployDrone_C", "MulticastOnItemMovedToPersistentData", 0),
-        Rpc("/Game/Characters/Hunter/S0/Ability_Q/Ability_Hunter_Q_RevealBolt_Signature.Ability_Hunter_Q_RevealBolt_Signature_C", "MulticastOnItemMovedToPersistentData", 0),
-        Rpc("/Game/Characters/Hunter/S0/Ability_X/Ability_Hunter_X_LaserMulti.Ability_Hunter_X_LaserMulti_C", "MulticastOnItemMovedToPersistentData", 0),
+        Rpc("/Game/Characters/Hunter/S0/Ability_E/Drone/Ability_Hunter_E_DeployDrone.Ability_Hunter_E_DeployDrone_C", MulticastOnItemMovedToPersistentData, 0),
+        Rpc("/Game/Characters/Hunter/S0/Ability_Q/Ability_Hunter_Q_RevealBolt_Signature.Ability_Hunter_Q_RevealBolt_Signature_C", MulticastOnItemMovedToPersistentData, 0),
+        Rpc("/Game/Characters/Hunter/S0/Ability_X/Ability_Hunter_X_LaserMulti.Ability_Hunter_X_LaserMulti_C", MulticastOnItemMovedToPersistentData, 0),
     ];
 }

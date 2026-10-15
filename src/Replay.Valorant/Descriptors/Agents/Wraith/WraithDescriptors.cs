@@ -26,10 +26,10 @@ public static class WraithDescriptors
     public static IReadOnlyList<ClassNetCacheDescriptor> CreateClassNetCacheDescriptors() =>
     [
         NearsightProjectileClassNetCacheDescriptors.CreateStopProjectile(NearsightPaths.OmenProjectile, 3),
-        Rpc("/Game/Characters/Wraith/S0/Ability_4/Ability_Wraith_4_Smoke.Ability_Wraith_4_Smoke_C", "MulticastOnItemMovedToPersistentData", 0),
+        Rpc("/Game/Characters/Wraith/S0/Ability_4/Ability_Wraith_4_Smoke.Ability_Wraith_4_Smoke_C", MulticastOnItemMovedToPersistentData, 0),
         Rpc("/Game/Characters/Wraith/S0/Ability_4/Projectile_Wraith_4_Smoke.Projectile_Wraith_4_Smoke_C", "MulticastStopProjectile", 4),
-        Rpc("/Game/Characters/Wraith/S0/Ability_E/Ability_Wraith_E_ShortTeleport.Ability_Wraith_E_ShortTeleport_C", "MulticastOnItemMovedToPersistentData", 0),
-        Rpc("/Game/Characters/Wraith/S0/Ability_Q/Ability_Wraith_Q_NearsightMissile.Ability_Wraith_Q_NearsightMissile_C", "MulticastOnItemMovedToPersistentData", 0),
-        Rpc("/Game/Characters/Wraith/S0/Ability_X/Ability_Wraith_X_GlobalTeleport.Ability_Wraith_X_GlobalTeleport_C", "MulticastOnItemMovedToPersistentData", 1),
+        Rpc("/Game/Characters/Wraith/S0/Ability_E/Ability_Wraith_E_ShortTeleport.Ability_Wraith_E_ShortTeleport_C", MulticastOnItemMovedToPersistentData, 0),
+        Rpc("/Game/Characters/Wraith/S0/Ability_Q/Ability_Wraith_Q_NearsightMissile.Ability_Wraith_Q_NearsightMissile_C", MulticastOnItemMovedToPersistentData, 0),
+        Rpc("/Game/Characters/Wraith/S0/Ability_X/Ability_Wraith_X_GlobalTeleport.Ability_Wraith_X_GlobalTeleport_C", MulticastOnItemMovedToPersistentData, 1),
     ];
 }

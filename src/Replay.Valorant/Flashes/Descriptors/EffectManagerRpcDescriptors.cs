@@ -170,8 +170,8 @@ public sealed class EffectManagerUpdateContinuousParameters
     public IReadOnlyList<EffectManagerFloatValue> FloatValues =>
         EffectManagerValueMapper.Map(UpdateFloatValues);
 
-    public IReadOnlyList<EffectManagerObjectValue> ObjectValues => UpdateObjectValues?
-        .OfType<EffectManagerUpdateObjectValue>().Select(v => new EffectManagerObjectValue(v.Name, v.Value)).ToArray() ?? [];
+    public IReadOnlyList<EffectManagerObjectValue> ObjectValues =>
+        EffectManagerValueMapper.Map(UpdateObjectValues);
 
     protected override void Configure()
     {

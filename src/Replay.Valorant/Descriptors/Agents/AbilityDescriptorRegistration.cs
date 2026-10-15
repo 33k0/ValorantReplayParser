@@ -7,6 +7,8 @@ namespace Replay.Valorant.Descriptors.Agents;
 /// <summary>Shared wire registration helpers; ability paths live in each agent's catalog.</summary>
 internal static class AbilityDescriptorRegistration
 {
+    public const string MulticastOnItemMovedToPersistentData = "MulticastOnItemMovedToPersistentData";
+
     private static readonly string[] EquipmentFields =
     [
         "AttachParent", "RelativeScale3D", "AttachComponent", "Owner", "Instigator",

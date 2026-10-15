@@ -27,9 +27,9 @@ public static class GuideDescriptors
     public static IReadOnlyList<ClassNetCacheDescriptor> CreateClassNetCacheDescriptors() =>
     [
         new SkyeFlashSourceClassNetCacheDescriptor(),
-        Rpc("/Game/Characters/Guide/S0/Ability_4/Ability_Guide_4_Heal.Ability_Guide_4_Heal_C", "MulticastOnItemMovedToPersistentData", 0),
-        Rpc("/Game/Characters/Guide/S0/Ability_E/Ability_Guide_E_HawkFlash.Ability_Guide_E_HawkFlash_C", "MulticastOnItemMovedToPersistentData", 0),
-        Rpc("/Game/Characters/Guide/S0/Ability_Q/Ability_Guide_Q_PossessableScout.Ability_Guide_Q_PossessableScout_C", "MulticastOnItemMovedToPersistentData", 1),
-        Rpc("/Game/Characters/Guide/S0/Ability_X/Ability_Guide_X_Pack.Ability_Guide_X_Pack_C", "MulticastOnItemMovedToPersistentData", 1),
+        Rpc("/Game/Characters/Guide/S0/Ability_4/Ability_Guide_4_Heal.Ability_Guide_4_Heal_C", MulticastOnItemMovedToPersistentData, 0),
+        Rpc("/Game/Characters/Guide/S0/Ability_E/Ability_Guide_E_HawkFlash.Ability_Guide_E_HawkFlash_C", MulticastOnItemMovedToPersistentData, 0),
+        Rpc("/Game/Characters/Guide/S0/Ability_Q/Ability_Guide_Q_PossessableScout.Ability_Guide_Q_PossessableScout_C", MulticastOnItemMovedToPersistentData, 1),
+        Rpc("/Game/Characters/Guide/S0/Ability_X/Ability_Guide_X_Pack.Ability_Guide_X_Pack_C", MulticastOnItemMovedToPersistentData, 1),
     ];
 }

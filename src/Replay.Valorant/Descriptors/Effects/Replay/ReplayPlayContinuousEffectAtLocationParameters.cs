@@ -79,7 +79,8 @@ public sealed class ReplayPlayContinuousEffectAtLocationParameters
             GetObject("FiringState.FiringState"),
             GetAttackVectors(),
             GetObject("FXC.Equippable"),
-            Equippable: null);
+            Equippable: null,
+            EffectContainer: EffectContainer);
     }
 
     private float? GetFloat(string tagName)

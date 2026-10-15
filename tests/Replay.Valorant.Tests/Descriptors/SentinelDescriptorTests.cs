@@ -1,5 +1,6 @@
 using Replay.Encoding.Archives;
 using Replay.Models.Descriptors;
+using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 using Replay.Valorant.Descriptors;
 using Replay.Valorant.Descriptors.Agents;
@@ -71,7 +72,7 @@ public sealed class SentinelDescriptorTests
     [Test]
     public void NamedFlagsAndObjectReferencesPreserveMissingAndFalse()
     {
-        var actor = new AbilityActorDescriptor("/Game/Test", new HashSet<string> { "IsBurrowed", "Target" });
+        var actor = new AbilityActorDescriptor("/Game/Test", new HashSet<string> { "IsBurrowed", "Target" }, ERotatorQuantization.ByteComponents);
         Assert.That(actor.IsBurrowed, Is.Null);
         Assert.That(actor.Target, Is.Null);
         Assert.That(actor.Fields.Any(f => f.PropertyName == "Owner"), Is.False);

@@ -11,17 +11,17 @@ public sealed class MulticastEnterPlayspaceParameters : ExportGroupDescriptor<Mu
     public override ExportGroupKind Kind => ExportGroupKind.ClassNetCache;
     public override FieldStreamGrammar Grammar => FieldStreamGrammar.FunctionParameters;
 
-    public ValorantRawPayload? PlayspaceComponent { get; set; } // TODO: Implement this object-reference encoding.
-    public ValorantRawPayload? NewPlayspace { get; set; } // TODO: Implement this object-reference encoding.
+    public uint? PlayspaceComponent { get; set; }
+    public uint? NewPlayspace { get; set; }
     public bool LeaveCurrentPlayspaces { get; set; }
     public bool ExecuteOnOwner { get; set; }
 
     protected override void Configure()
     {
         AddProperty(x => x.PlayspaceComponent, ExportCategory.GameState)
-            .Decode(ValorantPayloadDecoders.RawPayload("PlayspaceComponent"));
+            .ObjectNetGuid();
         AddProperty(x => x.NewPlayspace, ExportCategory.GameState)
-            .Decode(ValorantPayloadDecoders.RawPayload("NewPlayspace"));
+            .ObjectNetGuid();
         AddProperty("bLeaveCurrentPlayspaces", x => x.LeaveCurrentPlayspaces, ExportCategory.GameState).Bool();
         AddProperty("bExecuteOnOwner", x => x.ExecuteOnOwner, ExportCategory.GameState).Bool();
     }

@@ -15,6 +15,7 @@ public sealed class ReplayPlayContinuousEffectAtLocationParameters
     public override ExportGroupKind Kind => ExportGroupKind.ClassNetCache;
     public override FieldStreamGrammar Grammar => FieldStreamGrammar.FunctionParameters;
 
+    public uint? EffectContainer { get; set; }
     public ulong? EffectId { get; set; }
     public string? SourceId { get; set; }
     public bool? IsLocalEffect { get; set; }
@@ -30,6 +31,7 @@ public sealed class ReplayPlayContinuousEffectAtLocationParameters
 
     protected override void Configure()
     {
+        AddPropertyHandle(0, x => x.EffectContainer).ObjectNetGuid();
         AddPropertyHandle(1, "EffectID", x => x.EffectId, ExportCategory.Effects).UInt64();
         AddPropertyHandle(2, "SourceID", x => x.SourceId, ExportCategory.Effects).FName();
         AddPropertyHandle(3, "bLocalEffect", x => x.IsLocalEffect, ExportCategory.Effects).Bool();

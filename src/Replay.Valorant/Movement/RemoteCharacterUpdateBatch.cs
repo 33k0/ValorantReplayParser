@@ -10,6 +10,7 @@ public sealed class RemoteCharacterUpdateBatch
     }
 
     public IReadOnlyList<RemoteCharacterUpdate> Updates => _updates;
+    public bool? IsReplayFastForwardImportant { get; internal set; }
 
     public int MoveCount
     {

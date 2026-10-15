@@ -6,11 +6,16 @@ using Replay.Valorant.Descriptors;
 
 namespace Replay.Valorant.GameState;
 
+public sealed record AresRoundResultsUpdate(int DeclaredCount, IReadOnlyList<AresRoundResult> Updates);
+
 public sealed record AresRoundResult(
     int RoundNumber,
     string? WinningTeam,
     AresTeamRole? WinningTeamRole,
-    AresRoundOutcome? RoundResult);
+    AresRoundOutcome? RoundResult)
+{
+    public ReplicatedObjectReference?[]? EliminatedTeams { get; init; }
+}
 
 public enum AresTeamRole : byte
 {
@@ -48,12 +53,12 @@ internal sealed class AresRoundResultsDecoder : IFieldDecoder
 
     public DecodedFieldValue Decode(ref FieldDecodeContext context, FBitArchive archive)
     {
-        if (archive.AtEnd) return DecodedFieldValue.FromObject(Array.Empty<AresRoundResult>());
+        if (archive.AtEnd) return DecodedFieldValue.FromObject(new AresRoundResultsUpdate(0, []));
 
         var roundCount = ReadRoundCount(archive);
         var results = ReadUpdates(archive, roundCount);
         archive.EnsureFullyConsumed(nameof(AresRoundResultsDecoder));
-        return DecodedFieldValue.FromObject(results);
+        return DecodedFieldValue.FromObject(new AresRoundResultsUpdate(roundCount, results));
     }
 
     private static int ReadRoundCount(FBitArchive archive)
@@ -91,17 +96,19 @@ internal sealed class AresRoundResultsDecoder : IFieldDecoder
         string? winningTeam = null;
         AresTeamRole? winningTeamRole = null;
         AresRoundOutcome? roundResult = null;
+        ReplicatedObjectReference?[]? eliminatedTeams = null;
 
         for (var fieldCount = 0; fieldCount <= MaxFieldsPerUpdate; fieldCount++)
         {
             var encodedHandle = archive.ReadIntPacked();
             if (encodedHandle == 0)
             {
-                return new AresRoundResult(roundNumber, winningTeam, winningTeamRole, roundResult);
+                return new AresRoundResult(roundNumber, winningTeam, winningTeamRole, roundResult)
+                { EliminatedTeams = eliminatedTeams };
             }
 
             if (fieldCount == MaxFieldsPerUpdate) throw TooManyFields(archive);
-            ReadField(archive, encodedHandle - 1, ref winningTeam, ref winningTeamRole, ref roundResult);
+            ReadField(archive, encodedHandle - 1, ref winningTeam, ref winningTeamRole, ref roundResult, ref eliminatedTeams);
         }
 
         throw TooManyFields(archive);
@@ -112,9 +119,10 @@ internal sealed class AresRoundResultsDecoder : IFieldDecoder
         uint handle,
         ref string? winningTeam,
         ref AresTeamRole? winningTeamRole,
-        ref AresRoundOutcome? roundResult)
+        ref AresRoundOutcome? roundResult,
+        ref ReplicatedObjectReference?[]? eliminatedTeams)
     {
-        var field = ReadFieldPayload(archive);
+        using var field = ReadFieldPayload(archive);
         if (handle == _handles.WinningTeam)
         {
             winningTeam = field.ReadFName();
@@ -129,7 +137,11 @@ internal sealed class AresRoundResultsDecoder : IFieldDecoder
         }
         else if (handle == _handles.EliminatedTeams)
         {
-            field.SkipRemaining();
+            var decoder = RepLayoutArrayDecoders.DynamicArray(
+                new Replay.Models.Replay.VersionedDefinition<ReplicatedObjectReference>(
+                    new(_handles.EliminatedTeams + 1, "EliminatedTeams")));
+            var context = new FieldDecodeContext();
+            eliminatedTeams = (ReplicatedObjectReference?[])decoder.Decode(ref context, field).ObjectValue!;
         }
         else
         {
@@ -234,6 +246,7 @@ internal readonly record struct AresRoundResultHandles(
     uint RoundResult,
     uint EliminatedTeams)
 {
+    public static AresRoundResultHandles Release1211 { get; } = new("12.11", 96, 97, 98, 99);
     public static AresRoundResultHandles Release1301 { get; } = new("13.01", 93, 94, 95, 96);
     public static AresRoundResultHandles Release1305 { get; } = new("13.05", 82, 83, 84, 85);
 }

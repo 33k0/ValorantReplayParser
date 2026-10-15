@@ -8,6 +8,11 @@ namespace Replay.Valorant.Combat;
 /// <summary>A sparse section-life result inside the damage RPC's RepLayout dynamic array.</summary>
 public sealed class DamageLifeChangeEvent : ExportGroupDescriptor<DamageLifeChangeEvent>
 {
+    private readonly uint _offset;
+    public DamageLifeChangeEvent() { }
+    public DamageLifeChangeEvent(uint offset) => _offset = offset;
+    public override object CreatePayloadInstance() => new DamageLifeChangeEvent(_offset);
+
     public override string Path => "/Script/ShooterGame.LifeChangeEvent";
     public override ExportCategory Categories => ExportCategory.Gunplay;
     public uint ChangedComponent { get; set; }
@@ -17,14 +22,14 @@ public sealed class DamageLifeChangeEvent : ExportGroupDescriptor<DamageLifeChan
 
     protected override void Configure()
     {
-        AddPropertyHandle(10, x => x.ChangedComponent).ObjectNetGuid();
-        AddPropertyHandle(11, x => x.LifeResult).Float();
-        AddPropertyHandle(12, x => x.DeltaLife).Float();
-        AddPropertyHandle(13, "bAliveAfterChange", x => x.AliveAfterChange).Bool();
+        AddPropertyHandle(10 + _offset, x => x.ChangedComponent).ObjectNetGuid();
+        AddPropertyHandle(11 + _offset, x => x.LifeResult).Float();
+        AddPropertyHandle(12 + _offset, x => x.DeltaLife).Float();
+        AddPropertyHandle(13 + _offset, "bAliveAfterChange", x => x.AliveAfterChange).Bool();
     }
 }
 
-/// <summary>Retains the existing raw damage field contract while exposing bounded typed section results.</summary>
+/// <summary>Decodes separately captured life-change payloads into bounded typed section results.</summary>
 public static class DamageLifeChangeEvents
 {
     private static readonly IFieldDecoder Decoder = RepLayoutArrayDecoders.DynamicArray<DamageLifeChangeEvent>();

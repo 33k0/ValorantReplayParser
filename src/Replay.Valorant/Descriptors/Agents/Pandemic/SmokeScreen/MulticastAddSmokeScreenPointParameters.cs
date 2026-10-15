@@ -11,14 +11,16 @@ public sealed class MulticastAddSmokeScreenPointParameters : ExportGroupDescript
     public override ExportGroupKind Kind => ExportGroupKind.ClassNetCache;
     public override FieldStreamGrammar Grammar => FieldStreamGrammar.FunctionParameters;
 
+    public FQuat? Rotation { get; set; }
     public FVector Translation { get; set; }
     public FVector Scale3D { get; set; }
     public FVector ProjectileLocation { get; set; }
-    public float ValveDistance { get; set; }
+    public double ValveDistance { get; set; }
     public uint CreatingProjectile { get; set; }
 
     protected override void Configure()
     {
+        AddPropertyHandle(0, "249", x => x.Rotation).NormalizedQuaternion();
         AddProperty(x => x.Translation, ExportCategory.Ability).FVector();
         AddProperty(x => x.Scale3D, ExportCategory.Ability).FVector();
         AddProperty(x => x.ProjectileLocation, ExportCategory.Ability).FVector();

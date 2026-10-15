@@ -26,7 +26,9 @@ internal sealed class RemoteCharacterUpdatesRpcDecoder : IRpcDecoder
             return DecodedPayloadResult.Empty;
         }
 
-        DecodedPayloadResult? result = null;
+        RemoteCharacterUpdateBatch? batch = null;
+        bool? fastForwardImportant = null;
+        var decodedFieldCount = 0;
         while (archive.BitPosition < endBit)
         {
             var encodedHandle = ReadIntPacked(archive, endBit, nameof(RemoteCharacterUpdatesRpcDecoder));
@@ -39,32 +41,52 @@ internal sealed class RemoteCharacterUpdatesRpcDecoder : IRpcDecoder
             var payloadBits = ReadIntPacked(archive, endBit, nameof(RemoteCharacterUpdatesRpcDecoder));
             var payloadEndBit = CheckedPayloadEnd(archive, endBit, payloadBits, nameof(RemoteCharacterUpdatesRpcDecoder));
 
+            if (handle == 0)
+            {
+                using var flag = archive.ReadSubArchive(checked((int)payloadBits));
+                fastForwardImportant = flag.ReadBit();
+                flag.EnsureFullyConsumed("bIsReplayFastForwardImportant");
+                decodedFieldCount++;
+                continue;
+            }
+
             if (handle != RemoteCharacterUpdatesHandle)
             {
                 archive.SeekBits(payloadEndBit);
                 continue;
             }
 
-            var batch = ReadRemoteCharacterUpdates(archive, payloadEndBit);
+            batch = ReadRemoteCharacterUpdates(archive, payloadEndBit);
             archive.SeekBits(payloadEndBit);
-            EmitMovementEvents(ref context, batch);
-
-            var diagnostics = context.CaptureDiagnosticFields
-                ? new[]
-                {
-                    new DecodedReplayField(
-                        handle,
-                        "RemoteCharacterUpdates",
-                        "RemoteCharacterUpdates",
-                        ExportCategory.Movement,
-                        DecodedFieldValue.FromObject(batch)),
-                }
-                : [];
-
-            result = new DecodedPayloadResult(batch, DecodedFieldCount: 1, diagnostics);
+            decodedFieldCount++;
         }
 
-        return result ?? DecodedPayloadResult.Empty;
+        if (batch is null && fastForwardImportant is null) return DecodedPayloadResult.Empty;
+        var hasUpdates = batch is not null;
+        batch ??= new RemoteCharacterUpdateBatch(0);
+        batch.IsReplayFastForwardImportant = fastForwardImportant;
+        EmitMovementEvents(ref context, batch);
+        var diagnostics = CreateDiagnosticFields(context.CaptureDiagnosticFields, fastForwardImportant, hasUpdates, batch);
+        return new DecodedPayloadResult(batch, decodedFieldCount, diagnostics);
+    }
+
+    private static IReadOnlyList<DecodedReplayField> CreateDiagnosticFields(
+        bool captureDiagnosticFields,
+        bool? fastForwardImportant,
+        bool hasUpdates,
+        RemoteCharacterUpdateBatch batch)
+    {
+        List<DecodedReplayField>? diagnostics = captureDiagnosticFields ? new(2) : null;
+        if (diagnostics is not null)
+        {
+            if (fastForwardImportant is { } important)
+                diagnostics.Add(new DecodedReplayField(0, "IsReplayFastForwardImportant", "bIsReplayFastForwardImportant",
+                    ExportCategory.Movement, DecodedFieldValue.FromBool(important)));
+            if (hasUpdates)
+                diagnostics.Add(new DecodedReplayField(1, "RemoteCharacterUpdates", "RemoteCharacterUpdates",
+                    ExportCategory.Movement, DecodedFieldValue.FromObject(batch)));
+        }
+        return diagnostics is null ? Array.Empty<DecodedReplayField>() : diagnostics;
     }
 
     private static RemoteCharacterUpdateBatch ReadRemoteCharacterUpdates(FBitArchive archive, long endBit)

@@ -1,22 +1,32 @@
 using Replay.Encoding.Archives;
 using Replay.Models.Descriptors;
 using Replay.Models.Diagnostics;
+using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 using Replay.Valorant.Descriptors;
 
 namespace Replay.Valorant.GameState;
 
+/// <summary>A RepLayout array length and its sparse element updates; omitted fields remain null.</summary>
+public sealed record CombatReportArrayUpdate<T>(int DeclaredCount, IReadOnlyList<T> Updates);
+
 public sealed record CombatRoundReportUpdate(
     int Index,
     int? RoundNumber,
-    IReadOnlyList<CharacterCombatReportUpdate> Reports);
+    CombatReportArrayUpdate<CharacterCombatReportUpdate>? Reports);
 
 public sealed record CharacterCombatReportUpdate(
     int Index,
     int? RoundNumber,
-    IReadOnlyList<ParticipantInteractionUpdate> Interactions,
+    CombatReportArrayUpdate<ParticipantInteractionUpdate>? Interactions,
     uint? ResurrectorPlayerState,
-    bool? Died);
+    bool? Died)
+{
+    public CombatTimestamp? LastInteractionTime { get; init; }
+    public CombatTimestamp? RespawnTime { get; init; }
+    public FVector? DeathLocation { get; init; }
+    public CombatTimestamp? DeathTime { get; init; }
+}
 
 public sealed record ParticipantInteractionUpdate(
     int Index,
@@ -32,14 +42,21 @@ public sealed record ParticipantInteractionUpdate(
     uint? KillerPlayerState,
     bool? WasKiller,
     int? CombatReportIndex,
-    IReadOnlyList<CombatInteractionUpdate> DealtInteractions,
-    IReadOnlyList<CombatInteractionUpdate> ReceivedInteractions,
-    IReadOnlyList<uint> DestroyedArmor);
+    CombatReportArrayUpdate<CombatInteractionUpdate>? DealtInteractions,
+    CombatReportArrayUpdate<CombatInteractionUpdate>? ReceivedInteractions,
+    IReadOnlyList<uint> DestroyedArmor)
+{
+    public CombatTimestamp? LastInteractionTime { get; init; }
+}
 
 public sealed record CombatInteractionUpdate(
     int Index,
     uint? DamageType,
-    IReadOnlyList<RegionalDamageInteractionUpdate> Regions);
+    CombatReportArrayUpdate<RegionalDamageInteractionUpdate>? Regions)
+{
+    public CombatTimestamp? StartTime { get; init; }
+    public CombatTimestamp? EndTime { get; init; }
+}
 
 public sealed record RegionalDamageInteractionUpdate(
     int Index,
@@ -88,8 +105,26 @@ internal sealed class CompatibleCombatRoundReportsDecoder : IFieldDecoder
     }
 }
 
+public sealed record CombatTimestamp(uint? HudConfig, float? StateRemainingTime, float? GameTime, byte? GamePhase);
+
 public sealed class CombatRoundReportsDecoder : IFieldDecoder
 {
+    internal static IFieldDecoder Reports { get; } = new NestedDecoder(a => ReadArray(a, ReadCharacterReport));
+    internal static IFieldDecoder Interactions { get; } = new NestedDecoder(a => ReadArray(a, ReadParticipant));
+    internal static IFieldDecoder DealtInteractions { get; } = new NestedDecoder(a => ReadCombatInteractions(a, 44, 45));
+    internal static IFieldDecoder ReceivedInteractions { get; } = new NestedDecoder(a => ReadCombatInteractions(a, 79, 80));
+    internal static IFieldDecoder RegionalInteractions { get; } = new NestedDecoder(a => ReadRegionalInteractions(a, 45));
+
+    private sealed class NestedDecoder(Func<FBitArchive, object> read) : IFieldDecoder
+    {
+        public DecodedFieldValue Decode(ref FieldDecodeContext context, FBitArchive archive)
+        {
+            var value = read(archive);
+            archive.EnsureFullyConsumed(nameof(CombatRoundReportsDecoder));
+            return DecodedFieldValue.FromObject(value);
+        }
+    }
+
     private const int MaxItems = 256;
     private const int MaxFields = 128;
     private const int MaxFieldPayloadBits = 256 * 1024;
@@ -104,7 +139,7 @@ public sealed class CombatRoundReportsDecoder : IFieldDecoder
     private static CombatRoundReportUpdate ReadRound(int index, FBitArchive archive)
     {
         int? roundNumber = null;
-        IReadOnlyList<CharacterCombatReportUpdate> reports = [];
+        CombatReportArrayUpdate<CharacterCombatReportUpdate>? reports = null;
         ReadFields(archive, (handle, field) =>
         {
             if (handle == 3) roundNumber = ReadInt32(field);
@@ -116,17 +151,29 @@ public sealed class CombatRoundReportsDecoder : IFieldDecoder
     private static CharacterCombatReportUpdate ReadCharacterReport(int index, FBitArchive archive)
     {
         int? roundNumber = null;
-        IReadOnlyList<ParticipantInteractionUpdate> interactions = [];
+        CombatReportArrayUpdate<ParticipantInteractionUpdate>? interactions = null;
         uint? resurrector = null;
         bool? died = null;
+        FVector? deathLocation = null;
+        var interactionTime = new TimestampState(6);
+        var respawnTime = new TimestampState(99);
+        var deathTime = new TimestampState(105);
         ReadFields(archive, (handle, field) =>
         {
             if (handle == 5) roundNumber = ReadInt32(field);
             if (handle == 10) interactions = ReadArray(field, ReadParticipant);
             if (handle == 98) resurrector = ReadNetGuid(field);
             if (handle == 103) died = ReadBool(field);
+            if (handle == 104) deathLocation = ReadVector(field);
+            interactionTime.Read(handle, field);
+            respawnTime.Read(handle, field);
+            deathTime.Read(handle, field);
         });
-        return new CharacterCombatReportUpdate(index, roundNumber, interactions, resurrector, died);
+        return new CharacterCombatReportUpdate(index, roundNumber, interactions, resurrector, died)
+        {
+            LastInteractionTime = interactionTime.Build(), RespawnTime = respawnTime.Build(),
+            DeathTime = deathTime.Build(), DeathLocation = deathLocation,
+        };
     }
 
     private static ParticipantInteractionUpdate ReadParticipant(int index, FBitArchive archive)
@@ -136,7 +183,7 @@ public sealed class CombatRoundReportsDecoder : IFieldDecoder
         return state.Build();
     }
 
-    private static IReadOnlyList<CombatInteractionUpdate> ReadCombatInteractions(
+    private static CombatReportArrayUpdate<CombatInteractionUpdate> ReadCombatInteractions(
         FBitArchive archive,
         int regionsHandle,
         int regionHandle)
@@ -144,19 +191,25 @@ public sealed class CombatRoundReportsDecoder : IFieldDecoder
         return ReadArray(archive, (index, item) =>
         {
             uint? damageType = null;
-            IReadOnlyList<RegionalDamageInteractionUpdate> regions = [];
+            CombatReportArrayUpdate<RegionalDamageInteractionUpdate>? regions = null;
+            var start = new TimestampState(regionsHandle - 17);
+            var end = new TimestampState(regionsHandle - 13);
             ReadFields(item, (handle, field) =>
             {
+                if (handle == regionsHandle - 9) damageType = ReadNetGuid(field);
+                start.Read(handle, field);
+                end.Read(handle, field);
                 if (handle == regionsHandle)
                 {
                     regions = ReadRegionalInteractions(field, regionHandle);
                 }
             });
-            return new CombatInteractionUpdate(index, damageType, regions);
+            return new CombatInteractionUpdate(index, damageType, regions)
+            { StartTime = start.Build(), EndTime = end.Build() };
         });
     }
 
-    private static IReadOnlyList<RegionalDamageInteractionUpdate> ReadRegionalInteractions(
+    private static CombatReportArrayUpdate<RegionalDamageInteractionUpdate> ReadRegionalInteractions(
         FBitArchive archive,
         int regionHandle)
     {
@@ -170,19 +223,22 @@ public sealed class CombatRoundReportsDecoder : IFieldDecoder
             uint? armor = null;
             ReadFields(item, (handle, field) =>
             {
-                if (handle == regionHandle) region = TryRead(field, ReadByte);
-                if (handle == regionHandle + 1) hits = TryRead(field, ReadInt32);
-                if (handle == regionHandle + 2) damage = TryRead(field, ReadFloat);
-                if (handle == regionHandle + 3) wallPen = TryRead(field, ReadBool);
-                if (handle == regionHandle + 4) kill = TryRead(field, ReadBool);
-                if (handle == regionHandle + 5) armor = TryRead(field, ReadNetGuid);
+                switch (handle - regionHandle)
+                {
+                    case 0: region = ReadByte(field); break;
+                    case 1: hits = ReadInt32(field); break;
+                    case 2: damage = ReadFloat(field); break;
+                    case 3: wallPen = ReadBool(field); break;
+                    case 4: kill = ReadBool(field); break;
+                    case 5: armor = ReadNetGuid(field); break;
+                }
             });
             return new RegionalDamageInteractionUpdate(
                 index, region, hits, damage, wallPen, kill, armor);
         });
     }
 
-    private static T[] ReadArray<T>(FBitArchive archive, Func<int, FBitArchive, T> readItem)
+    private static CombatReportArrayUpdate<T> ReadArray<T>(FBitArchive archive, Func<int, FBitArchive, T> readItem)
     {
         var declaredCount = ReadCount(archive);
         var updates = new List<T>();
@@ -190,7 +246,7 @@ public sealed class CombatRoundReportsDecoder : IFieldDecoder
         {
             updates.Add(readItem(index, archive));
         }
-        return updates.ToArray();
+        return new CombatReportArrayUpdate<T>(declaredCount, updates.ToArray());
     }
 
     private static void ReadFields(FBitArchive archive, Action<int, FBitArchive> readField)
@@ -201,7 +257,7 @@ public sealed class CombatRoundReportsDecoder : IFieldDecoder
             if (encodedHandle == 0) return;
             using var field = ReadFieldPayload(archive);
             readField(checked((int)encodedHandle - 1), field);
-            field.SkipRemaining();
+            field.EnsureFullyConsumed($"Combat report field {encodedHandle - 1}");
         }
         throw InvalidCount(archive, MaxFields, "Combat report contains too many fields.");
     }
@@ -241,25 +297,27 @@ public sealed class CombatRoundReportsDecoder : IFieldDecoder
     private static string ReadString(FBitArchive archive) => archive.ReadFString();
     private static string ReadName(FBitArchive archive) => archive.ReadFName();
 
-    private static T? TryRead<T>(FBitArchive archive, Func<FBitArchive, T> read)
-        where T : struct
+    private static FVector ReadVector(FBitArchive archive)
     {
-        using var checkpoint = archive.CreateCheckpoint();
-        try
+        var context = new FieldDecodeContext();
+        return PrimitiveDecoders.Vector.Decode(ref context, archive).VectorValue;
+    }
+
+    private sealed class TimestampState(int firstHandle)
+    {
+        private uint? _hud;
+        private float? _remaining;
+        private float? _time;
+        private byte? _phase;
+        public void Read(int handle, FBitArchive field)
         {
-            var value = read(archive);
-            if (!archive.AtEnd) return null;
-            checkpoint.Commit();
-            return value;
+            if (handle == firstHandle) _hud = ReadNetGuid(field);
+            if (handle == firstHandle + 1) _remaining = ReadFloat(field);
+            if (handle == firstHandle + 2) _time = ReadFloat(field);
+            if (handle == firstHandle + 3) _phase = ReadByte(field);
         }
-        catch (ArchiveReadException)
-        {
-            return null;
-        }
-        catch (OverflowException)
-        {
-            return null;
-        }
+        public CombatTimestamp? Build() => _hud.HasValue || _remaining.HasValue || _time.HasValue || _phase.HasValue
+            ? new(_hud, _remaining, _time, _phase) : null;
     }
 
     private static ArchiveReadException InvalidCount(
@@ -276,8 +334,8 @@ public sealed class CombatRoundReportsDecoder : IFieldDecoder
 
     private sealed class ParticipantState(int index)
     {
-        private IReadOnlyList<CombatInteractionUpdate> _dealtInteractions = [];
-        private IReadOnlyList<CombatInteractionUpdate> _receivedInteractions = [];
+        private CombatReportArrayUpdate<CombatInteractionUpdate>? _dealtInteractions;
+        private CombatReportArrayUpdate<CombatInteractionUpdate>? _receivedInteractions;
         private string? _subject;
         private string? _team;
         private uint? _characterIcon;
@@ -290,9 +348,11 @@ public sealed class CombatRoundReportsDecoder : IFieldDecoder
         private uint? _killerPlayerState;
         private bool? _wasKiller;
         private int? _combatReportIndex;
+        private readonly TimestampState _lastInteractionTime = new(14);
 
         public void Read(int handle, FBitArchive field)
         {
+            _lastInteractionTime.Read(handle, field);
             switch (handle)
             {
                 case 11: _subject = ReadString(field); break;
@@ -314,9 +374,9 @@ public sealed class CombatRoundReportsDecoder : IFieldDecoder
 
         public ParticipantInteractionUpdate Build()
         {
-            var armor = _dealtInteractions
-                .Concat(_receivedInteractions)
-                .SelectMany(interaction => interaction.Regions)
+            var armor = (_dealtInteractions?.Updates ?? [])
+                .Concat(_receivedInteractions?.Updates ?? [])
+                .SelectMany(interaction => interaction.Regions?.Updates ?? [])
                 .Where(region => region.DestroyedArmor.HasValue)
                 .Select(region => region.DestroyedArmor!.Value)
                 .ToArray();
@@ -336,7 +396,7 @@ public sealed class CombatRoundReportsDecoder : IFieldDecoder
                 _combatReportIndex,
                 _dealtInteractions,
                 _receivedInteractions,
-                armor);
+                armor) { LastInteractionTime = _lastInteractionTime.Build() };
         }
     }
 }

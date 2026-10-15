@@ -14,9 +14,20 @@ public sealed class BombObjectiveClassNetCacheDescriptor : ClassNetCacheDescript
         AddFunction<BombDefusedRpcParameters>("BombDefusedRPC", BombDefusedRpcParameters.ExportPath, ExportCategory.GameState);
         AddFunction<BombPickedUpRpcParameters>("BombPickedUpRPC", BombPickedUpRpcParameters.ExportPath, ExportCategory.GameState);
         AddFunction<BombDroppedRpcParameters>("BombDroppedRPC", BombDroppedRpcParameters.ExportPath, ExportCategory.GameState);
-        AddFunction("BombExplodedRPC", "/Game/GameModes/Components/Comp_BombEvents.Comp_BombEvents_C:BombExplodedRPC",
-            ExportCategory.GameState).Decode(ValorantPayloadDecoders.NoParametersRpc);
+        AddFunction<BombExplodedRpcParameters>("BombExplodedRPC", BombExplodedRpcParameters.ExportPath,
+            ExportCategory.GameState);
     }
+}
+
+public sealed class BombExplodedRpcParameters : ExportGroupDescriptor<BombExplodedRpcParameters>
+{
+    public const string ExportPath = "/Game/GameModes/Components/Comp_BombEvents.Comp_BombEvents_C:BombExplodedRPC";
+    public override string Path => ExportPath;
+    public override ExportCategory Categories => ExportCategory.GameState;
+    public override ExportGroupKind Kind => ExportGroupKind.ClassNetCache;
+    public override FieldStreamGrammar Grammar => FieldStreamGrammar.FunctionParameters;
+    public byte? PlantSite { get; set; }
+    protected override void Configure() => AddPropertyHandle(0, x => x.PlantSite).EnumRemainingBits();
 }
 
 public sealed class BombPlantedRpcParameters : ExportGroupDescriptor<BombPlantedRpcParameters>

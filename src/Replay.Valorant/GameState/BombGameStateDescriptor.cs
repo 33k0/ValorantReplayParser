@@ -25,7 +25,7 @@ public sealed class BombGameStateDescriptor : ExportGroupDescriptor<BombGameStat
     public string? MatchID { get; set; }
     public object? RoundResults { get; set; }
     public byte Phase { get; set; }
-    public ValorantRawPayload? RoundParticipantsInfos { get; set; }
+    public RoundParticipantsInfo?[]? RoundParticipantsInfos { get; set; }
     public int RoundNumber { get; set; }
     public byte BombState { get; set; }
 
@@ -47,11 +47,20 @@ public sealed class BombGameStateDescriptor : ExportGroupDescriptor<BombGameStat
             new VersionedDefinition<IFieldDecoderDescriptor>(
                     new CompatibleAresRoundResultsDecoder(AresRoundResultHandles.Release1301))
                 .From(
-                    new ReplayReleaseVersion(13, 5),
+                    new ReplayReleaseVersion(12, 11),
+                    new CompatibleAresRoundResultsDecoder(AresRoundResultHandles.Release1211))
+                .From(
+                    new ReplayReleaseVersion(13, 0),
+                    new CompatibleAresRoundResultsDecoder(AresRoundResultHandles.Release1301))
+                .From(
+                    new ReplayReleaseVersion(13, 4),
                     new CompatibleAresRoundResultsDecoder(AresRoundResultHandles.Release1305)));
         AddProperty(x => x.Phase, ExportCategory.GameState).EnumByte();
         AddProperty(x => x.RoundParticipantsInfos, ExportCategory.GameState)
-            .Decode(ValorantPayloadDecoders.RawPayload("TArray<FRoundParticipantsInfo>"));
+            .RepLayoutDynamicArray(new VersionedDefinition<RoundParticipantsInfo>(new(132))
+                .From(new ReplayReleaseVersion(13, 4), new(121))
+                .From(new ReplayReleaseVersion(13, 5), new(125))
+                .From(new ReplayReleaseVersion(13, 8), new(106)));
         AddProperty(x => x.RoundNumber, ExportCategory.GameState | ExportCategory.Economy).Int32();
         AddProperty(x => x.BombState, ExportCategory.GameState).SerializedInt(maxValue: 16);
     }

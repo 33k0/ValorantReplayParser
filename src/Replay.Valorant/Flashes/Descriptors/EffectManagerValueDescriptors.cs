@@ -80,6 +80,28 @@ public sealed class ActiveEffectFloatValue : ExportGroupDescriptor<ActiveEffectF
     }
 }
 
+public sealed class EffectManagerUpdateVectorValue : ExportGroupDescriptor<EffectManagerUpdateVectorValue>
+{
+    public FGameplayTag? Name { get; set; }
+    public FVector? Value { get; set; }
+    protected override void Configure()
+    {
+        AddPropertyHandle(10, "58", x => x.Name).FGameplayTag();
+        AddPropertyHandle(11, "59", x => x.Value).FVector();
+    }
+}
+
+public sealed class EffectManagerUpdateObjectValue : ExportGroupDescriptor<EffectManagerUpdateObjectValue>
+{
+    public FGameplayTag? Name { get; set; }
+    public uint? Value { get; set; }
+    protected override void Configure()
+    {
+        AddPropertyHandle(14, "58", x => x.Name).FGameplayTag();
+        AddPropertyHandle(15, "100", x => x.Value).ObjectNetGuid();
+    }
+}
+
 public sealed class ActiveEffectObjectValue : ExportGroupDescriptor<ActiveEffectObjectValue>
 {
     public FGameplayTag? Name { get; set; }
@@ -116,5 +138,9 @@ internal static class EffectManagerValueMapper
 
     public static EffectManagerObjectValue[] Map(ActiveEffectObjectValue[]? values) =>
         values?.OfType<ActiveEffectObjectValue>()
+            .Select(value => new EffectManagerObjectValue(value.Name, value.Value)).ToArray() ?? [];
+
+    public static EffectManagerObjectValue[] Map(EffectManagerUpdateObjectValue[]? values) =>
+        values?.OfType<EffectManagerUpdateObjectValue>()
             .Select(value => new EffectManagerObjectValue(value.Name, value.Value)).ToArray() ?? [];
 }

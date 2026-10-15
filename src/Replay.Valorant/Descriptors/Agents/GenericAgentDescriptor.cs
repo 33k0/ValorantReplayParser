@@ -32,7 +32,7 @@ public abstract class GenericAgentDescriptor : ExportGroupDescriptor<GenericAgen
         AddProperty(x => Instigator).ObjectNetGuid();
         AddProperty(x => PlayerState).ObjectNetGuid();
         AddProperty(x => Controller).ObjectNetGuid();
-        AddProperty(x => ReplayLastTransformUpdateTimeStamp).Ignore();
+        AddProperty(x => ReplayLastTransformUpdateTimeStamp).Float();
         AddProperty(x => ReplicatedGravityDirection).FVectorNetQuantizeNormal();
         AddProperty(x => ReplicatedMovementMode).Byte();
         AddProperty("bIsPlayerCharacter", x => IsPlayerCharacter).Bool();

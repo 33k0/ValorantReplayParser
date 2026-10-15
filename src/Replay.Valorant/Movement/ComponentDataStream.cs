@@ -9,7 +9,8 @@ public sealed class ComponentDataStream
     private const double FixedVectorScale = 1.0 / 65536.0;
     private const double OptionalByteScale = 1.0;
     private const double AngleScale = 360.0 / 65536.0;
-    private const int MaxMovementPaddingBits = 31;
+    private const int MaxMoveCount = 16;
+    private const int MaxPayloadBytes = 8192;
 
     public bool HasMovementSection { get; private set; }
     public bool HasValidMovementMagic { get; private set; }
@@ -17,6 +18,11 @@ public sealed class ComponentDataStream
     public int MoveCount { get; private set; }
     public bool HasLatestMove { get; private set; }
     public MovementMove LatestMove { get; private set; }
+    public int PayloadByteCount { get; private set; }
+    public byte UnusedBitCount { get; private set; }
+    public ushort InputEndBit { get; private set; }
+    public bool HasInputSection { get; private set; }
+    public bool HasPlayerDiscrepancySection { get; private set; }
 
     public static ComponentDataStream Decode(FBitArchive archive)
     {
@@ -37,57 +43,51 @@ public sealed class ComponentDataStream
 
     private void Parse(FBitArchive archive, long endBit)
     {
-        if (TryParseByteWrappedPayload(archive, endBit))
-        {
-            return;
-        }
+        using var encoded = archive.ReadSubArchive(checked((int)(endBit - archive.BitPosition)));
+        var byteCount = encoded.ReadInt32();
+        if (byteCount < 0 || byteCount > MaxPayloadBytes)
+            throw Invalid(encoded, byteCount, "Invalid native component byte count.");
+        PayloadByteCount = byteCount;
+        using var data = encoded.ReadSubArchive(byteCount * 8);
+        UnusedBitCount = encoded.ReadByte();
+        if (UnusedBitCount > 7 || (byteCount == 0 && UnusedBitCount != 0))
+            throw Invalid(encoded, UnusedBitCount, "Invalid component unused-bit count.");
+        encoded.EnsureFullyConsumed(nameof(ComponentDataStream));
+        if (byteCount == 0) return;
 
-        ParseComponentPayload(archive, endBit);
-    }
-
-    private bool TryParseByteWrappedPayload(FBitArchive archive, long endBit)
-    {
-        using var checkpoint = archive.CreateCheckpoint();
-
-        if (!TryReadUInt16(archive, endBit, out var byteCount) ||
-            byteCount == 0 ||
-            BitsRemaining(archive, endBit) < byteCount * 8L)
-        {
-            return false;
-        }
-
-        var payloadEndBit = archive.BitPosition + byteCount * 8L;
-        ParseComponentPayload(archive, payloadEndBit);
-        archive.SeekBits(payloadEndBit);
-        checkpoint.Commit();
-        return true;
-    }
-
-    private void ParseComponentPayload(FBitArchive archive, long componentEndBit)
-    {
-        if (!TryReadUInt16(archive, componentEndBit, out var movementBitCount))
-        {
-            return;
-        }
-
-        var remainingBits = BitsRemaining(archive, componentEndBit);
-        if (movementBitCount == 0 || movementBitCount > remainingBits)
-        {
-            HasMovementSection = true;
-            ParseMovementSection(archive, componentEndBit);
-            archive.SeekBits(componentEndBit);
-            return;
-        }
-
+        using var components = data.ReadSubArchive(byteCount * 8 - UnusedBitCount);
         HasMovementSection = true;
+        ParseMovementSection(components, components.BitLength);
+        if (MovementParseError is { } error) throw Invalid(components, 0, error);
 
-        var movementEndBit = archive.BitPosition + movementBitCount;
-        ParseMovementSection(archive, movementEndBit);
-        archive.SeekBits(movementEndBit);
-
-        if (archive.BitPosition >= componentEndBit) return;
-        archive.SeekBits(componentEndBit);
+        // 13.08 native FUN_146d9dea0 / FUN_147428850: movement, absolute input end bit,
+        // InputStateComponent (0xA3), then PlayerDiscrepancyDetectionComponent (0xA4).
+        // Recorded replay streams carry only the latter components' headers.
+        InputEndBit = components.ReadUInt16();
+        if (InputEndBit < components.BitPosition + 8 || InputEndBit > components.BitLength)
+            throw Invalid(components, InputEndBit, "Invalid component input boundary.");
+        using (var input = components.ReadSubArchive(checked((int)(InputEndBit - components.BitPosition))))
+        {
+            RequireMagic(input, 0xA3, "InputStateComponent");
+            HasInputSection = true;
+            input.EnsureFullyConsumed("replay InputStateComponent");
+        }
+        if (!components.AtEnd)
+        {
+            RequireMagic(components, 0xA4, "PlayerDiscrepancyDetectionComponent");
+            HasPlayerDiscrepancySection = true;
+        }
+        components.EnsureFullyConsumed("replay PlayerDiscrepancyDetectionComponent");
     }
+
+    private static void RequireMagic(FBitArchive archive, byte expected, string component)
+    {
+        var magic = archive.ReadByte();
+        if (magic != expected) throw Invalid(archive, magic, $"Invalid {component} magic 0x{magic:X2}.");
+    }
+
+    private static ArchiveReadException Invalid(FBitArchive archive, long requested, string message) =>
+        new(ArchiveErrorCode.InvalidData, nameof(ComponentDataStream), archive.Position, archive.Length, requested, message);
 
     private void ParseMovementSection(FBitArchive archive, long endBit)
     {
@@ -114,6 +114,11 @@ public sealed class ComponentDataStream
 
         while (marker != 0)
         {
+            if (MoveCount == MaxMoveCount)
+            {
+                MovementParseError = "Movement stream exceeds 16 records";
+                return;
+            }
             if (marker != expectedMarker)
             {
                 MovementParseError = $"Movement marker mismatch: expected {expectedMarker}, got {marker}";
@@ -131,11 +136,6 @@ public sealed class ComponentDataStream
             MoveCount++;
             LatestMove = move;
             HasLatestMove = true;
-
-            if (BitsRemaining(archive, endBit) <= MaxMovementPaddingBits)
-            {
-                return;
-            }
 
             expectedMarker = NextMarker(expectedMarker);
             if (!TryReadBits(archive, endBit, 3, out marker))
@@ -523,18 +523,6 @@ public sealed class ComponentDataStream
         if (TryReadBitsToUInt64(archive, endBit, 8, out var bits))
         {
             value = (byte)bits;
-            return true;
-        }
-
-        value = 0;
-        return false;
-    }
-
-    private static bool TryReadUInt16(FBitArchive archive, long endBit, out ushort value)
-    {
-        if (TryReadBitsToUInt64(archive, endBit, 16, out var bits))
-        {
-            value = (ushort)bits;
             return true;
         }
 

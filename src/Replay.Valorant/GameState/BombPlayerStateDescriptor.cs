@@ -11,7 +11,7 @@ public sealed class BombPlayerStateDescriptor : ExportGroupDescriptor<BombPlayer
     public override ExportGroupKind Kind => ExportGroupKind.Actor;
 
     public int PlayerId { get; set; }
-    public ValorantRawPayload? UniqueId { get; set; } // TODO: Implement FUniqueNetIdRepl.
+    public RiotUniqueNetId? UniqueId { get; set; }
     public int CompetitiveTier { get; set; }
     public string? Subject { get; set; }
     public uint SpectatedPlayer { get; set; }
@@ -26,7 +26,7 @@ public sealed class BombPlayerStateDescriptor : ExportGroupDescriptor<BombPlayer
     {
         AddProperty("PlayerId", x => x.PlayerId, ExportCategory.GameState).Int32();
         AddProperty("PlayerID", x => x.PlayerId, ExportCategory.GameState).Int32();
-        AddProperty(x => x.UniqueId, ExportCategory.GameState).Decode(ValorantPayloadDecoders.RawPayload("FUniqueNetIdRepl"));
+        AddProperty(x => x.UniqueId, ExportCategory.GameState).Decode(RiotUniqueNetIdDecoder.Instance);
         AddProperty(x => x.CompetitiveTier, ExportCategory.GameState).Int32();
         AddProperty(x => x.Subject, ExportCategory.GameState | ExportCategory.Inventory | ExportCategory.Economy).FString();
         AddProperty(x => x.SpectatedPlayer, ExportCategory.GameState).ObjectNetGuid();

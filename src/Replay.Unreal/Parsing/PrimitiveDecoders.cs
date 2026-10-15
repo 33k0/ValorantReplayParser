@@ -27,6 +27,7 @@ public static class PrimitiveDecoders
     public static readonly IFieldDecoder VectorNetQuantizeNormal = new FixedNormalVectorDecoder();
     public static readonly IFieldDecoder RotatorShort = VectorDecoders.RotationShort;
     public static readonly IFieldDecoder Transform = VectorDecoders.Transform;
+    public static readonly IFieldDecoder NormalizedQuaternion = new NormalizedQuaternionDecoder();
     public static readonly IFieldDecoder EnumRemainingBits = new EnumRemainingBitsDecoder();
     public static readonly IFieldDecoder GameplayTag = new GameplayTagDecoder();
     public static readonly IFieldDecoder RepMovement = new ReplicatedMovementDecoder(
@@ -51,6 +52,21 @@ public static class PrimitiveDecoders
     {
         public DecodedFieldValue Decode(ref FieldDecodeContext context, FBitArchive archive) =>
             DecodedFieldValue.FromVector(ArchiveVectorReaders.ReadFloatVector(archive));
+    }
+
+    private sealed class NormalizedQuaternionDecoder : IFieldDecoder
+    {
+        public DecodedFieldValue Decode(ref FieldDecodeContext context, FBitArchive archive)
+        {
+            var x = archive.ReadDouble();
+            var y = archive.ReadDouble();
+            var z = archive.ReadDouble();
+            var squaredLength = x * x + y * y + z * z;
+            if (!double.IsFinite(squaredLength) || squaredLength > 1.000001)
+                throw new ArchiveReadException(ArchiveErrorCode.InvalidData, nameof(NormalizedQuaternionDecoder),
+                    archive.Position, archive.Length, 192, "Invalid normalized quaternion components.");
+            return DecodedFieldValue.FromObject(new FQuat(x, y, z, Math.Sqrt(Math.Max(0, 1 - squaredLength))));
+        }
     }
 
     private sealed class DoubleVectorDecoder : IFieldDecoder

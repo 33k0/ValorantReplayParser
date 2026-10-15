@@ -68,15 +68,12 @@ public sealed class ActorListTransitionContextDescriptor
     public override string Path => "/Script/ShooterGame.ActorListTransitionContext";
     public override ExportCategory Categories => ExportCategory.Ability;
 
-    public ValorantRawPayload? Actors { get; set; }
-    public ValorantRawPayload? SecondaryActors { get; set; }
+    public ReplicatedObjectReference?[]? Actors { get; set; }
 
     protected override void Configure()
     {
-        AddPropertyHandle(1, "Actors", x => x.Actors)
-            .Decode(ValorantPayloadDecoders.RawPayload("Actors"));
-        AddPropertyHandle(2, "Actors", x => x.SecondaryActors)
-            .Decode(ValorantPayloadDecoders.RawPayload("Actors"));
+        AddPropertyHandle(1, "Actors", x => x.Actors).RepLayoutDynamicArray(
+            new Replay.Models.Replay.VersionedDefinition<ReplicatedObjectReference>(new(2, "Actors")));
     }
 }
 
@@ -86,14 +83,16 @@ public sealed class TransformTransitionContextDescriptor
     public override string Path => "/Script/ShooterGame.TransformTransitionContext";
     public override ExportCategory Categories => ExportCategory.Ability;
 
-    public ValorantRawPayload? Rotation { get; set; }
+    public FQuat? Rotation { get; set; }
     public FVector? Translation { get; set; }
+    public FVector? Scale3D { get; set; }
 
     protected override void Configure()
     {
         AddPropertyHandle(1, "249", x => x.Rotation)
-            .Decode(ValorantPayloadDecoders.RawPayload("Rotation"));
+            .NormalizedQuaternion();
         AddPropertyHandle(2, x => x.Translation).FVector();
+        AddPropertyHandle(3, x => x.Scale3D).FVector();
     }
 }
 

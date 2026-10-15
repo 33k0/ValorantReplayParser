@@ -12,13 +12,13 @@ public sealed class EquippableStateMachineComponentDescriptor
     public override ExportGroupKind Kind => ExportGroupKind.Component;
 
     public uint CurrentState { get; set; }
-    public ValorantRawPayload? TransitionContext { get; set; }
+    public uint? TransitionContext { get; set; }
     public float AuthStartWorldTime { get; set; }
 
     protected override void Configure()
     {
         AddProperty(x => x.CurrentState).ObjectNetGuid();
-        AddProperty(x => x.TransitionContext).Decode(ValorantPayloadDecoders.RawPayload("UTransitionContext"));
+        AddProperty(x => x.TransitionContext).ObjectNetGuid();
         AddProperty(x => x.AuthStartWorldTime).Float();
     }
 }

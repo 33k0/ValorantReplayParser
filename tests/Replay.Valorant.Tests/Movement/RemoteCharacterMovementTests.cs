@@ -12,7 +12,7 @@ public class RemoteCharacterMovementTests
     [Test]
     public void ComponentDataStream_DecodesMovementSection()
     {
-        var payload = BuildComponentDataStreamPayload(useByteWrapper: false);
+        var payload = BuildComponentDataStreamPayload();
         using var archive = new BitArchiveReader(payload.Bytes, payload.BitCount);
 
         var stream = ComponentDataStream.Decode(archive);
@@ -34,7 +34,7 @@ public class RemoteCharacterMovementTests
     [Test]
     public void ComponentDataStream_DecodesByteWrappedPayload()
     {
-        var payload = BuildComponentDataStreamPayload(useByteWrapper: true);
+        var payload = BuildComponentDataStreamPayload();
         using var archive = new BitArchiveReader(payload.Bytes, payload.BitCount);
 
         var stream = ComponentDataStream.Decode(archive);
@@ -49,30 +49,17 @@ public class RemoteCharacterMovementTests
     }
 
     [Test]
-    public void ComponentDataStream_InvalidMagic_RecordsParseError()
+    public void ComponentDataStream_InvalidMagic_Throws()
     {
-        var movement = new BitWriter();
-        movement.WriteByte(0x00);
-        var payload = new BitWriter();
-        payload.WriteUInt16((ushort)movement.BitCount);
-        payload.WriteBits(movement);
-        using var archive = new BitArchiveReader(payload.ToArray(), payload.BitCount);
-
-        var stream = ComponentDataStream.Decode(archive);
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(stream.HasMovementSection, Is.True);
-            Assert.That(stream.HasValidMovementMagic, Is.False);
-            Assert.That(stream.MovementParseError, Is.EqualTo("Invalid movement magic 0x00"));
-            Assert.That(archive.AtEnd, Is.True);
-        });
+        using var archive = new BitArchiveReader(new byte[] { 1, 0, 0, 0, 0, 0 });
+        var exception = Assert.Throws<ArchiveReadException>(() => ComponentDataStream.Decode(archive));
+        Assert.That(exception!.ErrorCode, Is.EqualTo(ArchiveErrorCode.InvalidData));
     }
 
     [Test]
     public void ComponentDataStream_DecodesVariant1QuantizedVelocity()
     {
-        var payload = BuildComponentDataStreamPayload(useByteWrapper: false, useVariant1: true);
+        var payload = BuildComponentDataStreamPayload(useVariant1: true);
         using var archive = new BitArchiveReader(payload.Bytes, payload.BitCount);
 
         var stream = ComponentDataStream.Decode(archive);
@@ -93,7 +80,7 @@ public class RemoteCharacterMovementTests
     [Test]
     public void ComponentDataStream_DecodesAllMovesButKeepsOnlyLatestMove()
     {
-        var payload = BuildComponentDataStreamPayload(useByteWrapper: false, includeSecondMove: true);
+        var payload = BuildComponentDataStreamPayload(includeSecondMove: true);
         using var archive = new BitArchiveReader(payload.Bytes, payload.BitCount);
 
         var stream = ComponentDataStream.Decode(archive);
@@ -133,9 +120,10 @@ public class RemoteCharacterMovementTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(result.DecodedFieldCount, Is.EqualTo(1));
+            Assert.That(result.DecodedFieldCount, Is.EqualTo(2));
             Assert.That(result.DiagnosticFields, Is.Empty);
             Assert.That(batch.Updates, Has.Count.EqualTo(1));
+            Assert.That(batch.IsReplayFastForwardImportant, Is.False);
             Assert.That(batch.Updates[0].ShooterCharacterNetGuidValue, Is.EqualTo(1234));
             Assert.That(batch.Updates[0].ComponentDataStream!.MoveCount, Is.EqualTo(1));
             Assert.That(batch.Updates[0].ComponentDataStream!.HasLatestMove, Is.True);
@@ -158,7 +146,7 @@ public class RemoteCharacterMovementTests
 
     private static PayloadData BuildRemoteCharacterUpdatesRpcPayload()
     {
-        var componentDataStream = BuildComponentDataStreamPayload(useByteWrapper: false);
+        var componentDataStream = BuildComponentDataStreamPayload();
 
         var update = new BitWriter();
         update.WriteIntPacked(3);
@@ -177,6 +165,9 @@ public class RemoteCharacterMovementTests
 
         var rpc = new BitWriter();
         rpc.WriteBit(false);
+        rpc.WriteIntPacked(1);
+        rpc.WriteIntPacked(1);
+        rpc.WriteBit(false);
         rpc.WriteIntPacked(2);
         rpc.WriteIntPacked((uint)array.BitCount);
         rpc.WriteBits(array);
@@ -185,7 +176,6 @@ public class RemoteCharacterMovementTests
     }
 
     private static PayloadData BuildComponentDataStreamPayload(
-        bool useByteWrapper,
         bool useVariant1 = false,
         bool includeSecondMove = false)
     {
@@ -199,21 +189,17 @@ public class RemoteCharacterMovementTests
             WriteMove(movement, useVariant1: false, timestamp: 84, x: 10.0f, y: 11.0f, z: 12.0f);
         }
 
+        movement.WriteBits(0, 3);
         var payload = new BitWriter();
-        payload.WriteUInt16((ushort)movement.BitCount);
         payload.WriteBits(movement);
-        var payloadData = new PayloadData(payload.ToArray(), payload.BitCount);
-
-        if (!useByteWrapper)
-        {
-            return payloadData;
-        }
-
-        payload.PadToByte();
-        payloadData = new PayloadData(payload.ToArray(), payload.BitCount);
+        payload.WriteUInt16((ushort)(movement.BitCount + 16 + 8));
+        payload.WriteByte(0xA3);
+        payload.WriteByte(0xA4);
+        var data = payload.ToArray();
         var wrapped = new BitWriter();
-        wrapped.WriteUInt16((ushort)payloadData.Bytes.Length);
-        wrapped.WriteBits(payloadData.Bytes, payloadData.BitCount);
+        wrapped.WriteUInt32((uint)data.Length);
+        wrapped.WriteBits(data, data.Length * 8);
+        wrapped.WriteByte((byte)((8 - payload.BitCount % 8) % 8));
         return new PayloadData(wrapped.ToArray(), wrapped.BitCount);
     }
 

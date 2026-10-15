@@ -1,4 +1,5 @@
 using Replay.Encoding.Archives;
+using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 using Replay.Valorant.Flashes.Descriptors;
 
@@ -19,14 +20,20 @@ public class BreachFlashExitLocationDecoderTests
         var bytes = Convert.FromHexString(hex);
         using var archive = new BitArchiveReader(bytes, bitCount);
         var context = new FieldDecodeContext();
-        var decoder = new BreachFlashExitLocationDecoder();
-        var location = decoder.Decode(ref context, archive).VectorValue;
+        var decoder = new BreachFlashHitResultDecoder();
+        var hit = (FHitResult)decoder.Decode(ref context, archive).ObjectValue!;
+        var location = hit.Location;
         Assert.Multiple(() =>
         {
             Assert.That(location.X, Is.EqualTo(x));
             Assert.That(location.Y, Is.EqualTo(y));
             Assert.That(location.Z, Is.EqualTo(z));
             Assert.That(location.ScaleFactor, Is.EqualTo(1));
+            Assert.That(hit.Time, Is.InRange(0f, 1f));
+            Assert.That(hit.ImpactNormal, Is.EqualTo(hit.Normal));
+            Assert.That(hit.Item, Is.EqualTo(-1));
+            Assert.That(hit.FaceIndex, Is.EqualTo(-1));
+            Assert.That(hit.Component, Is.GreaterThan(0));
             Assert.That(archive.AtEnd, Is.True);
         });
 

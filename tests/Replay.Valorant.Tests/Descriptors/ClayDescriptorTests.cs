@@ -86,7 +86,7 @@ public sealed class ClayDescriptorTests
     {
         var descriptor = new RazeForceParameters();
         Assert.That(descriptor.Grammar, Is.EqualTo(FieldStreamGrammar.FunctionParameters));
-        Assert.That(descriptor.Fields.Select(f => f.Handle), Is.EqualTo(Enumerable.Range(0, 9)));
+        Assert.That(descriptor.Fields.Select(f => f.Handle), Is.EqualTo(Enumerable.Range(0, 10)));
         Assert.That(Decode(descriptor, "Duration", Convert.ToBase64String(BitConverter.GetBytes(0.6f)), 32).FloatValue, Is.EqualTo(0.6f));
         Assert.That(Decode(descriptor, "NetTimestamp", Convert.ToBase64String(BitConverter.GetBytes(9.6625f)), 32).FloatValue, Is.EqualTo(9.6625f));
         Assert.That(Decode(descriptor, "RespawnNumber", Convert.ToBase64String(BitConverter.GetBytes(3)), 32).Int32Value, Is.EqualTo(3));

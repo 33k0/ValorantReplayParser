@@ -12,8 +12,8 @@ public sealed class BaseReplayPlayerState : ExportGroupDescriptor<BaseReplayPlay
     public uint RemoteRole { get; set; }
     public uint Owner { get; set; }
     public bool OnlySpectator { get; set; }
-    public ValorantRawPayload? AllPlayersObfuscatedPlayerInformation { get; set; }
-    public ValorantRawPayload? SubjectUniqueId { get; set; }
+    public ObfuscatedPlayerInformation?[]? AllPlayersObfuscatedPlayerInformation { get; set; }
+    public RiotUniqueNetId? SubjectUniqueId { get; set; }
     public bool IsAfk { get; set; }
     public byte ConnectionStatus { get; set; }
 
@@ -23,9 +23,9 @@ public sealed class BaseReplayPlayerState : ExportGroupDescriptor<BaseReplayPlay
         AddProperty(x => x.Owner).ObjectNetGuid();
         AddProperty("bOnlySpectator", x => x.OnlySpectator).Bool();
         AddProperty(x => x.AllPlayersObfuscatedPlayerInformation)
-            .Decode(ValorantPayloadDecoders.RawPayload("TArray<FObfuscatedPlayerInformation>"));
+            .RepLayoutDynamicArray<ObfuscatedPlayerInformation>();
         AddProperty(x => x.SubjectUniqueId)
-            .Decode(ValorantPayloadDecoders.RawPayload("FUniqueNetIdRepl"));
+            .Decode(RiotUniqueNetIdDecoder.Instance);
         AddProperty("bIsAfk", x => x.IsAfk).Bool();
         AddProperty(x => x.ConnectionStatus).EnumByte();
     }

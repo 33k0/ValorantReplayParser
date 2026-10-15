@@ -17,13 +17,13 @@ public sealed class SequoiaTeleportContextDescriptor
     public override string Path => ExportPath;
     public override ExportCategory Categories => ExportCategory.Ability | ExportCategory.Movement;
 
-    public ValorantRawPayload? Rotation { get; set; }
+    public FQuat? Rotation { get; set; }
     public FVector? Translation { get; set; }
 
     protected override void Configure()
     {
         AddPropertyHandle(1, "249", x => x.Rotation)
-            .Decode(ValorantPayloadDecoders.RawPayload("Rotation"));
+            .NormalizedQuaternion();
         AddPropertyHandle(2, "Translation", x => x.Translation).FVector();
     }
 }

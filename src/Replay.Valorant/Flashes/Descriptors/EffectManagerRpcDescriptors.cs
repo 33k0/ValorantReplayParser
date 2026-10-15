@@ -26,6 +26,7 @@ public sealed class EffectManagerPlayContinuousParameters
     public EffectManagerFunctionVectorValue[]? FunctionVectorValues { get; set; }
     public EffectManagerFunctionObjectValue[]? FunctionObjectValues { get; set; }
     public FVector? Translation { get; set; }
+    public FQuat? Rotation { get; set; }
     public FVector? Scale3D { get; set; }
     public string? AttachSocket { get; set; }
     public ulong? EffectId { get; set; }
@@ -55,6 +56,7 @@ public sealed class EffectManagerPlayContinuousParameters
             .RepLayoutDynamicArray<EffectManagerFunctionVectorValue>();
         AddPropertyHandle(10, "ObjectValues", x => x.FunctionObjectValues)
             .RepLayoutDynamicArray<EffectManagerFunctionObjectValue>();
+        AddPropertyHandle(22, "249", x => x.Rotation).NormalizedQuaternion();
         AddPropertyHandle(23, x => x.Translation).FVector();
         AddPropertyHandle(24, x => x.Scale3D).FVector();
         AddPropertyHandle(25, x => x.AttachSocket).FName();
@@ -87,6 +89,9 @@ public sealed class EffectManagerPlayOneShotParameters
     public uint? WaitOnReplicationActor { get; set; }
     public EffectManagerFunctionFloatValue[]? FunctionFloatValues { get; set; }
     public EffectManagerFunctionObjectValue[]? FunctionObjectValues { get; set; }
+    public EffectManagerFunctionVectorValue[]? FunctionVectorValues { get; set; }
+    public FQuat? Rotation { get; set; }
+    public string? AttachSocket { get; set; }
     public FVector? Translation { get; set; }
     public FVector? Scale3D { get; set; }
     public uint? ClientControllerThatTriggered { get; set; }
@@ -105,10 +110,14 @@ public sealed class EffectManagerPlayOneShotParameters
         AddPropertyHandle(1, x => x.WaitOnReplicationActor).ObjectNetGuid();
         AddPropertyHandle(2, "FloatValues", x => x.FunctionFloatValues)
             .RepLayoutDynamicArray<EffectManagerFunctionFloatValue>();
+        AddPropertyHandle(6, "VectorValues", x => x.FunctionVectorValues)
+            .RepLayoutDynamicArray<EffectManagerFunctionVectorValue>();
         AddPropertyHandle(10, "ObjectValues", x => x.FunctionObjectValues)
             .RepLayoutDynamicArray<EffectManagerFunctionObjectValue>();
+        AddPropertyHandle(22, "249", x => x.Rotation).NormalizedQuaternion();
         AddPropertyHandle(23, x => x.Translation).FVector();
         AddPropertyHandle(24, x => x.Scale3D).FVector();
+        AddPropertyHandle(25, x => x.AttachSocket).FName();
         AddPropertyHandle(26, x => x.ClientControllerThatTriggered).ObjectNetGuid();
         AddPropertyHandle(27, x => x.StartMovementTime).Float();
         AddPropertyHandle(28, x => x.AllianceFilter).EnumRemainingBits();
@@ -155,11 +164,14 @@ public sealed class EffectManagerUpdateContinuousParameters
     public bool? IsTransient { get; set; }
     public uint? WaitOnReplicationActor { get; set; }
     public EffectManagerUpdateFloatValue[]? UpdateFloatValues { get; set; }
+    public EffectManagerUpdateVectorValue[]? UpdateVectorValues { get; set; }
+    public EffectManagerUpdateObjectValue[]? UpdateObjectValues { get; set; }
 
     public IReadOnlyList<EffectManagerFloatValue> FloatValues =>
         EffectManagerValueMapper.Map(UpdateFloatValues);
 
-    public IReadOnlyList<EffectManagerObjectValue> ObjectValues => [];
+    public IReadOnlyList<EffectManagerObjectValue> ObjectValues => UpdateObjectValues?
+        .OfType<EffectManagerUpdateObjectValue>().Select(v => new EffectManagerObjectValue(v.Name, v.Value)).ToArray() ?? [];
 
     protected override void Configure()
     {
@@ -170,6 +182,10 @@ public sealed class EffectManagerUpdateContinuousParameters
         AddPropertyHandle(4, x => x.WaitOnReplicationActor).ObjectNetGuid();
         AddPropertyHandle(5, "FloatValues", x => x.UpdateFloatValues)
             .RepLayoutDynamicArray<EffectManagerUpdateFloatValue>();
+        AddPropertyHandle(9, "VectorValues", x => x.UpdateVectorValues)
+            .RepLayoutDynamicArray<EffectManagerUpdateVectorValue>();
+        AddPropertyHandle(13, "ObjectValues", x => x.UpdateObjectValues)
+            .RepLayoutDynamicArray<EffectManagerUpdateObjectValue>();
     }
 }
 

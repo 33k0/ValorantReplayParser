@@ -19,6 +19,7 @@ public sealed class RazeForceParameters : ExportGroupDescriptor<RazeForceParamet
     public uint? Character { get; set; }
     public float? NetTimestamp { get; set; }
     public int? RespawnNumber { get; set; }
+    public uint? ContextActor { get; set; }
     protected override void Configure()
     {
         AddPropertyHandle(0, x => x.HandleNumber).Int32();
@@ -30,5 +31,6 @@ public sealed class RazeForceParameters : ExportGroupDescriptor<RazeForceParamet
         AddPropertyHandle(6, x => x.Character).ObjectNetGuid();
         AddPropertyHandle(7, x => x.NetTimestamp).Float();
         AddPropertyHandle(8, x => x.RespawnNumber).Int32();
+        AddPropertyHandle(9, x => x.ContextActor).ObjectNetGuid();
     }
 }

@@ -10,4 +10,5 @@ public enum ArchiveErrorCode
     InvalidBitCount,
     BufferTooSmall,
     UnexpectedTrailingData,
+    InvalidData,
 }

@@ -58,12 +58,22 @@ public sealed class BreachFlashProjectileDescriptor : FlashProjectileDescriptor<
     public override string Path => FlashPaths.BreachProjectile;
 
     public FVector? ExitLocation { get; set; }
+    public FHitResult? ExitResults
+    {
+        get;
+        set
+        {
+            field = value;
+            ExitLocation = value?.Location;
+            MarkDecoded(nameof(ExitLocation));
+        }
+    }
 
     protected override void Configure()
     {
         base.Configure();
-        AddPropertyHandle(16, "ExitResults", x => x.ExitLocation)
-            .Decode(new BreachFlashExitLocationDecoder());
+        AddPropertyHandle(16, "ExitResults", x => x.ExitResults)
+            .Decode(new BreachFlashHitResultDecoder());
     }
 }
 

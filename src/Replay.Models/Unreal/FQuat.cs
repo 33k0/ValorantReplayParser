@@ -1,3 +1,3 @@
 namespace Replay.Models.Unreal;
 
-public readonly record struct FQuat(float X, float Y, float Z, float W);
+public readonly record struct FQuat(double X, double Y, double Z, double W);

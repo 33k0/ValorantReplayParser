@@ -8,6 +8,50 @@ namespace Replay.Unreal.Tests.Parsing;
 public class PrimitiveDecodersVectorTests
 {
     [Test]
+    public void NormalizedQuaternionPreservesDoublesAndReconstructsPositiveW()
+    {
+        using var archive = CreateArchive(writer =>
+        {
+            writer.WriteDouble(0.123456789012345);
+            writer.WriteDouble(0);
+            writer.WriteDouble(-0.5);
+        });
+        var context = new FieldDecodeContext();
+        var value = (FQuat)PrimitiveDecoders.NormalizedQuaternion.Decode(ref context, archive).ObjectValue!;
+        Assert.Multiple(() =>
+        {
+            Assert.That(value.X, Is.EqualTo(0.123456789012345));
+            Assert.That(value.Z, Is.EqualTo(-0.5));
+            Assert.That(value.W, Is.EqualTo(Math.Sqrt(0.75 - value.X * value.X)).Within(1e-15));
+            Assert.That(archive.AtEnd, Is.True);
+        });
+    }
+
+    [TestCase(double.NaN)]
+    [TestCase(double.PositiveInfinity)]
+    [TestCase(2.0)]
+    public void NormalizedQuaternionRejectsInvalidComponents(double x)
+    {
+        using var archive = CreateArchive(writer =>
+        {
+            writer.WriteDouble(x);
+            writer.WriteDouble(0);
+            writer.WriteDouble(0);
+        });
+        var context = new FieldDecodeContext();
+        var exception = Assert.Throws<ArchiveReadException>(() => PrimitiveDecoders.NormalizedQuaternion.Decode(ref context, archive));
+        Assert.That(exception!.ErrorCode, Is.EqualTo(ArchiveErrorCode.InvalidData));
+    }
+
+    [Test]
+    public void NormalizedQuaternionRejectsTruncatedComponents()
+    {
+        using var archive = new BitArchiveReader(new byte[24], 191);
+        var context = new FieldDecodeContext();
+        Assert.Throws<ArchiveReadException>(() => PrimitiveDecoders.NormalizedQuaternion.Decode(ref context, archive));
+    }
+
+    [Test]
     public void Vector_ReadsUnquantizedDoubleVector()
     {
         var archive = CreateArchive(writer =>

@@ -11,6 +11,21 @@ namespace Replay.Valorant.Tests.GameState;
 public class AresRoundResultsDecoderTests
 {
     [Test]
+    public void Decode_RecordedRelease1211PayloadUsesItsExplicitHandleLayout()
+    {
+        using var archive = new BitArchiveReader(Convert.FromBase64String("AgLC0goAAACE2OrKAAAAAACIDWSMMAAA"), 192);
+        var release = new ReplayReleaseVersion(12, 11);
+        var context = new FieldDecodeContext { ReplayReleaseVersion = release };
+        var results = ((AresRoundResultsUpdate)Decoder(release).Decode(ref context, archive).ObjectValue!).Updates;
+        Assert.Multiple(() =>
+        {
+            Assert.That(results.Single().RoundNumber, Is.Zero);
+            Assert.That(results.Single().WinningTeam, Is.EqualTo("Blue"));
+            Assert.That(archive.AtEnd, Is.True);
+        });
+    }
+
+    [Test]
     public void Decode_EmitsRoundIndexAndWinnerFields()
     {
         var archive = CreateArchive(writer =>
@@ -25,12 +40,14 @@ public class AresRoundResultsDecoderTests
         });
         var context = new FieldDecodeContext();
 
-        var value = Decoder(new ReplayReleaseVersion(13, 4)).Decode(ref context, archive);
-        var results = (AresRoundResult[])value.ObjectValue!;
+        var value = Decoder(new ReplayReleaseVersion(13, 1)).Decode(ref context, archive);
+        var update = (AresRoundResultsUpdate)value.ObjectValue!;
+        var results = update.Updates;
 
         Assert.Multiple(() =>
         {
-            Assert.That(results, Has.Length.EqualTo(1));
+            Assert.That(update.DeclaredCount, Is.EqualTo(3));
+            Assert.That(results, Has.Count.EqualTo(1));
             Assert.That(results[0].RoundNumber, Is.EqualTo(2));
             Assert.That(results[0].WinningTeam, Is.EqualTo("Blue"));
             Assert.That(results[0].WinningTeamRole, Is.EqualTo(AresTeamRole.Defender));
@@ -65,11 +82,17 @@ public class AresRoundResultsDecoderTests
         var context = new FieldDecodeContext();
 
         var value = Decoder().Decode(ref context, archive);
-        var result = ((AresRoundResult[])value.ObjectValue!).Single();
+        var result = ((AresRoundResultsUpdate)value.ObjectValue!).Updates.Single();
 
-        Assert.That(
-            result,
-            Is.EqualTo(new AresRoundResult(roundNumber, winningTeam, winningTeamRole, roundResult)));
+        Assert.Multiple(() =>
+        {
+            Assert.That(result.RoundNumber, Is.EqualTo(roundNumber));
+            Assert.That(result.WinningTeam, Is.EqualTo(winningTeam));
+            Assert.That(result.WinningTeamRole, Is.EqualTo(winningTeamRole));
+            Assert.That(result.RoundResult, Is.EqualTo(roundResult));
+            if (roundNumber == 0)
+                Assert.That(result.EliminatedTeams!.Single()!.NetGuid, Is.EqualTo(364));
+        });
         Assert.That(archive.AtEnd, Is.True);
     }
 
@@ -83,7 +106,14 @@ public class AresRoundResultsDecoderTests
             WriteField(writer, 82, payload => payload.WriteFName("Red"));
             WriteField(writer, 83, payload => payload.WriteBits((byte)AresTeamRole.Attacker, 3));
             WriteField(writer, 84, payload => payload.WriteBits((byte)AresRoundOutcome.Detonate, 4));
-            WriteField(writer, 85, payload => payload.WriteBits(0xA5, 8));
+            WriteField(writer, 85, payload =>
+            {
+                payload.WriteIntPacked(1);
+                payload.WriteIntPacked(1);
+                WriteField(payload, 86, field => field.WriteIntPacked(42));
+                payload.WriteIntPacked(0);
+                payload.WriteIntPacked(0);
+            });
             writer.WriteIntPacked(0);
             writer.WriteIntPacked(0);
         });
@@ -91,15 +121,15 @@ public class AresRoundResultsDecoderTests
         var context = new FieldDecodeContext { ReplayReleaseVersion = release };
 
         var value = Decoder(release).Decode(ref context, archive);
-        var result = ((AresRoundResult[])value.ObjectValue!).Single();
+        var result = ((AresRoundResultsUpdate)value.ObjectValue!).Updates.Single();
 
         Assert.Multiple(() =>
         {
-            Assert.That(result, Is.EqualTo(new AresRoundResult(
-                7,
-                "Red",
-                AresTeamRole.Attacker,
-                AresRoundOutcome.Detonate)));
+            Assert.That(result.RoundNumber, Is.EqualTo(7));
+            Assert.That(result.WinningTeam, Is.EqualTo("Red"));
+            Assert.That(result.WinningTeamRole, Is.EqualTo(AresTeamRole.Attacker));
+            Assert.That(result.RoundResult, Is.EqualTo(AresRoundOutcome.Detonate));
+            Assert.That(result.EliminatedTeams!.Single()!.NetGuid, Is.EqualTo(42));
             Assert.That(archive.AtEnd, Is.True);
         });
     }

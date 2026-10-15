@@ -12,13 +12,17 @@ public sealed class MulticastResetForRespawnParameters : ExportGroupDescriptor<M
     public override ExportGroupKind Kind => ExportGroupKind.ClassNetCache;
     public override FieldStreamGrammar Grammar => FieldStreamGrammar.FunctionParameters;
 
-    public ValorantRawPayload? ShooterCharacter { get; set; } // TODO: Implement this object-reference encoding.
-    public FTransform? SpawnTransform { get; set; }
+    public uint? ShooterCharacter { get; set; }
+    public FQuat? Rotation { get; set; }
+    public FVector? Translation { get; set; }
+    public FVector? Scale3D { get; set; }
 
     protected override void Configure()
     {
-        AddProperty(x => x.ShooterCharacter, ExportCategory.GameState)
-            .Decode(ValorantPayloadDecoders.RawPayload("ShooterCharacter"));
-        AddProperty(x => x.SpawnTransform, ExportCategory.GameState).Transform();
+        AddPropertyHandle(0, x => x.ShooterCharacter, ExportCategory.GameState)
+            .ObjectNetGuid();
+        AddPropertyHandle(1, "249", x => x.Rotation).NormalizedQuaternion();
+        AddPropertyHandle(2, x => x.Translation).FVector();
+        AddPropertyHandle(3, x => x.Scale3D).FVector();
     }
 }

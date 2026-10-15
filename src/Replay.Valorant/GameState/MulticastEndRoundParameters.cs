@@ -11,9 +11,19 @@ public sealed class MulticastEndRoundParameters : ExportGroupDescriptor<Multicas
     public override FieldStreamGrammar Grammar => FieldStreamGrammar.FunctionParameters;
 
     public int NewRoundNumber { get; set; }
+    public byte? Type { get; set; }
+    public MatchPointTeam?[]? TeamsOnMatchPoint { get; set; }
 
     protected override void Configure()
     {
-        AddProperty(x => x.NewRoundNumber, ExportCategory.GameState).Int32();
+        AddPropertyHandle(0, x => x.NewRoundNumber, ExportCategory.GameState).Int32();
+        AddPropertyHandle(1, x => x.Type).EnumRemainingBits();
+        AddPropertyHandle(2, x => x.TeamsOnMatchPoint).RepLayoutDynamicArray<MatchPointTeam>();
     }
+}
+
+public sealed class MatchPointTeam : ExportGroupDescriptor<MatchPointTeam>
+{
+    public int? Team { get; set; }
+    protected override void Configure() => AddPropertyHandle(3, "TeamsOnMatchPoint", x => x.Team).Int32();
 }

@@ -54,6 +54,9 @@ public static class DescriptorBuilderDecoderExtensions
     public static FieldDescriptorBuilder Transform(this FieldDescriptorBuilder builder) =>
         builder.Decode(PrimitiveDecoders.Transform);
 
+    public static FieldDescriptorBuilder NormalizedQuaternion(this FieldDescriptorBuilder builder) =>
+        builder.Decode(PrimitiveDecoders.NormalizedQuaternion);
+
     public static FieldDescriptorBuilder ReplicatedMovement(
         this FieldDescriptorBuilder builder,
         ERotatorQuantization rotationQuantization = ERotatorQuantization.ShortComponents) =>

@@ -149,11 +149,11 @@ public static class ValorantDescriptors
         catalog.Add(WushuDescriptors.CreateDescriptors());
         catalog.Add(WushuDescriptors.CreateClassNetCacheDescriptors());
 
-        catalog.Add(new Control.ControllablePawnDescriptor(Control.ControllablePawnDescriptor.Skye));
-        catalog.Add(new Control.ControllablePawnDescriptor(Control.ControllablePawnDescriptor.Sova));
-        catalog.Add(new Control.ControllablePawnDescriptor(Control.ControllablePawnDescriptor.Tejo));
-        catalog.Add(new Control.ControllablePawnDescriptor(Control.ControllablePawnDescriptor.Gekko));
-        catalog.Add(new Control.PossessableActorComponentDescriptor());
+        catalog.Add(new ControllablePawnDescriptor(ControllablePawnDescriptor.Skye));
+        catalog.Add(new ControllablePawnDescriptor(ControllablePawnDescriptor.Sova));
+        catalog.Add(new ControllablePawnDescriptor(ControllablePawnDescriptor.Tejo));
+        catalog.Add(new ControllablePawnDescriptor(ControllablePawnDescriptor.Gekko));
+        catalog.Add(new PossessableActorComponentDescriptor());
         catalog.Add(new AbilityRechargeCooldownComponentDescriptor());
         catalog.Add(new AresAbilitySystemComponentDescriptor());
         catalog.Add(new AresAttributeSetDescriptor());

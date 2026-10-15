@@ -1,7 +1,7 @@
 ﻿using System.Text;
 using Replay.Encoding.Archives;
 using Microsoft.Extensions.Logging;
-using Replay.Tools.Logging;
+using NetGuidCacheReader;
 using Replay.Models.Descriptors;
 using Replay.Models.Errors;
 using Replay.Valorant;

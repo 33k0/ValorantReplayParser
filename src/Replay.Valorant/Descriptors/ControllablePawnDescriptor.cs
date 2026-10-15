@@ -1,7 +1,7 @@
 using Replay.Models.Descriptors;
 using Replay.Unreal.Parsing;
 
-namespace Replay.Valorant.Descriptors.Control;
+namespace Replay.Valorant.Descriptors;
 
 /// <summary>Pawn fields verified in recorded export groups; remote motion uses RemoteCharacterUpdate.</summary>
 public sealed class ControllablePawnDescriptor(string path) : ExportGroupDescriptor<ControllablePawnDescriptor>

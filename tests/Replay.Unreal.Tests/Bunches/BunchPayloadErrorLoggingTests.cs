@@ -113,7 +113,7 @@ public class BunchPayloadErrorLoggingTests
 
     private sealed class CapturingLoggerFactory : ILoggerFactory
     {
-        public List<LogEntry> Entries { get; } = [];
+        public List<string> Entries { get; } = [];
 
         public void AddProvider(ILoggerProvider provider)
         {
@@ -126,7 +126,7 @@ public class BunchPayloadErrorLoggingTests
         }
     }
 
-    private sealed class CapturingLogger(List<LogEntry> entries) : ILogger
+    private sealed class CapturingLogger(List<string> entries) : ILogger
     {
         public IDisposable? BeginScope<TState>(TState state) where TState : notnull => null;
 
@@ -138,10 +138,8 @@ public class BunchPayloadErrorLoggingTests
             TState state,
             Exception? exception,
             Func<TState, Exception?, string> formatter) =>
-            entries.Add(new LogEntry(logLevel, exception, formatter(state, exception)));
+            entries.Add(formatter(state, exception));
     }
-
-    private sealed record LogEntry(LogLevel Level, Exception? Exception, string Message);
 
     private static ArchiveReadException CreateArchiveException(string operation) =>
         new(ArchiveErrorCode.EndOfArchive, operation, position: 0, length: 0, requested: 1);

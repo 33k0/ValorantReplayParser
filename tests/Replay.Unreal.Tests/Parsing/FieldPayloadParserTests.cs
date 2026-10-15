@@ -509,6 +509,8 @@ public class FieldPayloadParserTests
     {
         private readonly string _path;
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("ReSharper", "UnusedMember.Local",
+            Justification = "Required by ExportGroupDescriptor.CreatePayloadInstance through Activator.CreateInstance.")]
         public TestPayloadDescriptor()
             : this("/Game/Test.Test_C")
         {

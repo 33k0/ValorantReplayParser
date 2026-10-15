@@ -132,14 +132,18 @@ public class ValorantReplayReaderTests
         var decompressor = new CallbackOodleDecompressor([0xAA]);
         var reader = new ValorantReplayReader(decompressor, new NoOpReplayDataChunkHandler());
         var nestedReplay = BuildReplayInfo(chunks: [HeaderChunk(BuildHeader())]);
-        using var reentrantReadStream = new MemoryStream(nestedReplay);
-        using var reentrantMetadataStream = new MemoryStream(nestedReplay);
+        long? reentrantReadPosition = null;
+        long? reentrantMetadataPosition = null;
         InvalidOperationException? reentrantReadException = null;
         InvalidOperationException? reentrantMetadataException = null;
         decompressor.OnDecompress = () =>
         {
+            using var reentrantReadStream = new MemoryStream(nestedReplay);
+            using var reentrantMetadataStream = new MemoryStream(nestedReplay);
             reentrantReadException = Assert.Throws<InvalidOperationException>(() => reader.Read(reentrantReadStream));
             reentrantMetadataException = Assert.Throws<InvalidOperationException>(() => reader.ReadMetadata(reentrantMetadataStream));
+            reentrantReadPosition = reentrantReadStream.Position;
+            reentrantMetadataPosition = reentrantMetadataStream.Position;
             throw reentrantReadException!;
         };
         var replayBytes = BuildReplayInfo(
@@ -158,8 +162,8 @@ public class ValorantReplayReaderTests
             Assert.That(exception!.Message, Does.Contain("concurrent or reentrant"));
             Assert.That(reentrantReadException!.Message, Does.Contain("concurrent or reentrant"));
             Assert.That(reentrantMetadataException!.Message, Does.Contain("concurrent or reentrant"));
-            Assert.That(reentrantReadStream.Position, Is.Zero);
-            Assert.That(reentrantMetadataStream.Position, Is.Zero);
+            Assert.That(reentrantReadPosition, Is.Zero);
+            Assert.That(reentrantMetadataPosition, Is.Zero);
             Assert.That(result.Metadata.ReplayInfo.DataChunks, Has.Count.EqualTo(1));
         });
     }

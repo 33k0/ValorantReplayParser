@@ -37,8 +37,8 @@ public class ReleaseAwareDescriptorTests
     [Test]
     public void FieldDecoder_SelectsByReleaseBeforeIdenticalPayloadIsDecoded()
     {
-        var baseline = new TrackingFieldDecoder("baseline");
-        var current = new TrackingFieldDecoder("13.05");
+        var baseline = new TrackingFieldDecoder();
+        var current = new TrackingFieldDecoder();
         var descriptor = new ExportGroupDescriptor(
             "/Game/VersionedDecoder.Test_C",
             fields:
@@ -236,7 +236,7 @@ public class ReleaseAwareDescriptorTests
 
     private static ExportGroupDescriptor CreateVersionedDecoderDescriptor()
     {
-        var baseline = new TrackingFieldDecoder("baseline");
+        var baseline = new TrackingFieldDecoder();
         return new ExportGroupDescriptor(
             "/Game/MissingRelease.Test_C",
             fields:
@@ -246,7 +246,7 @@ public class ReleaseAwareDescriptorTests
                     ExportName = "Value",
                     Decoder = baseline,
                     DecoderDefinition = new VersionedDefinition<IFieldDecoderDescriptor>(baseline)
-                        .From(Release1305, new TrackingFieldDecoder("13.05")),
+                        .From(Release1305, new TrackingFieldDecoder()),
                 },
             ]);
     }
@@ -316,9 +316,8 @@ public class ReleaseAwareDescriptorTests
         protected override void Configure() => AddPropertyHandle(1, x => x.Value).Int32();
     }
 
-    private sealed class TrackingFieldDecoder(string name) : IFieldDecoder
+    private sealed class TrackingFieldDecoder : IFieldDecoder
     {
-        public string Name { get; } = name;
         public int DecodeCount { get; private set; }
 
         public DecodedFieldValue Decode(ref FieldDecodeContext context, FBitArchive archive)

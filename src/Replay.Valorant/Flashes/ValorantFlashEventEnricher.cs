@@ -1,3 +1,7 @@
+using BlindKey = (uint TargetCharacterNetGuid, uint BlindId, ulong? EffectId, int StartMovementTimeBits);
+using TargetEffectKey = (uint TargetCharacterNetGuid, ulong EffectId);
+using TargetFlashKey = (uint TargetCharacterNetGuid, uint FlashActorNetGuid);
+using EffectFallbackKey = (uint TargetCharacterNetGuid, ulong? EffectId, uint ContextActorNetGuid, int StartMovementTimeBits, int DurationBits);
 using Replay.Encoding.Net;
 using Replay.Models.Events;
 using Replay.Models.Net;
@@ -841,23 +845,6 @@ internal sealed class ValorantFlashEventEnricher : IReplayEventSink
     {
         public string? Subject { get; set; }
     }
-
-    private readonly record struct BlindKey(
-        uint TargetCharacterNetGuid,
-        uint BlindId,
-        ulong? EffectId,
-        int StartMovementTimeBits);
-
-    private readonly record struct TargetEffectKey(uint TargetCharacterNetGuid, ulong EffectId);
-
-    private readonly record struct TargetFlashKey(uint TargetCharacterNetGuid, uint FlashActorNetGuid);
-
-    private readonly record struct EffectFallbackKey(
-        uint TargetCharacterNetGuid,
-        ulong? EffectId,
-        uint ContextActorNetGuid,
-        int StartMovementTimeBits,
-        int DurationBits);
 
     private sealed record EffectFallbackCandidate(
         float TimeSeconds,

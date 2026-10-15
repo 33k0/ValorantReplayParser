@@ -1,3 +1,5 @@
+using TargetHitKey = (uint NearsightActorNetGuid, uint TargetCharacterNetGuid);
+using TargetEffectKey = (uint TargetCharacterNetGuid, ulong EffectId);
 using Replay.Encoding.Net;
 using Replay.Models.Events;
 using Replay.Models.Net;
@@ -588,10 +590,6 @@ internal sealed class ValorantNearsightEventEnricher : IReplayEventSink
     {
         public string? Subject { get; set; }
     }
-
-    private readonly record struct TargetHitKey(uint NearsightActorNetGuid, uint TargetCharacterNetGuid);
-
-    private readonly record struct TargetEffectKey(uint TargetCharacterNetGuid, ulong EffectId);
 
     private sealed record ActiveNearsightEffect(
         NearsightState State,

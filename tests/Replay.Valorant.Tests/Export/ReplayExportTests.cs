@@ -702,6 +702,8 @@ public class ReplayExportTests
         };
 
         public int Health { get; } = 87;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("ReSharper", "UnusedMember.Local",
+            Justification = "Read through reflection by ReplayJsonNormalizer; verifies undecoded properties are excluded.")]
         public string Ignored { get; } = "not decoded";
 
         public bool HasDecoded(string propertyName) => DecodedProperties.Contains(propertyName);
@@ -709,6 +711,8 @@ public class ReplayExportTests
 
     private sealed class RoundResultPayload
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("ReSharper", "UnusedMember.Local",
+            Justification = "Read through reflection by ReplayJsonNormalizer.")]
         public AresRoundResult[] RoundResults { get; } =
         [
             new(0, "Blue", AresTeamRole.Defender, AresRoundOutcome.Defuse),
@@ -719,7 +723,11 @@ public class ReplayExportTests
     {
         private readonly byte[] _data = data;
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("ReSharper", "UnusedMember.Local",
+            Justification = "Read through reflection to verify memory serialization.")]
         public ReadOnlyMemory<byte> Data => _data;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("ReSharper", "UnusedMember.Local",
+            Justification = "Discovered through reflection to verify unsupported span properties serialize as null.")]
         public ReadOnlySpan<byte> Span => _data;
     }
 }

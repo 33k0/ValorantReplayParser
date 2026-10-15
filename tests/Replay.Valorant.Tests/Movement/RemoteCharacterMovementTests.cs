@@ -351,14 +351,6 @@ public class RemoteCharacterMovementTests
             }
         }
 
-        public void PadToByte()
-        {
-            while (_bits.Count % 8 != 0)
-            {
-                WriteBit(false);
-            }
-        }
-
         public byte[] ToArray()
         {
             var bytes = new byte[(_bits.Count + 7) / 8];

@@ -38,23 +38,24 @@ internal sealed class PartialBunchAccumulatorTests
         }
 
         var tooLargePool = new CountingMemoryPool();
-        using var tooLargeAccumulator = new PartialBunchAccumulator(
+        var tooLargeAccumulator = new PartialBunchAccumulator(
             new PartialBunchLimits(maxPayloadBytesPerChannel: 1),
             tooLargePool);
-        using (var first = Payload(8, 0x11))
+        using (tooLargeAccumulator)
         {
-            tooLargeAccumulator.AddFragment(4, Header(4, 20, initial: true, final: false), first, new BunchPayloadStats());
-        }
+            using (var first = Payload(8, 0x11))
+            {
+                tooLargeAccumulator.AddFragment(4, Header(4, 20, initial: true, final: false), first, new BunchPayloadStats());
+            }
 
-        using (var final = Payload(1, 1))
-        {
-            var exception = Assert.Throws<InvalidReplayDataException>(() =>
-                tooLargeAccumulator.AddFragment(4, Header(4, 21, initial: false, final: true, sequence: 1), final, new BunchPayloadStats()));
-            Assert.That(exception!.Message, Does.Contain("allowed 1, requested 2"));
-            Assert.That(exception.Message, Does.Contain("channel 4"));
+            using (var final = Payload(1, 1))
+            {
+                var exception = Assert.Throws<InvalidReplayDataException>(() =>
+                    tooLargeAccumulator.AddFragment(4, Header(4, 21, initial: false, final: true, sequence: 1), final, new BunchPayloadStats()));
+                Assert.That(exception!.Message, Does.Contain("allowed 1, requested 2"));
+                Assert.That(exception.Message, Does.Contain("channel 4"));
+            }
         }
-
-        tooLargeAccumulator.Dispose();
         Assert.That(tooLargePool.Owners.Single().DisposeCount, Is.EqualTo(1));
     }
 
@@ -74,43 +75,47 @@ internal sealed class PartialBunchAccumulatorTests
         }
 
         var pool = new CountingMemoryPool(_ => 2);
-        using var aggregateLimitAccumulator = new PartialBunchAccumulator(
+        var aggregateLimitAccumulator = new PartialBunchAccumulator(
             new PartialBunchLimits(maxRetainedCapacityBytes: 3),
             pool);
-        using (var first = Payload(8, 0x12))
+        using (aggregateLimitAccumulator)
         {
-            aggregateLimitAccumulator.AddFragment(5, Header(5, 3, initial: true, final: false), first, new BunchPayloadStats());
-        }
+            using (var first = Payload(8, 0x12))
+            {
+                aggregateLimitAccumulator.AddFragment(5, Header(5, 3, initial: true, final: false), first, new BunchPayloadStats());
+            }
 
-        using (var second = Payload(8, 0x34))
-        {
-            var exception = Assert.Throws<InvalidReplayDataException>(() =>
-                aggregateLimitAccumulator.AddFragment(6, Header(6, 4, initial: true, final: false), second, new BunchPayloadStats()));
-            Assert.That(exception!.Message, Does.Contain("aggregate retained buffer capacity limit exceeded"));
-            Assert.That(exception.Message, Does.Contain("allowed 3, requested 4"));
-        }
+            using (var second = Payload(8, 0x34))
+            {
+                var exception = Assert.Throws<InvalidReplayDataException>(() =>
+                    aggregateLimitAccumulator.AddFragment(6, Header(6, 4, initial: true, final: false), second, new BunchPayloadStats()));
+                Assert.That(exception!.Message, Does.Contain("aggregate retained buffer capacity limit exceeded"));
+                Assert.That(exception.Message, Does.Contain("allowed 3, requested 4"));
+            }
 
-        Assert.That(pool.Owners[1].DisposeCount, Is.EqualTo(1), "the over-limit rental is rejected and released");
-        Assert.That(aggregateLimitAccumulator.RetainedCapacityBytes, Is.EqualTo(2));
-        Assert.That(aggregateLimitAccumulator.PendingAssemblyCount, Is.EqualTo(1));
-        aggregateLimitAccumulator.Dispose();
+            Assert.That(pool.Owners[1].DisposeCount, Is.EqualTo(1), "the over-limit rental is rejected and released");
+            Assert.That(aggregateLimitAccumulator.RetainedCapacityBytes, Is.EqualTo(2));
+            Assert.That(aggregateLimitAccumulator.PendingAssemblyCount, Is.EqualTo(1));
+        }
         Assert.That(pool.Owners.Select(owner => owner.DisposeCount), Is.EqualTo(new[] { 1, 1 }));
         Assert.That(aggregateLimitAccumulator.RetainedCapacityBytes, Is.Zero);
         Assert.That(aggregateLimitAccumulator.PendingAssemblyCount, Is.Zero);
 
         var exactPool = new CountingMemoryPool(_ => 2);
-        using var exactAggregateAccumulator = new PartialBunchAccumulator(
+        var exactAggregateAccumulator = new PartialBunchAccumulator(
             new PartialBunchLimits(maxRetainedCapacityBytes: 4),
             exactPool);
-        using (var first = Payload(8, 0x56))
-        using (var second = Payload(8, 0x78))
+        using (exactAggregateAccumulator)
         {
-            exactAggregateAccumulator.AddFragment(8, Header(8, 5, initial: true, final: false), first, new BunchPayloadStats());
-            exactAggregateAccumulator.AddFragment(9, Header(9, 6, initial: true, final: false), second, new BunchPayloadStats());
-        }
+            using (var first = Payload(8, 0x56))
+            using (var second = Payload(8, 0x78))
+            {
+                exactAggregateAccumulator.AddFragment(8, Header(8, 5, initial: true, final: false), first, new BunchPayloadStats());
+                exactAggregateAccumulator.AddFragment(9, Header(9, 6, initial: true, final: false), second, new BunchPayloadStats());
+            }
 
-        Assert.That(exactAggregateAccumulator.RetainedCapacityBytes, Is.EqualTo(4));
-        exactAggregateAccumulator.Dispose();
+            Assert.That(exactAggregateAccumulator.RetainedCapacityBytes, Is.EqualTo(4));
+        }
         Assert.That(exactPool.Owners.Select(owner => owner.DisposeCount), Is.EqualTo(new[] { 1, 1 }));
     }
 
@@ -118,28 +123,29 @@ internal sealed class PartialBunchAccumulatorTests
     public void AddFragment_EnforcesTemporaryReplacementCapacityBeforeRenting()
     {
         var pool = new CountingMemoryPool(minimum => minimum);
-        using var accumulator = new PartialBunchAccumulator(
+        var accumulator = new PartialBunchAccumulator(
             new PartialBunchLimits(
                 maxPayloadBytesPerChannel: 4,
                 maxRetainedCapacityBytes: 8,
                 maxReplacementTransientCapacityBytes: 2),
             pool);
-
-        using (var initial = Payload(8, 0x01))
+        using (accumulator)
         {
-            accumulator.AddFragment(7, Header(7, 10, initial: true, final: false), initial, new BunchPayloadStats());
-        }
+            using (var initial = Payload(8, 0x01))
+            {
+                accumulator.AddFragment(7, Header(7, 10, initial: true, final: false), initial, new BunchPayloadStats());
+            }
 
-        using (var continuation = Payload(8, 0x02))
-        {
-            var exception = Assert.Throws<InvalidReplayDataException>(() =>
-                accumulator.AddFragment(7, Header(7, 11, initial: false, final: true, sequence: 1), continuation, new BunchPayloadStats()));
-            Assert.That(exception!.Message, Does.Contain("temporary replacement buffer capacity limit exceeded"));
-            Assert.That(exception.Message, Does.Contain("allowed 2, requested 3"));
-        }
+            using (var continuation = Payload(8, 0x02))
+            {
+                var exception = Assert.Throws<InvalidReplayDataException>(() =>
+                    accumulator.AddFragment(7, Header(7, 11, initial: false, final: true, sequence: 1), continuation, new BunchPayloadStats()));
+                Assert.That(exception!.Message, Does.Contain("temporary replacement buffer capacity limit exceeded"));
+                Assert.That(exception.Message, Does.Contain("allowed 2, requested 3"));
+            }
 
-        Assert.That(pool.Owners, Has.Count.EqualTo(1), "requested replacement capacity is checked before rent");
-        accumulator.Dispose();
+            Assert.That(pool.Owners, Has.Count.EqualTo(1), "requested replacement capacity is checked before rent");
+        }
         Assert.That(pool.Owners[0].DisposeCount, Is.EqualTo(1));
     }
 

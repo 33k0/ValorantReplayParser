@@ -47,6 +47,7 @@ public class FlashLifecycleIntegrationTests
             .Where(replayEvent => replayEvent.Payload is BlindManagerComponentDescriptor)
             .SelectMany(replayEvent =>
                 ((BlindManagerComponentDescriptor)replayEvent.Payload!).ActiveBlinds?
+                    .OfType<ActiveBlindDescriptor>()
                     .Select(blind => new
                     {
                         replayEvent.ActorNetGuid,
@@ -147,6 +148,7 @@ public class FlashLifecycleIntegrationTests
             .Where(replayEvent => replayEvent.Payload is BlindManagerComponentDescriptor)
             .SelectMany(replayEvent =>
                 ((BlindManagerComponentDescriptor)replayEvent.Payload!).ActiveBlinds?
+                    .OfType<ActiveBlindDescriptor>()
                     .Select(blind => new
                     {
                         replayEvent.ActorNetGuid,

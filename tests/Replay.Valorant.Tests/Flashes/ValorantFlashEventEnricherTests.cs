@@ -13,6 +13,32 @@ public class ValorantFlashEventEnricherTests
 {
     [TestCase(false)]
     [TestCase(true)]
+    public void Emit_SparseBlindManagerUpdate_SkipsUnchangedSlotsAndPreservesHits(bool includeBlind)
+    {
+        var sink = new CapturingReplayEventSink();
+        var enricher = new ValorantFlashEventEnricher(sink, new NetGuidCache());
+        RegisterPlayer(enricher, 20, 30, "target");
+        SpawnAndExplodeKayo(enricher, 1, 100);
+        var manager = BlindManager(7, 99, 0);
+        var blind = manager.ActiveBlinds![0]!;
+        blind.CausingActor = 100;
+        manager.ActiveBlinds = includeBlind ? [null, blind, null] : [null, null];
+
+        enricher.Emit(Export(1.1f, 3, 20, manager));
+        enricher.Emit(Export(1.2f, 4, 20, manager));
+        enricher.Complete();
+
+        var hits = sink.Events.OfType<ValorantFlashPlayerHit>().ToArray();
+        Assert.That(hits, Has.Length.EqualTo(includeBlind ? 1 : 0));
+        if (includeBlind)
+        {
+            Assert.That(hits[0].EffectId, Is.EqualTo(99));
+            Assert.That(hits[0].TargetSubject, Is.EqualTo("target"));
+        }
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
     public void Emit_BreachExitResult_SurvivesLaterMovementAndStopOrClose(bool closeWithoutStop)
     {
         var sink = new CapturingReplayEventSink();
@@ -74,8 +100,8 @@ public class ValorantFlashEventEnricherTests
             if (blindManager)
             {
                 var manager = BlindManager((uint)effectId, effectId, 0);
-                manager.ActiveBlinds![0].CausingActor = 100;
-                manager.ActiveBlinds[0].InitialDuration = 1;
+                manager.ActiveBlinds![0]!.CausingActor = 100;
+                manager.ActiveBlinds[0]!.InitialDuration = 1;
                 enricher.Emit(Export(time, packet, target, manager));
             }
             else
@@ -109,7 +135,7 @@ public class ValorantFlashEventEnricherTests
         var enricher = new ValorantFlashEventEnricher(sink, new NetGuidCache());
         enricher.Emit(SpawnFlash(1, 100, FlashPaths.VyseFlashTrap));
         var manager = BlindManager(1, 101, 0);
-        manager.ActiveBlinds![0].CausingActor = 100;
+        manager.ActiveBlinds![0]!.CausingActor = 100;
         enricher.Emit(Export(2, 3, 412, manager));
         Assert.Multiple(() =>
         {
@@ -267,13 +293,13 @@ public class ValorantFlashEventEnricherTests
         }));
 
         var first = BlindManager(1, 101, 300);
-        first.ActiveBlinds![0].CausingActor = 100;
-        first.ActiveBlinds![0].InitialDuration = 1.2f;
+        first.ActiveBlinds![0]!.CausingActor = 100;
+        first.ActiveBlinds![0]!.InitialDuration = 1.2f;
         enricher.Emit(Export(2, 3, 20, first));
 
         var second = BlindManager(2, 102, 300);
-        second.ActiveBlinds![0].CausingActor = 100;
-        second.ActiveBlinds![0].InitialDuration = 0.4f;
+        second.ActiveBlinds![0]!.CausingActor = 100;
+        second.ActiveBlinds![0]!.InitialDuration = 0.4f;
         enricher.Emit(Export(3, 4, 20, second));
 
         var explosions = sink.Events.OfType<ValorantFlashExploded>().ToArray();

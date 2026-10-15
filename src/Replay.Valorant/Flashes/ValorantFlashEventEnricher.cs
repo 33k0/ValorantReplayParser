@@ -344,6 +344,11 @@ internal sealed class ValorantFlashEventEnricher : IReplayEventSink
 
         foreach (var blind in blindManager.ActiveBlinds)
         {
+            if (blind is null)
+            {
+                continue;
+            }
+
             if (blind.EffectId is { } effectId)
             {
                 _authoritativeTargetEffects.Add(new TargetEffectKey(exportGroup.ActorNetGuid, effectId));

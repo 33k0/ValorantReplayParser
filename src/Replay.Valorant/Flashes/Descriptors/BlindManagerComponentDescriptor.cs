@@ -36,7 +36,7 @@ public sealed class BlindManagerComponentDescriptor
     public override ExportCategory Categories => ExportCategory.Ability | ExportCategory.Effects;
     public override ExportGroupKind Kind => ExportGroupKind.Component;
 
-    public ActiveBlindDescriptor[]? ActiveBlinds { get; set; }
+    public ActiveBlindDescriptor?[]? ActiveBlinds { get; set; }
     public float? LongestActiveBlindDuration { get; set; }
 
     protected override void Configure()

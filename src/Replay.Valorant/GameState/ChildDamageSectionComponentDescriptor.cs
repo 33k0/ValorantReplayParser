@@ -11,11 +11,13 @@ public sealed class ChildDamageSectionComponentDescriptor
     public override ExportGroupKind Kind => ExportGroupKind.Component;
 
     public bool Alive { get; set; }
+    public float Life { get; set; }
     public float MaximumLife { get; set; }
 
     protected override void Configure()
     {
         AddProperty("bAlive", x => x.Alive).Bool();
+        AddProperty(x => x.Life).Float();
         AddProperty(x => x.MaximumLife).Float();
     }
 }

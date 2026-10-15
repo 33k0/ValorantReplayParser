@@ -43,25 +43,10 @@ internal sealed class ReplayExportBinder
             }
 
             var h = handle.Value;
-            var exportName = fieldDesc.ExportName ?? replayGroup.NetFieldExports[h]?.Name;
-            var propertyName = fieldDesc.PropertyName ?? exportName;
-            var categories = fieldDesc.Categories == ExportCategory.None
-                ? descriptor.Categories
-                : fieldDesc.Categories;
-            var decoder = ResolveFieldDecoder(fieldDesc);
-            var enabled = decoder is not null
-                          && groupEnabled
-                          && IsFieldSelected(descriptor.Path, propertyName, exportName, categories);
-
-            fields[h] = new FieldBinding
-            {
-                Enabled = enabled,
-                Categories = categories,
-                Decoder = enabled ? decoder : null,
-                Name = propertyName,
-                ExportName = exportName,
-                TargetProperty = fieldDesc.TargetProperty,
-            };
+            var binding = FieldBindingCompiler.Compile(
+                fieldDesc, descriptor.Categories, _releaseVersion, replayGroup.NetFieldExports[h]?.Name);
+            ApplySelection(ref binding, descriptor.Path, groupEnabled);
+            fields[h] = binding;
         }
 
         for (var i = 0; i < maxHandle; i++)
@@ -209,25 +194,10 @@ internal sealed class ReplayExportBinder
             }
 
             var fieldIndex = checked((int)handle);
-            var exportName = fieldDesc.ExportName;
-            var propertyName = fieldDesc.PropertyName ?? exportName;
-            var categories = fieldDesc.Categories == ExportCategory.None
-                ? descriptor.Categories
-                : fieldDesc.Categories;
-            var decoder = ResolveFieldDecoder(fieldDesc);
-            var enabled = decoder is not null
-                          && groupEnabled
-                          && IsFieldSelected(descriptor.Path, propertyName, exportName, categories);
-
-            fields[fieldIndex] = new FieldBinding
-            {
-                Enabled = enabled,
-                Categories = categories,
-                Decoder = enabled ? decoder : null,
-                Name = propertyName,
-                ExportName = exportName,
-                TargetProperty = fieldDesc.TargetProperty,
-            };
+            var binding = FieldBindingCompiler.Compile(
+                fieldDesc, descriptor.Categories, _releaseVersion);
+            ApplySelection(ref binding, descriptor.Path, groupEnabled);
+            fields[fieldIndex] = binding;
         }
 
         return new BoundExportGroup
@@ -295,23 +265,14 @@ internal sealed class ReplayExportBinder
         return null;
     }
 
-    private IFieldDecoder? ResolveFieldDecoder(FieldDescriptor fieldDesc)
+    private void ApplySelection(ref FieldBinding binding, string path, bool groupEnabled)
     {
-        var decoderDescriptor = fieldDesc.DecoderDefinition?.Resolve(_releaseVersion, "field decoder")
-                                ?? fieldDesc.Decoder;
-        if (decoderDescriptor is null)
-        {
-            return null;
-        }
-
-        var decoder = decoderDescriptor as IFieldDecoder
-                      ?? throw new InvalidOperationException(
-                   $"Field descriptor '{fieldDesc.PropertyName ?? fieldDesc.ExportName ?? fieldDesc.Handle?.ToString() ?? "<unnamed>"}' uses an incompatible decoder type.");
-        return decoder is IReplayReleaseAwareFieldDecoder releaseAware
-            ? releaseAware.Resolve(_releaseVersion)
-            : decoder;
+        binding.Enabled = binding.Decoder is not null
+                          && groupEnabled
+                          && IsFieldSelected(path, binding.Name, binding.ExportName, binding.Categories);
+        if (!binding.Enabled)
+            binding.Decoder = null;
     }
-
     private IRpcDecoder? ResolveRpcDecoder(RpcDescriptor rpcDesc)
     {
         var decoderDescriptor = rpcDesc.DecoderDefinition?.Resolve(_releaseVersion, "RPC decoder")

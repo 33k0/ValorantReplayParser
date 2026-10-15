@@ -5,5 +5,5 @@ namespace Replay.Valorant.Descriptors.Agents.Aggrobot;
 /// </summary>
 public sealed class AggrobotAgentDescriptor : GenericAgentDescriptor
 {
-    public override string Path => "/Game/Characters/Aggrobot/Aggrobot_PC.Aggrobot_PC_C";
+    public override string Path => "/Game/Characters/AggroBot/AggroBot_PC.AggroBot_PC_C";
 }

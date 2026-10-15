@@ -36,6 +36,7 @@ public class ValorantDescriptorsTests
     [TestCase("MoneyManagementComponent", "/Script/ShooterGame.MoneyManagementComponent")]
     [TestCase("PurchasedItemComponent", "/Script/ShooterGame.PurchasedItemComponent")]
     [TestCase("GunRequestComponent", "/Script/ShooterGame.GunRequestComponent")]
+    [TestCase("SplineMovement", "/Script/ShooterGame.SplineMovementComponent")]
     public void CreateCatalog_RegistersStableSubobjectClasses(string objectName, string classPath)
     {
         Assert.That(ValorantDescriptors.CreateCatalog().SubobjectClassPaths[objectName], Is.EqualTo(classPath));
@@ -54,7 +55,7 @@ public class ValorantDescriptorsTests
     {
         string[] expectedAgentPaths =
         [
-            "/Game/Characters/Aggrobot/Aggrobot_PC.Aggrobot_PC_C",
+            "/Game/Characters/AggroBot/AggroBot_PC.AggroBot_PC_C",
             "/Game/Characters/BountyHunter/BountyHunter_PC.BountyHunter_PC_C",
             "/Game/Characters/Breach/Breach_PC.Breach_PC_C",
             "/Game/Characters/Cable/Cable_PC.Cable_PC_C",

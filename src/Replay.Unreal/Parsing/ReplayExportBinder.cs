@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Errors;
 using Replay.Models.Net;
 using Replay.Models.Replay;
 
@@ -279,9 +280,10 @@ internal sealed class ReplayExportBinder
 
     private static uint? ResolveFunctionHandle(RpcDescriptor rpcDesc, NetFieldExportGroup replayGroup)
     {
-        if (rpcDesc.Handle.HasValue)
+        if (rpcDesc.Handle is { } handle)
         {
-            return rpcDesc.Handle.Value;
+            VerifyFunctionName(rpcDesc, handle, replayGroup);
+            return handle;
         }
 
         for (uint i = 0; i < replayGroup.NetFieldExportsLength; i++)
@@ -293,6 +295,19 @@ internal sealed class ReplayExportBinder
         }
 
         return null;
+    }
+
+    private static void VerifyFunctionName(RpcDescriptor rpcDesc, uint handle, NetFieldExportGroup replayGroup)
+    {
+        var replayName = handle < replayGroup.NetFieldExportsLength
+            ? replayGroup.NetFieldExports[handle]?.Name
+            : null;
+        if (replayName is not null && replayName != rpcDesc.Name)
+        {
+            throw new InvalidReplayDataException(
+                $"ClassNetCache '{replayGroup.PathName}' handle {handle} is '{replayName}' in the replay, " +
+                $"but the descriptor expects RPC '{rpcDesc.Name}'.");
+        }
     }
 
     private IFieldDecoder? ResolveFieldDecoder(FieldDescriptor fieldDesc)

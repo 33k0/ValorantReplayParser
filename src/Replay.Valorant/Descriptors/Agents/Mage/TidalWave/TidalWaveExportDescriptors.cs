@@ -23,15 +23,16 @@ public sealed class TidalWaveChunkDescriptor : ExportGroupDescriptor<TidalWaveCh
 public sealed class SplineMovementComponentDescriptor
     : ExportGroupDescriptor<SplineMovementComponentDescriptor>
 {
-    public override string Path => "/Script/ShooterGame.SplineMovementComponent";
+    public const string ExportPath = "/Script/ShooterGame.SplineMovementComponent";
+    public override string Path => ExportPath;
     public override ExportCategory Categories => ExportCategory.Ability | ExportCategory.Movement;
     public override ExportGroupKind Kind => ExportGroupKind.Component;
 
     public bool? IsActive { get; set; }
-    public ValorantRawPayload? Trajectory { get; set; }
-    public ValorantRawPayload? SecondaryTrajectory { get; set; }
+    /// <summary>Sparse trajectory update; null entries were not replicated in this update.</summary>
+    public SplineTrajectoryPoint?[]? Trajectory { get; set; }
     public float? SpeedAlongSpline { get; set; }
-    public float? SpeedUnit { get; set; }
+    public uint? SpeedUnit { get; set; }
     public float? ServerPosition { get; set; }
     public float? ServerMovementTime { get; set; }
     public float? ServerTeleportTime { get; set; }
@@ -40,15 +41,25 @@ public sealed class SplineMovementComponentDescriptor
     {
         AddPropertyHandle(1, "bIsActive", x => x.IsActive).Bool();
         AddPropertyHandle(2, "Trajectory", x => x.Trajectory)
-            .Decode(ValorantPayloadDecoders.RawPayload("Trajectory"));
-        AddPropertyHandle(3, "Trajectory", x => x.SecondaryTrajectory)
-            .Decode(ValorantPayloadDecoders.RawPayload("Trajectory"));
+            .RepLayoutDynamicArray<SplineTrajectoryPoint>();
         AddPropertyHandle(5, x => x.SpeedAlongSpline).Float();
-        AddPropertyHandle(6, x => x.SpeedUnit).Float();
+        AddPropertyHandle(6, x => x.SpeedUnit).EnumRemainingBits();
         AddPropertyHandle(7, x => x.ServerPosition).Float();
         AddPropertyHandle(8, x => x.ServerMovementTime).Float();
         AddPropertyHandle(9, x => x.ServerTeleportTime).Float();
     }
+}
+
+public sealed class SplineTrajectoryPoint : ExportGroupDescriptor<SplineTrajectoryPoint>
+{
+    public override string Path => SplineMovementComponentDescriptor.ExportPath + ":Trajectory";
+    public override ExportCategory Categories => ExportCategory.Ability | ExportCategory.Movement;
+    public FVector? Position { get; set; }
+
+    public override object CreatePayloadInstance() => new SplineTrajectoryPoint();
+
+    // The second Trajectory export is the nested element field, not another array.
+    protected override void Configure() => AddPropertyHandle(3, "Trajectory", x => x.Position).FVector();
 }
 
 public sealed class ActorListTransitionContextDescriptor

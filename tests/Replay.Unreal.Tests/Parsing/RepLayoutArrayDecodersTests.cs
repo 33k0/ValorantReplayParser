@@ -203,6 +203,33 @@ public class RepLayoutArrayDecodersTests
         });
     }
 
+    [TestCase(false)]
+    [TestCase(true)]
+    public void DynamicArray_RejectsMissingOrIncompatibleFieldDecoder(bool incompatible)
+    {
+        var descriptor = new ExportGroupDescriptor("/Test/ArrayElement", fields:
+        [
+            new FieldDescriptor
+            {
+                Handle = 2,
+                ExportName = "Value",
+                Decoder = incompatible ? new UnsupportedFieldDecoder() : null,
+            },
+        ]);
+        var decoder = RepLayoutArrayDecoders.DynamicArray(
+            new VersionedDefinition<ExportGroupDescriptor>(descriptor));
+        using var archive = new BitArchiveReader(ReadOnlyMemory<byte>.Empty, bitCount: 0);
+        var context = new FieldDecodeContext();
+
+        var error = Assert.Throws<InvalidOperationException>(() => decoder.Decode(ref context, archive));
+
+        Assert.That(error!.Message,
+            Is.EqualTo("Array element field 'Value' uses an incompatible decoder type."));
+    }
+
+    private sealed class UnsupportedFieldDecoder : IFieldDecoderDescriptor
+    {
+    }
     private static void WriteField(BitWriter writer, uint handle, Action<BitWriter> writePayload)
     {
         var payload = new BitWriter();

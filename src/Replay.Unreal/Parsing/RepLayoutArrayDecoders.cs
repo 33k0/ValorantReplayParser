@@ -230,28 +230,8 @@ public static class RepLayoutArrayDecoders
                     continue;
                 }
 
-                var decoderDescriptor = field.DecoderDefinition?.Resolve(releaseVersion, "nested array field decoder")
-                                        ?? field.Decoder;
-                var decoder = decoderDescriptor as IFieldDecoder
-                              ?? throw new InvalidOperationException(
-                                  $"Array element field '{field.PropertyName ?? field.ExportName ?? field.Handle.ToString()}' uses an incompatible decoder type.");
-                if (decoder is IReplayReleaseAwareFieldDecoder releaseAware)
-                {
-                    decoder = releaseAware.Resolve(releaseVersion);
-                }
-
-                var categories = field.Categories == ExportCategory.None
-                    ? descriptor.Categories
-                    : field.Categories;
-                fields[field.Handle.Value] = new FieldBinding
-                {
-                    Enabled = true,
-                    Categories = categories,
-                    Decoder = decoder,
-                    Name = field.PropertyName ?? field.ExportName,
-                    ExportName = field.ExportName,
-                    TargetProperty = field.TargetProperty,
-                };
+                fields[field.Handle.Value] = FieldBindingCompiler.Compile(
+                    field, descriptor.Categories, releaseVersion, arrayElement: true);
             }
 
             return fields;

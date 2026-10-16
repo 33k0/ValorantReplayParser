@@ -11,9 +11,9 @@ internal sealed class PackageMapReader
 {
     private readonly NetGuidObjectReader _objectReader;
 
-    public PackageMapReader(NetGuidCache netGuidCache)
+    public PackageMapReader(NetGuidCache netGuidCache, Action<uint, string, NetworkGuid>? netGuidExported = null)
     {
-        _objectReader = new NetGuidObjectReader(netGuidCache);
+        _objectReader = new NetGuidObjectReader(netGuidCache, netGuidExported);
     }
 
     public void ReceiveNetGUIDBunch(FBitArchive payload, BunchPayloadStats stats)

@@ -10,10 +10,12 @@ internal sealed class NetGuidObjectReader
     private const int MaxNetGuidRecursionDepth = 16;
 
     private readonly NetGuidCache _netGuidCache;
+    private readonly Action<uint, string, NetworkGuid>? _netGuidExported;
 
-    public NetGuidObjectReader(NetGuidCache netGuidCache)
+    public NetGuidObjectReader(NetGuidCache netGuidCache, Action<uint, string, NetworkGuid>? netGuidExported = null)
     {
         _netGuidCache = netGuidCache;
+        _netGuidExported = netGuidExported;
     }
 
     public NetworkGuid InternalLoadObject(
@@ -53,6 +55,7 @@ internal sealed class NetGuidObjectReader
         }
 
         _netGuidCache.SetNetGuidPath(netGuid.Value, pathName, outerNetGuid);
+        _netGuidExported?.Invoke(netGuid.Value, pathName, outerNetGuid);
         return netGuid;
     }
 }

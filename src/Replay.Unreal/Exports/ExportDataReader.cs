@@ -22,11 +22,12 @@ public class ExportDataReader
         FBinaryArchive archive,
         NetGuidCache netGuidCache,
         ILogger<ExportDataReader>? logger = null,
-        Action<NetFieldExportGroup>? exportGroupChanged = null)
+        Action<NetFieldExportGroup>? exportGroupChanged = null,
+        Action<uint, string, NetworkGuid>? netGuidExported = null)
     {
         _archive = archive;
         _netGuidCache = netGuidCache;
-        _objectReader = new NetGuidObjectReader(netGuidCache);
+        _objectReader = new NetGuidObjectReader(netGuidCache, netGuidExported);
         _logger = logger ?? NullLogger<ExportDataReader>.Instance;
         _exportGroupChanged = exportGroupChanged;
     }

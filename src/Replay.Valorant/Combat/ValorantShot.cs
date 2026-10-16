@@ -24,7 +24,8 @@ public sealed record ValorantShot(
     uint? EffectEquippable,
     ValorantEquippable? Equippable,
     ValorantShotFireMode FireMode = ValorantShotFireMode.Unknown,
-    string? FireModeEvidence = null);
+    string? FireModeEvidence = null,
+    uint? EffectContainer = null);
 
 public enum ValorantShotFireMode
 {

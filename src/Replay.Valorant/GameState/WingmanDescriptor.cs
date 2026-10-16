@@ -1,5 +1,6 @@
 using Replay.Models.Descriptors;
 using Replay.Unreal.Parsing;
+using Replay.Models.Unreal;
 
 namespace Replay.Valorant.GameState;
 
@@ -10,10 +11,12 @@ public sealed class WingmanDescriptor : ExportGroupDescriptor<WingmanDescriptor>
     public override string Path => ExportPath;
     public override ExportCategory Categories => ExportCategory.GameState;
     public override ExportGroupKind Kind => ExportGroupKind.Actor;
+    public FRepMovement? ReplicatedMovement { get; set; }
     public uint Owner { get; set; }
     public uint Instigator { get; set; }
     protected override void Configure()
     {
+        AddProperty(x => x.ReplicatedMovement, ExportCategory.Movement).ReplicatedMovement(ERotatorQuantization.ShortComponents);
         AddProperty(x => x.Owner).ObjectNetGuid();
         AddProperty(x => x.Instigator).ObjectNetGuid();
     }

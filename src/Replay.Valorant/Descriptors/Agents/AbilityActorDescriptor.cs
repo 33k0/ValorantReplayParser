@@ -2,6 +2,7 @@ using Replay.Models.Descriptors;
 using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
+using Replay.Valorant.Descriptors.Agents.Terra;
 
 namespace Replay.Valorant.Descriptors.Agents;
 
@@ -48,6 +49,7 @@ public sealed class AbilityActorDescriptor(
     public bool? IsRewinding { get; set; }
     public FVector? Position { get; set; }
     public FVector? RewindEndPointLocation { get; set; }
+    public WaylayRewindPathPointDescriptor[]? RewindPath { get; set; }
     public FVector? EndingStrikeLocation { get; set; }
     public FRepMovement? ReplicatedMovement { get; set; }
     protected override void Configure()
@@ -84,6 +86,8 @@ public sealed class AbilityActorDescriptor(
         if (exportedFields.Contains("bIsRewinding")) AddProperty("bIsRewinding", x => x.IsRewinding).Bool();
         if (exportedFields.Contains("Position")) AddProperty("Position", x => x.Position).FVector();
         if (exportedFields.Contains("RewindEndPointLocation")) AddProperty("RewindEndPointLocation", x => x.RewindEndPointLocation).FVector();
+        if (exportedFields.Contains("RewindPath"))
+            AddProperty("RewindPath", x => x.RewindPath).RepLayoutDynamicArray<WaylayRewindPathPointDescriptor>();
         if (exportedFields.Contains("EndingStrikeLocation")) AddProperty("EndingStrikeLocation", x => x.EndingStrikeLocation).FVector();
         if (exportedFields.Contains("ReplicatedMovement"))
             AddProperty(x => x.ReplicatedMovement, ExportCategory.Movement).ReplicatedMovement(rotatorQuantization);

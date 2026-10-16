@@ -15,7 +15,7 @@ public static class TerraDescriptors
             Equipment("/Game/Characters/Terra/S0/Ability_4/Ability_Terra_C_TimeSlowGrenade.Ability_Terra_C_TimeSlowGrenade_C"),
             Projectile("/Game/Characters/Terra/S0/Ability_4/GameObject_Terra_C_TimeSlowGrenade_Explosion.GameObject_Terra_C_TimeSlowGrenade_Explosion_C"),
             Projectile("/Game/Characters/Terra/S0/Ability_4/Projectile_Terra_C_TimeSlowGrenade.Projectile_Terra_C_TimeSlowGrenade_C"),
-            Equipment("/Game/Characters/Terra/S0/Ability_E/Ability_Terra_E_RewindTime.Ability_Terra_E_RewindTime_C", "RewindEndPointLocation", "bIsRecording", "bIsRewinding"),
+            Equipment("/Game/Characters/Terra/S0/Ability_E/Ability_Terra_E_RewindTime.Ability_Terra_E_RewindTime_C", "RewindEndPointLocation", "bIsRecording", "bIsRewinding", "RewindPath"),
             Owned("/Game/Characters/Terra/S0/Ability_E/GameObject_Terra_E_RewindTime_RewindTarget.GameObject_Terra_E_RewindTime_RewindTarget_C"),
             Projectile("/Game/Characters/Terra/S0/Ability_E/Projectile_Terra_E_RewindTime_ForObservers.Projectile_Terra_E_RewindTime_ForObservers_C"),
             Equipment("/Game/Characters/Terra/S0/Ability_Q/Ability_Terra_Q_DoubleDash.Ability_Terra_Q_DoubleDash_C"),

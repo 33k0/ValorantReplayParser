@@ -2,9 +2,10 @@ using Replay.Encoding.Net;
 using Replay.Models.Descriptors;
 using Replay.Models.Events;
 using Replay.Valorant.Combat;
+using Replay.Valorant.Events.Combat;
 using Replay.Valorant.GameState;
 
-namespace Replay.Valorant.Tests.Combat;
+namespace Replay.Valorant.Events.Tests.Combat;
 
 public class ValorantShotEventEnricherTests
 {

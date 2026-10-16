@@ -1,6 +1,7 @@
 using Replay.Models.Events;
+using Replay.Valorant.Movement;
 
-namespace Replay.Valorant.Movement;
+namespace Replay.Valorant.Events.Movement;
 
 public interface IRemoteCharacterMovementSink
 {

@@ -3,11 +3,11 @@ using Replay.Models.Descriptors;
 using Replay.Models.Events;
 using Replay.Models.Net;
 using Replay.Models.Unreal;
-using Replay.Valorant.Flashes;
+using Replay.Valorant.Events.Flashes;
 using Replay.Valorant.Flashes.Descriptors;
 using Replay.Valorant.GameState;
 
-namespace Replay.Valorant.Tests.Flashes;
+namespace Replay.Valorant.Events.Tests.Flashes;
 
 public class ValorantFlashEventEnricherTests
 {

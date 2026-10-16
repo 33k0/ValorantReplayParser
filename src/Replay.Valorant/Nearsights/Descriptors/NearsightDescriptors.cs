@@ -5,7 +5,7 @@ using Replay.Valorant.Descriptors;
 
 namespace Replay.Valorant.Nearsights.Descriptors;
 
-internal static class NearsightPaths
+public static class NearsightPaths
 {
     public const string OmenProjectile =
         "/Game/Characters/Wraith/S0/Ability_Q/Projectile_Wraith_Q_NearsightMissile.Projectile_Wraith_Q_NearsightMissile_C";
@@ -19,7 +19,7 @@ internal static class NearsightPaths
         "/Game/Characters/Mage/S0/Ability_4/GameObject_Mage_4_SplashGrenade.GameObject_Mage_4_SplashGrenade_C";
 }
 
-internal interface INearsightProjectilePayload
+public interface INearsightProjectilePayload
 {
     FRepMovement? ReplicatedMovement { get; }
     uint? Owner { get; }
@@ -65,7 +65,7 @@ public sealed class HarborNearsightProjectileDescriptor
     public override string Path => NearsightPaths.HarborProjectile;
 }
 
-internal interface INearsightSourcePayload
+public interface INearsightSourcePayload
 {
     uint? Owner { get; }
     uint? Instigator { get; }

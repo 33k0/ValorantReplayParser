@@ -3,12 +3,12 @@ using Replay.Models.Descriptors;
 using Replay.Models.Events;
 using Replay.Models.Net;
 using Replay.Models.Unreal;
+using Replay.Valorant.Events.Nearsights;
 using Replay.Valorant.Flashes.Descriptors;
 using Replay.Valorant.GameState;
-using Replay.Valorant.Nearsights;
 using Replay.Valorant.Nearsights.Descriptors;
 
-namespace Replay.Valorant.Tests.Nearsights;
+namespace Replay.Valorant.Events.Tests.Nearsights;
 
 public class ValorantNearsightEventEnricherTests
 {

@@ -1,6 +1,7 @@
 using Replay.Models.Unreal;
+using Replay.Valorant.Combat;
 
-namespace Replay.Valorant.Combat;
+namespace Replay.Valorant.Events.Combat;
 
 public sealed record ValorantShot(
     ulong? EffectId,

@@ -215,7 +215,7 @@ public class ValorantDescriptorsTests
         Assert.Multiple(() =>
         {
             Assert.That(agentCaches, Has.Length.EqualTo(agentCachePaths.Count));
-            Assert.That(equippableField.TargetProperty!.PropertyType, Is.EqualTo(typeof(ValorantEquippable)));
+            Assert.That(equippableField.TargetProperty!.PropertyType, Is.EqualTo(typeof(uint?)));
             Assert.That(damagedBoneField.TargetProperty!.PropertyType, Is.EqualTo(typeof(string)));
             foreach (var cache in agentCaches)
             {

@@ -5,16 +5,18 @@ using Replay.Models.Diagnostics;
 using Replay.Models.Events;
 using Replay.Models.Net;
 using Replay.Models.Replay;
-using Replay.Models.Unreal;
 using Replay.Models.Results;
+using Replay.Models.Unreal;
 using Replay.Valorant.Combat;
-using Replay.Valorant.Flashes;
+using Replay.Valorant.Events.Combat;
+using Replay.Valorant.Events.Flashes;
+using Replay.Valorant.Events.Movement;
+using Replay.Valorant.Events.Nearsights;
+using Replay.Valorant.Events.Walls;
 using Replay.Valorant.GameState;
 using Replay.Valorant.Movement;
-using Replay.Valorant.Nearsights;
-using Replay.Valorant.Walls;
 
-namespace Replay.Valorant.Tests.Export;
+namespace Replay.Valorant.Events.Tests.Export;
 
 public class ReplayExportTests
 {

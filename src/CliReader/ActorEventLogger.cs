@@ -5,6 +5,7 @@ using Replay.Models.Events;
 using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Valorant.Combat;
+using Replay.Valorant.Events.Combat;
 
 namespace CliReader;
 

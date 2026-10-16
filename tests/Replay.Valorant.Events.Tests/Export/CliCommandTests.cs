@@ -1,7 +1,7 @@
 using System.CommandLine;
 using CliReader;
 
-namespace Replay.Valorant.Tests.Export;
+namespace Replay.Valorant.Events.Tests.Export;
 
 public class CliCommandTests
 {

@@ -1,7 +1,7 @@
 using Replay.Models.Events;
 using Replay.Models.Unreal;
 
-namespace Replay.Valorant.Walls;
+namespace Replay.Valorant.Events.Walls;
 
 public enum ValorantWallKind
 {

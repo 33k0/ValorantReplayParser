@@ -5,7 +5,7 @@ using Replay.Valorant.Descriptors;
 
 namespace Replay.Valorant.Flashes.Descriptors;
 
-internal interface IFlashProjectilePayload
+public interface IFlashProjectilePayload
 {
     FRepMovement? ReplicatedMovement { get; }
     uint? Owner { get; }

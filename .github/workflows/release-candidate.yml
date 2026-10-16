@@ -118,6 +118,7 @@ jobs:
             'ValorantReplayParser.Encoding'
             'ValorantReplayParser.Unreal'
             'ValorantReplayParser'
+            'ValorantReplayParser.Events'
           )
           $packageDirectory = 'artifacts/release-candidate/packages'
           $packages = @($packageIds | ForEach-Object {

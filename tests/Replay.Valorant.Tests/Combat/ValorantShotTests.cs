@@ -13,59 +13,7 @@ namespace Replay.Valorant.Tests.Combat;
 public class ValorantShotTests
 {
     [Test]
-    public void CreateShot_MapsOnlyNamedFiringStateValues()
-    {
-        var attackVector1 = new FVector(1, 0, 0);
-        var attackVector2 = new FVector(0, 1, 0);
-        var attackVector10 = new FVector(0, 0, 1);
-        var parameters = new ReplayPlayContinuousEffectAtLocationParameters
-        {
-            EffectId = 4,
-            StartMovementTime = 7.3303437f,
-            FloatValues =
-            [
-                FloatValue("FiringState.NumProjectiles", 1),
-                FloatValue("FiringState.AmmoRemaining", 11),
-                FloatValue("FiringState.TracerOption", 1),
-                FloatValue("FiringState.RandomSeed", -894045900),
-                FloatValue("FXC.Duration", 99),
-                new EffectDataFloat { Name = new FGameplayTag(65535, null), Float = 123 },
-            ],
-            VectorValues =
-            [
-                VectorValue("FiringState.AttackVector.10", attackVector10),
-                VectorValue("FiringState.AttackVector.2", attackVector2),
-                VectorValue("FiringState.AttackVector.1", attackVector1),
-                VectorValue("FiringState.AttackVector.16", new FVector(16, 0, 0)),
-            ],
-            ObjectValues =
-            [
-                ObjectValue("FiringState.FiringState", 368),
-                ObjectValue("FiringState.FiringPlayerState", 92),
-                ObjectValue("FXC.EffectContext", 146),
-                ObjectValue("FXC.Equippable", 500),
-            ],
-        };
-
-        var shot = parameters.CreateShot();
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(shot.EffectId, Is.EqualTo(4));
-            Assert.That(shot.StartMovementTime, Is.EqualTo(7.3303437f));
-            Assert.That(shot.NumProjectiles, Is.EqualTo(1));
-            Assert.That(shot.AmmoRemaining, Is.EqualTo(11));
-            Assert.That(shot.TracerOption, Is.EqualTo(1));
-            Assert.That(shot.RandomSeed, Is.EqualTo(-894045900));
-            Assert.That(shot.FiringState, Is.EqualTo(368));
-            Assert.That(shot.FiringPlayerState, Is.EqualTo(92));
-            Assert.That(shot.EffectEquippable, Is.EqualTo(500));
-            Assert.That(shot.AttackVectors, Is.EqualTo(new[] { attackVector1, attackVector2, attackVector10 }));
-        });
-    }
-
-    [Test]
-    public void DescriptorPipeline_DecodesContinuousEffectAndEmitsShotEvent()
+    public void DescriptorPipeline_DecodesContinuousEffectWithoutEmittingEvents()
     {
         var descriptor = new ReplayPlayContinuousEffectAtLocationParameters();
         var boundGroup = CreateBoundGroup(descriptor);
@@ -119,28 +67,19 @@ public class ValorantShotTests
             readPropertyChecksum: false);
 
         var parameters = (ReplayPlayContinuousEffectAtLocationParameters)result.Payload!;
-        var shotEvents = eventSink.Events.OfType<ValorantShotReceived>().ToArray();
-        var shotEvent = shotEvents.Single();
 
         Assert.Multiple(() =>
         {
-            Assert.That(shotEvents, Has.Length.EqualTo(1));
+            Assert.That(eventSink.Events, Is.Empty);
             Assert.That(result.DecodedFieldCount, Is.EqualTo(9));
             Assert.That(parameters.FloatValues, Has.Length.EqualTo(5));
             Assert.That(parameters.ObjectValues, Has.Length.EqualTo(4));
-            Assert.That(shotEvent.ActorNetGuid, Is.EqualTo(100));
-            Assert.That(shotEvent.ObjectNetGuid, Is.EqualTo(101));
-            Assert.That(shotEvent.ChannelIndex, Is.EqualTo(7));
-            Assert.That(shotEvent.Shot.EffectId, Is.EqualTo(4));
-            Assert.That(shotEvent.Shot.IsLocalEffect, Is.False);
-            Assert.That(shotEvent.Shot.IsTransient, Is.True);
-            Assert.That(shotEvent.Shot.WaitOnReplicationActor, Is.EqualTo(17));
-            Assert.That(shotEvent.Shot.AllianceFilter, Is.EqualTo(EAresAlliance.AllianceAny));
-            Assert.That(shotEvent.Shot.NumProjectiles, Is.EqualTo(1));
-            Assert.That(shotEvent.Shot.AmmoRemaining, Is.EqualTo(11));
-            Assert.That(shotEvent.Shot.FiringState, Is.EqualTo(368));
-            Assert.That(shotEvent.Shot.FiringPlayerState, Is.EqualTo(92));
-            Assert.That(shotEvent.Shot.EffectEquippable, Is.EqualTo(500));
+            Assert.That(parameters.EffectId, Is.EqualTo(4));
+            Assert.That(parameters.IsLocalEffect, Is.False);
+            Assert.That(parameters.IsTransient, Is.True);
+            Assert.That(parameters.WaitOnReplicationActor, Is.EqualTo(17));
+            Assert.That(parameters.AllianceFilter, Is.EqualTo(EAresAlliance.AllianceAny));
+            Assert.That(parameters.StartMovementTime, Is.EqualTo(7.3303437f));
             Assert.That(archive.AtEnd, Is.True);
         });
     }
@@ -238,15 +177,6 @@ public class ValorantShotTests
             FieldsByHandle = fieldsByHandle,
         };
     }
-
-    private static EffectDataFloat FloatValue(string tagName, float value) =>
-        new() { Name = new FGameplayTag(0, tagName), Float = value };
-
-    private static EffectDataVector VectorValue(string tagName, FVector value) =>
-        new() { Name = new FGameplayTag(0, tagName), Vector = value };
-
-    private static EffectDataObject ObjectValue(string tagName, uint value) =>
-        new() { Name = new FGameplayTag(0, tagName), Object = value };
 
     private static void WriteFloatValues(BitWriter writer, IReadOnlyList<(uint TagIndex, float Value)> values)
     {

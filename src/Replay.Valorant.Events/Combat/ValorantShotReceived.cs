@@ -1,6 +1,6 @@
 using Replay.Models.Events;
 
-namespace Replay.Valorant.Combat;
+namespace Replay.Valorant.Events.Combat;
 
 public sealed record ValorantShotReceived(
     float TimeSeconds,

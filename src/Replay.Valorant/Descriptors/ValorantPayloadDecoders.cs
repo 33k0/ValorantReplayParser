@@ -3,7 +3,6 @@ using Replay.Models.Descriptors;
 using Replay.Models.Diagnostics;
 using Replay.Models.Events;
 using Replay.Unreal.Parsing;
-using Replay.Valorant.Combat;
 
 namespace Replay.Valorant.Descriptors;
 
@@ -13,7 +12,6 @@ internal static class ValorantPayloadDecoders
 
     public static readonly IRpcDecoder NoParametersRpc = new NoParametersRpcDecoder();
     public static readonly IRpcDecoder SkipPayloadRpc = new SkipPayloadRpcDecoder();
-    public static readonly IFieldDecoder Equippable = new EquippableDecoder();
 
     public static IRpcDecoder RawRpc(string typeName) => new RawRpcDecoder(typeName);
 
@@ -151,15 +149,6 @@ internal static class ValorantPayloadDecoders
         {
             archive.SkipBits(checked((int)archive.BitsRemaining));
             return DecodedPayloadResult.Empty;
-        }
-    }
-
-    private sealed class EquippableDecoder : IFieldDecoder
-    {
-        public DecodedFieldValue Decode(ref FieldDecodeContext context, FBitArchive archive)
-        {
-            var netGuid = archive.ReadIntPacked();
-            return DecodedFieldValue.FromObject(ValorantEquippableResolver.Resolve(netGuid, context.NetGuidCache));
         }
     }
 }

@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using Replay.Encoding.Archives;
 using Replay.Models.Descriptors;
 using Replay.Valorant;
+using Replay.Valorant.Events;
 
 namespace CliReader;
 
@@ -26,10 +27,12 @@ internal sealed class ReplayLogRunner
         using var archive = new FBinaryArchive(file);
 
         var actorEventLogger = new ActorEventLogger(_loggerFactory.CreateLogger<ActorEventLogger>());
+        var events = new ValorantEventEnricher(actorEventLogger);
         var result = ValorantReplayReader.CreateDefault(
             _loggerFactory,
-            actorEventLogger,
+            events,
             ParseProfile.Default).Read(archive);
+        events.Complete();
         var metadata = result.Metadata;
 
         Console.WriteLine($"Took: {stopwatch.ElapsedMilliseconds}ms");

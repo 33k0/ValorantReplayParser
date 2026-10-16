@@ -65,7 +65,6 @@ internal sealed class RemoteCharacterUpdatesRpcDecoder : IRpcDecoder
         var hasUpdates = batch is not null;
         batch ??= new RemoteCharacterUpdateBatch(0);
         batch.IsReplayFastForwardImportant = fastForwardImportant;
-        EmitMovementEvents(ref context, batch);
         var diagnostics = CreateDiagnosticFields(context.CaptureDiagnosticFields, fastForwardImportant, hasUpdates, batch);
         return new DecodedPayloadResult(batch, decodedFieldCount, diagnostics);
     }
@@ -178,36 +177,6 @@ internal sealed class RemoteCharacterUpdatesRpcDecoder : IRpcDecoder
         }
 
         return update;
-    }
-
-    private static void EmitMovementEvents(ref FieldDecodeContext context, RemoteCharacterUpdateBatch batch)
-    {
-        if (context.EventSink is null or NullReplayEventSink)
-        {
-            return;
-        }
-
-        foreach (var update in batch.Updates)
-        {
-            if (update is not { ShooterCharacterNetGuidValue: { } shooterGuid, ComponentDataStream: { HasLatestMove: true } componentDataStream })
-            {
-                continue;
-            }
-
-            var moveIndex = componentDataStream.MoveCount - 1;
-            var move = componentDataStream.LatestMove;
-
-            context.EventSink.Emit(new RemoteCharacterMovementReceived(
-                context.CurrentTimeSeconds,
-                context.CurrentPacketId,
-                context.ActorNetGuid.Value,
-                context.ObjectNetGuid.Value,
-                context.ChannelIndex,
-                update.Index,
-                shooterGuid,
-                moveIndex,
-                move));
-        }
     }
 
     private static bool TryReadBit(FBitArchive archive, long endBit)

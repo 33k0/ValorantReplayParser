@@ -1,4 +1,4 @@
-namespace Replay.Valorant.Combat;
+namespace Replay.Valorant.Events.Combat;
 
 public enum ValorantEquippableCategory
 {

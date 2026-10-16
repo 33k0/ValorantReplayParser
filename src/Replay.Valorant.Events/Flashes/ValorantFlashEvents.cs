@@ -1,7 +1,7 @@
 using Replay.Models.Events;
 using Replay.Models.Unreal;
 
-namespace Replay.Valorant.Flashes;
+namespace Replay.Valorant.Events.Flashes;
 
 public enum ValorantFlashKind
 {

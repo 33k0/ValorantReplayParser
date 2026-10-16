@@ -1,3 +1,3 @@
 using System.Runtime.CompilerServices;
 
-[assembly: InternalsVisibleTo("Replay.Valorant.Tests")]
+[assembly: InternalsVisibleTo("Replay.Valorant.Events.Tests")]

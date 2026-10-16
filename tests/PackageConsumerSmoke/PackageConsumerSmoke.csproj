@@ -9,6 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="ValorantReplayParser" Version="$(PackageUnderTestVersion)" />
+    <PackageReference Include="ValorantReplayParser.Events" Version="$(PackageUnderTestVersion)" />
   </ItemGroup>
 
   <Target Name="RequirePackageUnderTestVersion" BeforeTargets="CollectPackageReferences;Restore;Build;Pack">

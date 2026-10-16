@@ -2,11 +2,11 @@ using Replay.Models.Descriptors;
 using Replay.Models.Events;
 using Replay.Models.Net;
 using Replay.Models.Unreal;
+using Replay.Valorant.Events.Walls;
 using Replay.Valorant.GameState;
-using Replay.Valorant.Walls;
 using Replay.Valorant.Walls.Descriptors;
 
-namespace Replay.Valorant.Tests.Walls;
+namespace Replay.Valorant.Events.Tests.Walls;
 
 public class ValorantWallEventEnricherTests
 {

@@ -1,10 +1,11 @@
-using Replay.Encoding.Net;
 using Replay.Encoding.Archives;
+using Replay.Encoding.Net;
 using Replay.Models.Net;
 using Replay.Unreal.Parsing;
 using Replay.Valorant.Combat;
+using Replay.Valorant.Events.Combat;
 
-namespace Replay.Valorant.Tests.Combat;
+namespace Replay.Valorant.Events.Tests.Combat;
 
 public class ValorantEquippableTests
 {
@@ -105,27 +106,4 @@ public class ValorantEquippableTests
         });
     }
 
-    [Test]
-    public void DamageEquippableFieldDecoder_ResolvesTheEncodedNetGuid()
-    {
-        const string classPath = "/Game/Equippables/Guns/Rifles/AK/AssaultRifle_AK.AssaultRifle_AK_C";
-        var cache = new NetGuidCache();
-        cache.SetNetGuidPath(17, classPath);
-        var field = new MulticastNotifyDamagePointParameters().Fields
-            .Single(candidate => candidate.PropertyName == "EquippableUsed");
-        Assert.That(field.Decoder, Is.AssignableTo<IFieldDecoder>());
-        var decoder = (IFieldDecoder)field.Decoder!;
-        var context = new FieldDecodeContext { NetGuidCache = cache };
-        using var archive = new BitArchiveReader(new byte[] { 0x22 }, bitCount: 8);
-
-        var value = decoder.Decode(ref context, archive);
-        var equippable = (ValorantEquippable)value.ObjectValue!;
-
-        Assert.Multiple(() =>
-        {
-            Assert.That(equippable.NetGuid, Is.EqualTo(17));
-            Assert.That(equippable.Name, Is.EqualTo("Vandal"));
-            Assert.That(archive.AtEnd, Is.True);
-        });
-    }
 }

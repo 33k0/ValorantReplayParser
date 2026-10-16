@@ -6,10 +6,8 @@ using Replay.Valorant.Combat;
 namespace Replay.Valorant.Descriptors.Effects.Replay;
 
 public sealed class ReplayPlayContinuousEffectAtLocationParameters
-    : ExportGroupDescriptor<ReplayPlayContinuousEffectAtLocationParameters>, IDecodedPayloadEventEmitter
+    : ExportGroupDescriptor<ReplayPlayContinuousEffectAtLocationParameters>
 {
-    private const string AttackVectorPrefix = "FiringState.AttackVector.";
-
     public override string Path => "/Script/ShooterGame.ReplayEffectComponent:ReplayPlayContinuousEffectAtLocation";
     public override ExportCategory Categories => ExportCategory.Effects | ExportCategory.Gunplay;
     public override ExportGroupKind Kind => ExportGroupKind.ClassNetCache;
@@ -44,81 +42,5 @@ public sealed class ReplayPlayContinuousEffectAtLocationParameters
         AddPropertyHandle(27, x => x.Rotation, ExportCategory.Effects | ExportCategory.Gunplay).FRotatorShort();
         AddPropertyHandle(28, x => x.AllianceFilter, ExportCategory.Effects).EnumRemainingBits();
         AddPropertyHandle(29, x => x.StartMovementTime, ExportCategory.Effects | ExportCategory.Gunplay).Float();
-    }
-
-    public void EmitDecodedEvents(ref FieldDecodeContext context)
-    {
-        context.EventSink?.Emit(new ValorantShotReceived(
-            context.CurrentTimeSeconds,
-            context.CurrentPacketId,
-            context.ActorNetGuid.Value,
-            context.ObjectNetGuid.Value,
-            context.ChannelIndex,
-            CreateShot()));
-    }
-
-    public ValorantShot CreateShot()
-    {
-        return new ValorantShot(
-            EffectId,
-            StartMovementTime,
-            SourceId,
-            IsLocalEffect,
-            IsTransient,
-            WaitOnReplicationActor,
-            AllianceFilter,
-            Location,
-            Rotation,
-            GetFloat("FiringState.AmmoRemaining"),
-            GetFloat("FiringState.NumProjectiles"),
-            GetFloat("FiringState.RandomSeed"),
-            GetFloat("FiringState.TracerOption"),
-            GetFloat("FiringState.BurstShotNumber"),
-            GetFloat("FiringState.YawSwitch"),
-            GetObject("FiringState.FiringPlayerState"),
-            GetObject("FiringState.FiringState"),
-            GetAttackVectors(),
-            GetObject("FXC.Equippable"),
-            Equippable: null,
-            EffectContainer: EffectContainer);
-    }
-
-    private float? GetFloat(string tagName)
-    {
-        return FloatValues?.FirstOrDefault(value => value.Name?.TagName == tagName)?.Float;
-    }
-
-    private uint? GetObject(string tagName)
-    {
-        return ObjectValues?.FirstOrDefault(value => value.Name?.TagName == tagName)?.Object;
-    }
-
-    private IReadOnlyList<FVector> GetAttackVectors()
-    {
-        if (VectorValues is null)
-        {
-            return [];
-        }
-
-        return VectorValues
-            .Select(value => new
-            {
-                Index = GetAttackVectorIndex(value.Name?.TagName),
-                value.Vector,
-            })
-            .Where(value => value.Index is >= 1 and <= 15 && value.Vector.HasValue)
-            .OrderBy(value => value.Index)
-            .Select(value => value.Vector!.Value)
-            .ToArray();
-    }
-
-    private static int? GetAttackVectorIndex(string? tagName)
-    {
-        if (tagName is null || !tagName.StartsWith(AttackVectorPrefix, StringComparison.Ordinal))
-        {
-            return null;
-        }
-
-        return int.TryParse(tagName[AttackVectorPrefix.Length..], out var index) ? index : null;
     }
 }

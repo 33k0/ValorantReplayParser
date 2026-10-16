@@ -2,10 +2,12 @@ using System.Text.Json;
 using Replay.Models.Descriptors;
 using Replay.Models.Events;
 using Replay.Valorant.Combat;
-using Replay.Valorant.Flashes;
+using Replay.Valorant.Events.Combat;
+using Replay.Valorant.Events.Flashes;
+using Replay.Valorant.Events.Movement;
+using Replay.Valorant.Events.Nearsights;
+using Replay.Valorant.Events.Walls;
 using Replay.Valorant.Movement;
-using Replay.Valorant.Nearsights;
-using Replay.Valorant.Walls;
 
 namespace CliReader.JsonExport;
 

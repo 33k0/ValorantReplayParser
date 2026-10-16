@@ -1,7 +1,7 @@
 using Replay.Encoding.Net;
 using Replay.Models.Net;
 
-namespace Replay.Valorant.Combat;
+namespace Replay.Valorant.Events.Combat;
 
 public static class ValorantEquippableResolver
 {

@@ -1,7 +1,7 @@
 using Replay.Models.Events;
 using Replay.Models.Unreal;
 
-namespace Replay.Valorant.Nearsights;
+namespace Replay.Valorant.Events.Nearsights;
 
 public enum ValorantNearsightKind
 {

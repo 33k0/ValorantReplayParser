@@ -1,9 +1,10 @@
 using Replay.Encoding.Net;
 using Replay.Models.Events;
 using Replay.Models.Net;
+using Replay.Valorant.Descriptors.Effects.Replay;
 using Replay.Valorant.GameState;
 
-namespace Replay.Valorant.Combat;
+namespace Replay.Valorant.Events.Combat;
 
 internal sealed class ValorantShotEventEnricher : IReplayEventSink
 {
@@ -33,6 +34,11 @@ internal sealed class ValorantShotEventEnricher : IReplayEventSink
                 break;
             case RpcReceived rpc:
                 TrackWeaponRpc(rpc);
+                if (rpc is { WasDecoded: true, Payload: ReplayPlayContinuousEffectAtLocationParameters parameters })
+                {
+                    Emit(new ValorantShotReceived(rpc.TimeSeconds, rpc.PacketId, rpc.ActorNetGuid,
+                        rpc.ObjectNetGuid, rpc.ChannelIndex, ValorantShotFactory.Create(parameters)));
+                }
                 break;
             case ValorantShotReceived shot:
                 var fireMode = ValorantShotFireModeResolver.Resolve(shot.Shot, _netGuidCache);

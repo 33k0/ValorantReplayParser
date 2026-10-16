@@ -11,16 +11,12 @@ using Replay.Models.Replay;
 using Replay.Models.Results;
 using Replay.Unreal.Chunks;
 using Replay.Unreal.Readers;
-using Replay.Valorant.Combat;
 using Replay.Valorant.Descriptors;
-using Replay.Valorant.Flashes;
-using Replay.Valorant.Nearsights;
-using Replay.Valorant.Walls;
 
 namespace Replay.Valorant;
 
 /// <summary>
-/// Reads VALORANT replay containers and emits the gameplay events understood by this parser version.
+/// Reads VALORANT replay containers and emits native decoded events understood by this parser version.
 /// </summary>
 /// <remarks>
 /// This is a synchronous, VALORANT-specific reader. Instances support sequential reuse, but not concurrent
@@ -251,13 +247,9 @@ public sealed class ValorantReplayReader
 
         var netGuidCache = new NetGuidCache();
         var consumerSink = new ConsumerEventSink(_eventSink);
-        var wallEventEnricher = new ValorantWallEventEnricher(consumerSink);
-        var nearsightEventEnricher = new ValorantNearsightEventEnricher(wallEventEnricher, netGuidCache);
-        var flashEventEnricher = new ValorantFlashEventEnricher(nearsightEventEnricher, netGuidCache);
-        var eventSink = new ValorantShotEventEnricher(flashEventEnricher, netGuidCache);
         var context = new ReplayReaderContext(
             archive,
-            eventSink,
+            consumerSink,
             _descriptorCatalog,
             SnapshotParseProfile(_parseProfile),
             _loggerFactory,
@@ -273,9 +265,6 @@ public sealed class ValorantReplayReader
         {
             dispatcher.DispatchRemaining(context);
             context.BunchPayloadPipeline.FinalizePending();
-            flashEventEnricher.Complete();
-            nearsightEventEnricher.Complete();
-            wallEventEnricher.Complete();
             return CreateReadResult(context);
         }
         finally

@@ -3,7 +3,7 @@ using Replay.Unreal.Parsing;
 
 namespace Replay.Valorant.Flashes.Descriptors;
 
-internal interface IFlashSourcePayload
+public interface IFlashSourcePayload
 {
     uint? Owner { get; }
     uint? Instigator { get; }

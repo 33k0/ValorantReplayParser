@@ -1,10 +1,13 @@
-using Replay.Models.Errors;
-using Replay.Models.Diagnostics;
 using Replay.Models.Descriptors;
+using Replay.Models.Diagnostics;
+using Replay.Models.Errors;
 using Replay.Models.Events;
 using Replay.Models.Replay;
 using Replay.Unreal.Parsing;
 using Replay.Valorant;
+using Replay.Valorant.Events;
+using Replay.Valorant.Events.Combat;
+using Replay.Valorant.Events.Movement;
 
 namespace PackageConsumerSmoke;
 
@@ -72,6 +75,16 @@ internal static class Program
 
         var typedGameplayEventCount = eventSink.Events.Count(IsTypedGameplayEvent);
         Require(typedGameplayEventCount > 0, "The parser did not emit any typed gameplay events.");
+        Require(eventSink.Events.All(e => e is ActorSpawned or ActorClosed or ExportGroupReceived or RpcReceived or NetGuidExported),
+            "The core parser emitted a derived event.");
+        var enrichedSink = new CapturingReplayEventSink();
+        var enrichment = new ValorantEventEnricher(enrichedSink);
+        foreach (var nativeEvent in eventSink.Events) enrichment.Emit(nativeEvent);
+        enrichment.Complete();
+        Require(enrichedSink.Events.OfType<RemoteCharacterMovementReceived>().Any(), "Movement enrichment produced no events.");
+        var nativeShots = eventSink.Events.OfType<RpcReceived>()
+            .Count(e => e is { WasDecoded: true, Payload: Replay.Valorant.Descriptors.Effects.Replay.ReplayPlayContinuousEffectAtLocationParameters });
+        Require(enrichedSink.Events.OfType<ValorantShotReceived>().Count() == nativeShots, "Shot enrichment count differs from native RPCs.");
 
         var exportGroups = result.ExportGroups;
         Require(exportGroups.Count > 0, "The result did not expose any detached export-group summaries.");

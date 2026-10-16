@@ -1,5 +1,3 @@
-using TargetHitKey = (uint NearsightActorNetGuid, uint TargetCharacterNetGuid);
-using TargetEffectKey = (uint TargetCharacterNetGuid, ulong EffectId);
 using Replay.Encoding.Net;
 using Replay.Models.Events;
 using Replay.Models.Net;
@@ -8,8 +6,10 @@ using Replay.Valorant.Descriptors.Agents;
 using Replay.Valorant.Flashes.Descriptors;
 using Replay.Valorant.GameState;
 using Replay.Valorant.Nearsights.Descriptors;
+using TargetEffectKey = (uint TargetCharacterNetGuid, ulong EffectId);
+using TargetHitKey = (uint NearsightActorNetGuid, uint TargetCharacterNetGuid);
 
-namespace Replay.Valorant.Nearsights;
+namespace Replay.Valorant.Events.Nearsights;
 
 internal sealed class ValorantNearsightEventEnricher : IReplayEventSink
 {

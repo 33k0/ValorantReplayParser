@@ -4,7 +4,7 @@ using Replay.Valorant.Descriptors.Agents;
 using Replay.Valorant.GameState;
 using Replay.Valorant.Walls.Descriptors;
 
-namespace Replay.Valorant.Walls;
+namespace Replay.Valorant.Events.Walls;
 
 internal sealed class ValorantWallEventEnricher : IReplayEventSink
 {

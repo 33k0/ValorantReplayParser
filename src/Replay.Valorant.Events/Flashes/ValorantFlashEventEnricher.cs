@@ -1,7 +1,3 @@
-using BlindKey = (uint TargetCharacterNetGuid, uint BlindId, ulong? EffectId, int StartMovementTimeBits);
-using TargetEffectKey = (uint TargetCharacterNetGuid, ulong EffectId);
-using TargetFlashKey = (uint TargetCharacterNetGuid, uint FlashActorNetGuid);
-using EffectFallbackKey = (uint TargetCharacterNetGuid, ulong? EffectId, uint ContextActorNetGuid, int StartMovementTimeBits, int DurationBits);
 using Replay.Encoding.Net;
 using Replay.Models.Events;
 using Replay.Models.Net;
@@ -9,8 +5,12 @@ using Replay.Models.Unreal;
 using Replay.Valorant.Descriptors.Agents;
 using Replay.Valorant.Flashes.Descriptors;
 using Replay.Valorant.GameState;
+using BlindKey = (uint TargetCharacterNetGuid, uint BlindId, ulong? EffectId, int StartMovementTimeBits);
+using EffectFallbackKey = (uint TargetCharacterNetGuid, ulong? EffectId, uint ContextActorNetGuid, int StartMovementTimeBits, int DurationBits);
+using TargetEffectKey = (uint TargetCharacterNetGuid, ulong EffectId);
+using TargetFlashKey = (uint TargetCharacterNetGuid, uint FlashActorNetGuid);
 
-namespace Replay.Valorant.Flashes;
+namespace Replay.Valorant.Events.Flashes;
 
 internal sealed class ValorantFlashEventEnricher : IReplayEventSink
 {

@@ -74,7 +74,7 @@
       <ProjectReference Include="..\..\src\Replay.Encoding\Replay.Encoding.csproj" />
       <ProjectReference Include="..\..\src\Replay.Models\Replay.Models.csproj" />
       <ProjectReference Include="..\..\src\Replay.Unreal\Replay.Unreal.csproj" />
-      <ProjectReference Include="..\..\src\Replay.Valorant\Replay.Valorant.csproj" />
+      <ProjectReference Include="..\..\src\Replay.Valorant.Events\Replay.Valorant.Events.csproj" />
     </ItemGroup>
 
 </Project>

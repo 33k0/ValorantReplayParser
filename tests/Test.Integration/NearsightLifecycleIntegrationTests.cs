@@ -1,7 +1,8 @@
 using Replay.Encoding.Archives;
 using Replay.Models.Events;
 using Replay.Valorant;
-using Replay.Valorant.Nearsights;
+using Replay.Valorant.Events;
+using Replay.Valorant.Events.Nearsights;
 
 namespace Test.Integration;
 
@@ -145,7 +146,9 @@ public class NearsightLifecycleIntegrationTests
         var sink = new CapturingReplayEventSink();
         using var stream = File.OpenRead(replayPath);
         using var archive = new FBinaryArchive(stream);
-        var result = ValorantReplayReader.CreateDefault(loggerFactory: null, eventSink: sink).Read(archive);
+        var events = new ValorantEventEnricher(sink);
+        var result = ValorantReplayReader.CreateDefault(loggerFactory: null, eventSink: events).Read(archive);
+        events.Complete();
         return (sink, result);
     }
 

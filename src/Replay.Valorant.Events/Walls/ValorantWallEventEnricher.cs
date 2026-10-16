@@ -91,9 +91,9 @@ internal sealed class ValorantWallEventEnricher : IReplayEventSink
                 TrackSageSegment(exportGroup, segment);
                 break;
             case GenericAgentDescriptor agent:
-                if (agent.HasDecoded(nameof(GenericAgentDescriptor.PlayerState)) && agent.PlayerState != 0)
+                if (agent.HasDecoded(nameof(GenericAgentDescriptor.PlayerState)) && agent.PlayerState.NetGuid != 0)
                 {
-                    SetCharacterPlayerState(exportGroup.ActorNetGuid, agent.PlayerState);
+                    SetCharacterPlayerState(exportGroup.ActorNetGuid, agent.PlayerState.NetGuid);
                 }
                 break;
             case BombPlayerStateDescriptor playerState:
@@ -109,8 +109,8 @@ internal sealed class ValorantWallEventEnricher : IReplayEventSink
             return;
         }
 
-        wall.OwnerNetGuid = descriptor.Owner ?? wall.OwnerNetGuid;
-        wall.CasterCharacterNetGuid = descriptor.Instigator ?? wall.CasterCharacterNetGuid;
+        wall.OwnerNetGuid = descriptor.Owner?.NetGuid ?? wall.OwnerNetGuid;
+        wall.CasterCharacterNetGuid = descriptor.Instigator?.NetGuid ?? wall.CasterCharacterNetGuid;
     }
 
     private void TrackActiveVyseWall(uint actorNetGuid, IWallOwnedActor descriptor)
@@ -120,8 +120,8 @@ internal sealed class ValorantWallEventEnricher : IReplayEventSink
             return;
         }
 
-        active.WallActorNetGuid = descriptor.Owner ?? active.WallActorNetGuid;
-        active.CasterCharacterNetGuid = descriptor.Instigator ?? active.CasterCharacterNetGuid;
+        active.WallActorNetGuid = descriptor.Owner?.NetGuid ?? active.WallActorNetGuid;
+        active.CasterCharacterNetGuid = descriptor.Instigator?.NetGuid ?? active.CasterCharacterNetGuid;
         if (active.WallActorNetGuid is { } wallActor && _walls.TryGetValue(wallActor, out var wall))
         {
             wall.ActiveWallActorNetGuid = actorNetGuid;
@@ -135,7 +135,7 @@ internal sealed class ValorantWallEventEnricher : IReplayEventSink
             return;
         }
 
-        if (descriptor.HasDecoded(nameof(SageWallSegmentDescriptor.Owner)) && descriptor.Owner is { } owner &&
+        if (descriptor.HasDecoded(nameof(SageWallSegmentDescriptor.Owner)) && descriptor.Owner?.NetGuid is { } owner &&
             _walls.TryGetValue(owner, out var wall))
         {
             segment.WallActorNetGuid = owner;
@@ -231,7 +231,7 @@ internal sealed class ValorantWallEventEnricher : IReplayEventSink
         active.WallStart = parameters.WallStartLocation;
         active.WallEnd = parameters.WallEndLocation;
         active.ImpactNormal = parameters.WallImpactNormal;
-        active.TriggerCharacterNetGuid = parameters.EnemyTrigger;
+        active.TriggerCharacterNetGuid = parameters.EnemyTrigger?.NetGuid;
         if (active.WallActorNetGuid is null)
         {
             active.WallActorNetGuid = FindVysePlacement(active.WallStart, active.WallEnd)?.Spawn.ActorNetGuid;
@@ -432,11 +432,11 @@ internal sealed class ValorantWallEventEnricher : IReplayEventSink
 
         if (playerState.HasDecoded(nameof(BombPlayerStateDescriptor.PossessedCharacter)))
         {
-            SetCharacterPlayerState(playerState.PossessedCharacter, playerStateNetGuid);
+            SetCharacterPlayerState(playerState.PossessedCharacter.NetGuid, playerStateNetGuid);
         }
         else if (playerState.HasDecoded(nameof(BombPlayerStateDescriptor.SpawnedCharacter)))
         {
-            SetCharacterPlayerState(playerState.SpawnedCharacter, playerStateNetGuid);
+            SetCharacterPlayerState(playerState.SpawnedCharacter.NetGuid, playerStateNetGuid);
         }
     }
 

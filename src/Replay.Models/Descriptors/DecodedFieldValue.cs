@@ -1,3 +1,4 @@
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 
 namespace Replay.Models.Descriptors;
@@ -13,7 +14,7 @@ public readonly record struct DecodedFieldValue
         ulong uint64Value = 0,
         float floatValue = 0,
         double doubleValue = 0,
-        uint netGuidValue = 0,
+        NetObjectReference objectReferenceValue = default,
         Guid guidValue = default,
         string? stringValue = null,
         FVector vectorValue = default,
@@ -31,7 +32,7 @@ public readonly record struct DecodedFieldValue
         UInt64Value = uint64Value;
         FloatValue = floatValue;
         DoubleValue = doubleValue;
-        NetGuidValue = netGuidValue;
+        ObjectReferenceValue = objectReferenceValue;
         GuidValue = guidValue;
         StringValue = stringValue;
         VectorValue = vectorValue;
@@ -60,7 +61,7 @@ public readonly record struct DecodedFieldValue
 
     public double DoubleValue { get; }
 
-    public uint NetGuidValue { get; }
+    public NetObjectReference ObjectReferenceValue { get; }
     public Guid GuidValue { get; }
 
     public string? StringValue { get; }
@@ -91,7 +92,8 @@ public readonly record struct DecodedFieldValue
 
     public static DecodedFieldValue FromDouble(double value) => new(DecodedFieldValueKind.Double, doubleValue: value);
 
-    public static DecodedFieldValue FromNetGuid(uint value) => new(DecodedFieldValueKind.NetGuid, netGuidValue: value);
+    public static DecodedFieldValue FromObjectReference(NetObjectReference value) =>
+        new(DecodedFieldValueKind.ObjectReference, objectReferenceValue: value);
 
     public static DecodedFieldValue FromGuid(Guid value) => new(DecodedFieldValueKind.Guid, guidValue: value);
 

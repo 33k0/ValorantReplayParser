@@ -36,7 +36,7 @@ public class UltimateObjectiveDescriptorTests
         using var archive = new BitArchiveReader(new byte[] { 0x54 }, 8);
         var context = new FieldDecodeContext();
         var decoded = ((IFieldDecoder)field.Decoder!).Decode(ref context, archive);
-        Assert.That(decoded.NetGuidValue, Is.EqualTo(42));
+        Assert.That(decoded.ObjectReferenceValue.NetGuid, Is.EqualTo(42));
         Assert.That(archive.AtEnd, Is.True);
     }
 

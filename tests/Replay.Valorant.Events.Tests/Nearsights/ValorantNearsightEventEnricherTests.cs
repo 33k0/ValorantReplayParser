@@ -23,7 +23,7 @@ public class ValorantNearsightEventEnricherTests
         var enricher = new ValorantNearsightEventEnricher(sink, new NetGuidCache());
         var identity = new BombPlayerStateDescriptor
         {
-            Subject = "target", SpawnedCharacter = 20, PossessedCharacter = device,
+            Subject = "target", SpawnedCharacter = new(20, null), PossessedCharacter = new(device, null),
         };
         identity.MarkDecoded(nameof(identity.Subject));
         identity.MarkDecoded(nameof(identity.SpawnedCharacter));
@@ -33,7 +33,7 @@ public class ValorantNearsightEventEnricherTests
         enricher.Emit(Export(1, 2, 100, Projectile(20, owner: 60)));
         enricher.Emit(EffectStarted(1.1f, 3, device, 100, 11, 2));
         enricher.Emit(EffectStarted(1.2f, 4, 20, 100, 12, 2));
-        var released = new BombPlayerStateDescriptor { PossessedCharacter = 20 };
+        var released = new BombPlayerStateDescriptor { PossessedCharacter = new(20, null) };
         released.MarkDecoded(nameof(released.PossessedCharacter));
         enricher.Emit(Export(1.3f, 5, 30, released));
         enricher.Emit(EffectStarted(1.4f, 6, device, 100, 13, 2));
@@ -143,8 +143,8 @@ public class ValorantNearsightEventEnricherTests
     {
         var playerState = new BombPlayerStateDescriptor
         {
-            SpawnedCharacter = characterNetGuid,
-            PossessedCharacter = characterNetGuid,
+            SpawnedCharacter = new(characterNetGuid, null),
+            PossessedCharacter = new(characterNetGuid, null),
             Subject = subject,
         };
         playerState.MarkDecoded(nameof(BombPlayerStateDescriptor.SpawnedCharacter));
@@ -157,8 +157,8 @@ public class ValorantNearsightEventEnricherTests
     {
         var descriptor = new OmenNearsightProjectileDescriptor
         {
-            Instigator = instigator,
-            Owner = owner,
+            Instigator = new(instigator, null),
+            Owner = new(owner, null),
             ReplicatedMovement = Movement(),
         };
         MarkProjectileDecoded(descriptor);
@@ -169,8 +169,8 @@ public class ValorantNearsightEventEnricherTests
     {
         var descriptor = new ReynaNearsightProjectileDescriptor
         {
-            Instigator = instigator,
-            Owner = owner,
+            Instigator = new(instigator, null),
+            Owner = new(owner, null),
             ReplicatedMovement = Movement(),
         };
         MarkProjectileDecoded(descriptor);
@@ -181,8 +181,8 @@ public class ValorantNearsightEventEnricherTests
     {
         var descriptor = new HarborNearsightProjectileDescriptor
         {
-            Instigator = instigator,
-            Owner = owner,
+            Instigator = new(instigator, null),
+            Owner = new(owner, null),
             ReplicatedMovement = Movement(),
         };
         MarkProjectileDecoded(descriptor);
@@ -215,7 +215,7 @@ public class ValorantNearsightEventEnricherTests
             new EffectManagerPlayContinuousParameters
             {
                 AttachSocket = attachSocket,
-                EffectContainer = 500,
+                EffectContainer = new(500, null),
                 EffectId = effectId,
                 StartMovementTime = time,
                 FunctionFloatValues =
@@ -231,7 +231,7 @@ public class ValorantNearsightEventEnricherTests
                     new EffectManagerFunctionObjectValue
                     {
                         Name = new FGameplayTag(2, "FXC.EffectContext"),
-                        Value = contextActorNetGuid,
+                        Value = new(contextActorNetGuid, null),
                     },
                 ],
             });

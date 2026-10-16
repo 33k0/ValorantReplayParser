@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Unreal.Parsing;
 using Replay.Valorant.Descriptors;
 
@@ -14,10 +15,10 @@ public sealed class BombPlayerStateDescriptor : ExportGroupDescriptor<BombPlayer
     public RiotUniqueNetId? UniqueId { get; set; }
     public int CompetitiveTier { get; set; }
     public string? Subject { get; set; }
-    public uint SpectatedPlayer { get; set; }
-    public uint PlayerInfo { get; set; }
-    public uint SpawnedCharacter { get; set; }
-    public uint PossessedCharacter { get; set; }
+    public NetObjectReference SpectatedPlayer { get; set; }
+    public NetObjectReference PlayerInfo { get; set; }
+    public NetObjectReference SpawnedCharacter { get; set; }
+    public NetObjectReference PossessedCharacter { get; set; }
     public bool UltimateActive { get; set; }
     public int NumUltimatePoints { get; set; }
     public int TotalAcquiredUltimatePoints { get; set; }

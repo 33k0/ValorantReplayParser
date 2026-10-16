@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Unreal.Parsing;
 
 namespace Replay.Valorant.Combat;
@@ -9,14 +10,14 @@ public sealed class MulticastNotifyDamagePointParameters : PointDamageParameters
 
     public DamageAssist?[]? AssistsList { get; set; }
     public byte? AssistType { get; set; }
-    public uint Assister { get; set; }
-    public uint AssistingEquippableClass { get; set; }
+    public NetObjectReference Assister { get; set; }
+    public NetObjectReference AssistingEquippableClass { get; set; }
     public Replay.Models.Unreal.FGameplayTag? AssistTag { get; set; }
     public int KillsForKiller { get; set; }
     public int KillsForVictim { get; set; }
-    public uint DeathAnimMontage { get; set; }
-    public uint? DeathMontageEffectOverride { get; set; }
-    public uint? DeathMontageEffectOverrideContext { get; set; }
+    public NetObjectReference DeathAnimMontage { get; set; }
+    public NetObjectReference? DeathMontageEffectOverride { get; set; }
+    public NetObjectReference? DeathMontageEffectOverrideContext { get; set; }
     public bool DeathMontageEffectOverrideIsQueued { get; set; }
 
     protected override void Configure()

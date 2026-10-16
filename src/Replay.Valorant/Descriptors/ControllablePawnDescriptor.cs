@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Unreal.Parsing;
 
 namespace Replay.Valorant.Descriptors;
@@ -14,10 +15,10 @@ public sealed class ControllablePawnDescriptor(string path) : ExportGroupDescrip
     public override object CreatePayloadInstance() => new ControllablePawnDescriptor(path);
     public override ExportCategory Categories => ExportCategory.Agent;
     public override ExportGroupKind Kind => ExportGroupKind.Actor;
-    public uint Owner { get; set; }
-    public uint Instigator { get; set; }
-    public uint PlayerState { get; set; }
-    public uint Controller { get; set; }
+    public NetObjectReference Owner { get; set; }
+    public NetObjectReference Instigator { get; set; }
+    public NetObjectReference PlayerState { get; set; }
+    public NetObjectReference Controller { get; set; }
     protected override void Configure()
     {
         AddProperty(x => x.Owner).ObjectNetGuid();

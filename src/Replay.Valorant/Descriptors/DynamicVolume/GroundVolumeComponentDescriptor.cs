@@ -1,5 +1,6 @@
 using Replay.Encoding.Archives;
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 
@@ -14,8 +15,8 @@ public sealed class GroundVolumeComponentDescriptor : ExportGroupDescriptor<Grou
     public override ExportCategory Categories => ExportCategory.Ability;
     public override ExportGroupKind Kind => ExportGroupKind.Component;
     public bool? IsActive { get; set; }
-    public uint? AttachParent { get; set; }
-    public uint? VolumeMaxExtentShape { get; set; }
+    public NetObjectReference? AttachParent { get; set; }
+    public NetObjectReference? VolumeMaxExtentShape { get; set; }
     public int? FinalCount { get; set; }
     public GroundVolumeDelta? FragmentDelta { get; set; }
 

@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 
@@ -7,7 +8,7 @@ namespace Replay.Valorant.Descriptors.Effects.Replay;
 public sealed class EffectDataObject : ExportGroupDescriptor<EffectDataObject>
 {
     public FGameplayTag? Name { get; set; }
-    public uint? Object { get; set; }
+    public NetObjectReference? Object { get; set; }
 
     protected override void Configure()
     {

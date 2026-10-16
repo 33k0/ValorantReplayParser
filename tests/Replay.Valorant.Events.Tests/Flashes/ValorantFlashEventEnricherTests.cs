@@ -21,7 +21,7 @@ public class ValorantFlashEventEnricherTests
         SpawnAndExplodeKayo(enricher, 1, 100);
         var manager = BlindManager(7, 99, 0);
         var blind = manager.ActiveBlinds![0]!;
-        blind.CausingActor = 100;
+        blind.CausingActor = new(100, null);
         manager.ActiveBlinds = includeBlind ? [null, blind, null] : [null, null];
 
         enricher.Emit(Export(1.1f, 3, 20, manager));
@@ -87,7 +87,7 @@ public class ValorantFlashEventEnricherTests
         var enricher = new ValorantFlashEventEnricher(sink, new NetGuidCache());
         var identity = new BombPlayerStateDescriptor
         {
-            Subject = "target", SpawnedCharacter = 20, PossessedCharacter = device,
+            Subject = "target", SpawnedCharacter = new(20, null), PossessedCharacter = new(device, null),
         };
         identity.MarkDecoded(nameof(identity.Subject));
         identity.MarkDecoded(nameof(identity.SpawnedCharacter));
@@ -100,7 +100,7 @@ public class ValorantFlashEventEnricherTests
             if (blindManager)
             {
                 var manager = BlindManager((uint)effectId, effectId, 0);
-                manager.ActiveBlinds![0]!.CausingActor = 100;
+                manager.ActiveBlinds![0]!.CausingActor = new(100, null);
                 manager.ActiveBlinds[0]!.InitialDuration = 1;
                 enricher.Emit(Export(time, packet, target, manager));
             }
@@ -112,7 +112,7 @@ public class ValorantFlashEventEnricherTests
 
         Blind(device, 1.1f, 3, 11);
         Blind(20, 1.2f, 4, 12); // Body hits still count while controlling the device.
-        var released = new BombPlayerStateDescriptor { PossessedCharacter = 20 };
+        var released = new BombPlayerStateDescriptor { PossessedCharacter = new(20, null) };
         released.MarkDecoded(nameof(released.PossessedCharacter));
         enricher.Emit(Export(1.3f, 5, 30, released));
         Blind(device, 1.4f, 6, 13); // Possession must not permanently turn a device into an agent.
@@ -135,7 +135,7 @@ public class ValorantFlashEventEnricherTests
         var enricher = new ValorantFlashEventEnricher(sink, new NetGuidCache());
         enricher.Emit(SpawnFlash(1, 100, FlashPaths.VyseFlashTrap));
         var manager = BlindManager(1, 101, 0);
-        manager.ActiveBlinds![0]!.CausingActor = 100;
+        manager.ActiveBlinds![0]!.CausingActor = new(100, null);
         enricher.Emit(Export(2, 3, 412, manager));
         Assert.Multiple(() =>
         {
@@ -168,7 +168,7 @@ public class ValorantFlashEventEnricherTests
         enricher.Emit(SpawnFlash(1, 100, FlashPaths.KayoOverhandProjectile));
 
         enricher.Emit(Export(1.01f, 20, 100, Projectile(
-            instigator: 20,
+            instigator: new(20, null),
             new FRepMovement(
                 new FVector(4, 5, 6),
                 new FVector(7, 8, 9),
@@ -217,7 +217,7 @@ public class ValorantFlashEventEnricherTests
         var enricher = new ValorantFlashEventEnricher(sink, new NetGuidCache());
         RegisterPlayer(enricher, 20, 30, "subject-1");
         enricher.Emit(SpawnFlash(1, 100, FlashPaths.SkyeProjectile));
-        enricher.Emit(Export(1.01f, 2, 100, Projectile(20, Movement(new FVector(1, 2, 3)))));
+        enricher.Emit(Export(1.01f, 2, 100, Projectile(new(20, null), Movement(new FVector(1, 2, 3)))));
         enricher.Emit(new ActorClosed(2, 3, 100, 1, ChannelCloseReason.Destroyed));
         enricher.Emit(SpawnFlash(2.01f, 200, FlashPaths.SkyeFlashSource));
         enricher.Emit(Rpc(
@@ -234,8 +234,8 @@ public class ValorantFlashEventEnricherTests
             EffectId = 99,
             InitialDuration = 1.25f,
             StartNetMovementTime = 2.02f,
-            BlindConfig = 300,
-            CausingActor = 200,
+            BlindConfig = new(300, null),
+            CausingActor = new(200, null),
         };
         var manager = new BlindManagerComponentDescriptor { ActiveBlinds = [blind] };
         manager.MarkDecoded(nameof(BlindManagerComponentDescriptor.ActiveBlinds));
@@ -266,7 +266,7 @@ public class ValorantFlashEventEnricherTests
         var enricher = new ValorantFlashEventEnricher(sink, new NetGuidCache());
         RegisterPlayer(enricher, 20, 30, "subject-1");
         enricher.Emit(SpawnFlash(1, 100, FlashPaths.YoruProjectile));
-        enricher.Emit(Export(1.01f, 2, 100, YoruProjectile(20, Movement(new FVector(4, 5, 6)))));
+        enricher.Emit(Export(1.01f, 2, 100, YoruProjectile(new(20, null), Movement(new FVector(4, 5, 6)))));
         enricher.Emit(StopRpc(1.2f, 3, 100));
 
         var cast = sink.Events.OfType<ValorantFlashCast>().Single();
@@ -289,16 +289,16 @@ public class ValorantFlashEventEnricherTests
         enricher.Emit(SpawnFlash(1, 100, FlashPaths.VyseFlashTrap));
         enricher.Emit(Export(1.01f, 2, 100, new VyseFlashSourceDescriptor
         {
-            Instigator = 20,
+            Instigator = new(20, null),
         }));
 
         var first = BlindManager(1, 101, 300);
-        first.ActiveBlinds![0]!.CausingActor = 100;
+        first.ActiveBlinds![0]!.CausingActor = new(100, null);
         first.ActiveBlinds![0]!.InitialDuration = 1.2f;
         enricher.Emit(Export(2, 3, 20, first));
 
         var second = BlindManager(2, 102, 300);
-        second.ActiveBlinds![0]!.CausingActor = 100;
+        second.ActiveBlinds![0]!.CausingActor = new(100, null);
         second.ActiveBlinds![0]!.InitialDuration = 0.4f;
         enricher.Emit(Export(3, 4, 20, second));
 
@@ -348,7 +348,7 @@ public class ValorantFlashEventEnricherTests
         var enricher = new ValorantFlashEventEnricher(sink, new NetGuidCache());
         RegisterPlayer(enricher, 20, 30, "subject-1");
         enricher.Emit(SpawnFlash(1, 100, FlashPaths.BreachProjectile));
-        enricher.Emit(Export(1.01f, 2, 100, Projectile(20, Movement(new FVector(1, 2, 3)))));
+        enricher.Emit(Export(1.01f, 2, 100, Projectile(new(20, null), Movement(new FVector(1, 2, 3)))));
 
         enricher.Emit(EffectRpc(1.5f, 3, 20, 100, 0.7f, 50));
         enricher.Emit(StopRpc(2, 4, 100));
@@ -420,8 +420,8 @@ public class ValorantFlashEventEnricherTests
     {
         var playerState = new BombPlayerStateDescriptor
         {
-            SpawnedCharacter = characterNetGuid,
-            PossessedCharacter = characterNetGuid,
+            SpawnedCharacter = new(characterNetGuid, null),
+            PossessedCharacter = new(characterNetGuid, null),
             Subject = subject,
         };
         playerState.MarkDecoded(nameof(BombPlayerStateDescriptor.SpawnedCharacter));
@@ -436,7 +436,7 @@ public class ValorantFlashEventEnricherTests
         uint actorNetGuid)
     {
         enricher.Emit(SpawnFlash(time, actorNetGuid, FlashPaths.KayoOverhandProjectile));
-        enricher.Emit(Export(time, 1, actorNetGuid, Projectile(20, Movement(new FVector(1, 2, 3)))));
+        enricher.Emit(Export(time, 1, actorNetGuid, Projectile(new(20, null), Movement(new FVector(1, 2, 3)))));
         enricher.Emit(StopRpc(time, 2, actorNetGuid));
     }
 
@@ -454,7 +454,7 @@ public class ValorantFlashEventEnricherTests
                     BlindId = blindId,
                     EffectId = effectId,
                     InitialDuration = 1,
-                    BlindConfig = blindConfig,
+                    BlindConfig = new(blindConfig, null),
                 },
             ],
         };
@@ -463,7 +463,7 @@ public class ValorantFlashEventEnricherTests
     }
 
     private static KayoOverhandFlashProjectileDescriptor Projectile(
-        uint? instigator,
+        NetObjectReference? instigator,
         FRepMovement movement)
     {
         var projectile = new KayoOverhandFlashProjectileDescriptor
@@ -481,7 +481,7 @@ public class ValorantFlashEventEnricherTests
     }
 
     private static YoruFlashProjectileDescriptor YoruProjectile(
-        uint? instigator,
+        NetObjectReference? instigator,
         FRepMovement movement)
     {
         var projectile = new YoruFlashProjectileDescriptor
@@ -579,7 +579,7 @@ public class ValorantFlashEventEnricherTests
                     new EffectManagerFunctionObjectValue
                     {
                         Name = new FGameplayTag(2, "FXC.EffectContext"),
-                        Value = contextActorNetGuid,
+                        Value = new(contextActorNetGuid, null),
                     },
                 ],
             });

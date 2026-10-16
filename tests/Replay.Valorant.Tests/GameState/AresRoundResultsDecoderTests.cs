@@ -91,7 +91,7 @@ public class AresRoundResultsDecoderTests
             Assert.That(result.WinningTeamRole, Is.EqualTo(winningTeamRole));
             Assert.That(result.RoundResult, Is.EqualTo(roundResult));
             if (roundNumber == 0)
-                Assert.That(result.EliminatedTeams!.Single()!.NetGuid, Is.EqualTo(364));
+                Assert.That(result.EliminatedTeams!.Single()!.NetGuid?.NetGuid, Is.EqualTo(364));
         });
         Assert.That(archive.AtEnd, Is.True);
     }
@@ -129,7 +129,7 @@ public class AresRoundResultsDecoderTests
             Assert.That(result.WinningTeam, Is.EqualTo("Red"));
             Assert.That(result.WinningTeamRole, Is.EqualTo(AresTeamRole.Attacker));
             Assert.That(result.RoundResult, Is.EqualTo(AresRoundOutcome.Detonate));
-            Assert.That(result.EliminatedTeams!.Single()!.NetGuid, Is.EqualTo(42));
+            Assert.That(result.EliminatedTeams!.Single()!.NetGuid?.NetGuid, Is.EqualTo(42));
             Assert.That(archive.AtEnd, Is.True);
         });
     }

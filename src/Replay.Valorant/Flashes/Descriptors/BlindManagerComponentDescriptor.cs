@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Unreal.Parsing;
 
 namespace Replay.Valorant.Flashes.Descriptors;
@@ -12,8 +13,8 @@ public sealed class ActiveBlindDescriptor : ExportGroupDescriptor<ActiveBlindDes
     public bool? IsTransient { get; set; }
     public float? InitialDuration { get; set; }
     public float? StartNetMovementTime { get; set; }
-    public uint? BlindConfig { get; set; }
-    public uint? CausingActor { get; set; }
+    public NetObjectReference? BlindConfig { get; set; }
+    public NetObjectReference? CausingActor { get; set; }
 
     protected override void Configure()
     {

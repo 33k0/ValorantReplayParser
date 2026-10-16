@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Unreal.Parsing;
 using Replay.Valorant.Descriptors;
 
@@ -78,7 +79,7 @@ public sealed class MapDoorRpcParameters(string path) : ExportGroupDescriptor<Ma
     public byte OldState { get; set; }
     public bool IsMoveTo { get; set; }
     public byte NewPhase { get; set; }
-    public uint DamageCauser { get; set; }
+    public NetObjectReference DamageCauser { get; set; }
     protected override void Configure()
     {
         if (path.EndsWith(":OnPhaseChangeEvent", StringComparison.Ordinal))

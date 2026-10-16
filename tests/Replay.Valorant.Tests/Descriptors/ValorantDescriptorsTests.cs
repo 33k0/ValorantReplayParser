@@ -1,5 +1,6 @@
 using Replay.Encoding.Archives;
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Unreal.Parsing;
 using Replay.Valorant.Combat;
 using Replay.Valorant.Descriptors;
@@ -215,7 +216,7 @@ public class ValorantDescriptorsTests
         Assert.Multiple(() =>
         {
             Assert.That(agentCaches, Has.Length.EqualTo(agentCachePaths.Count));
-            Assert.That(equippableField.TargetProperty!.PropertyType, Is.EqualTo(typeof(uint?)));
+            Assert.That(equippableField.TargetProperty!.PropertyType, Is.EqualTo(typeof(NetObjectReference?)));
             Assert.That(damagedBoneField.TargetProperty!.PropertyType, Is.EqualTo(typeof(string)));
             foreach (var cache in agentCaches)
             {

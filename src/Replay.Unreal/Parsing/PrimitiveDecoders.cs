@@ -1,5 +1,6 @@
 using Replay.Encoding.Archives;
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 
 namespace Replay.Unreal.Parsing;
@@ -150,8 +151,12 @@ public static class PrimitiveDecoders
 
     private sealed class ObjectNetGuidDecoder : IFieldDecoder
     {
-        public DecodedFieldValue Decode(ref FieldDecodeContext context, FBitArchive archive) =>
-            DecodedFieldValue.FromNetGuid(archive.ReadIntPacked());
+        public DecodedFieldValue Decode(ref FieldDecodeContext context, FBitArchive archive)
+        {
+            var netGuid = archive.ReadIntPacked();
+            var path = context.NetGuidCache?.TryGetFullPath(netGuid, out var fullPath) == true ? fullPath : null;
+            return DecodedFieldValue.FromObjectReference(new NetObjectReference(netGuid, path));
+        }
     }
 
     private sealed class SerializedIntDecoder : IFieldDecoder

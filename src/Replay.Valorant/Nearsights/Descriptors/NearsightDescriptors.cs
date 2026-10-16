@@ -1,7 +1,9 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 using Replay.Valorant.Descriptors;
+using Replay.Valorant.Descriptors.Agents;
 
 namespace Replay.Valorant.Nearsights.Descriptors;
 
@@ -22,29 +24,15 @@ public static class NearsightPaths
 public interface INearsightProjectilePayload
 {
     FRepMovement? ReplicatedMovement { get; }
-    uint? Owner { get; }
-    uint? Instigator { get; }
+    NetObjectReference? Owner { get; }
+    NetObjectReference? Instigator { get; }
     bool HasDecoded(string propertyName);
 }
 
-public abstract class NearsightProjectileDescriptor<TDescriptor> : ExportGroupDescriptor<TDescriptor>,
+public abstract class NearsightProjectileDescriptor<TDescriptor> : SparseAbilityProjectileDescriptor<TDescriptor>,
     INearsightProjectilePayload
     where TDescriptor : NearsightProjectileDescriptor<TDescriptor>
 {
-    public override ExportCategory Categories => ExportCategory.Ability | ExportCategory.Effects;
-    public override ExportGroupKind Kind => ExportGroupKind.Actor;
-
-    public FRepMovement? ReplicatedMovement { get; set; }
-    public uint? Owner { get; set; }
-    public uint? Instigator { get; set; }
-
-    protected override void Configure()
-    {
-        AddPropertyHandle(10, x => x.ReplicatedMovement, ExportCategory.Movement)
-            .ReplicatedMovement(ERotatorQuantization.ByteComponents);
-        AddPropertyHandle(11, x => x.Owner, ExportCategory.Ability).ObjectNetGuid();
-        AddPropertyHandle(13, x => x.Instigator, ExportCategory.Ability).ObjectNetGuid();
-    }
 }
 
 public sealed class OmenNearsightProjectileDescriptor
@@ -67,8 +55,8 @@ public sealed class HarborNearsightProjectileDescriptor
 
 public interface INearsightSourcePayload
 {
-    uint? Owner { get; }
-    uint? Instigator { get; }
+    NetObjectReference? Owner { get; }
+    NetObjectReference? Instigator { get; }
 }
 
 public abstract class NearsightSourceDescriptor<TDescriptor> : ExportGroupDescriptor<TDescriptor>,
@@ -78,8 +66,8 @@ public abstract class NearsightSourceDescriptor<TDescriptor> : ExportGroupDescri
     public override ExportCategory Categories => ExportCategory.Ability | ExportCategory.Effects;
     public override ExportGroupKind Kind => ExportGroupKind.Actor;
 
-    public uint? Owner { get; set; }
-    public uint? Instigator { get; set; }
+    public NetObjectReference? Owner { get; set; }
+    public NetObjectReference? Instigator { get; set; }
 
     protected override void Configure()
     {

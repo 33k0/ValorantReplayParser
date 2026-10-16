@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 
@@ -10,7 +11,7 @@ public sealed class BaseReplayControllerDescriptor : ExportGroupDescriptor<BaseR
     public override ExportCategory Categories => ExportCategory.Movement | ExportCategory.Economy;
     public override ExportGroupKind Kind => ExportGroupKind.PlayerController;
 
-    public uint PlayerState { get; set; }
+    public NetObjectReference PlayerState { get; set; }
     public uint RemoteCharacterUpdatesArray { get; set; }
     public FVector SpawnLocation { get; set; }
 

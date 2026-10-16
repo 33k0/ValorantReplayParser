@@ -1,3 +1,4 @@
+using Replay.Models.Net;
 using Replay.Unreal.Parsing;
 using Replay.Models.Descriptors;
 
@@ -30,6 +31,6 @@ public sealed class ClayAgentDescriptor : GenericAgentDescriptor
 
 public sealed class ClayFocusProjectileReference : ExportGroupDescriptor<ClayFocusProjectileReference>
 {
-    public uint? ActorNetGuid { get; set; }
+    public NetObjectReference? ActorNetGuid { get; set; }
     protected override void Configure() => AddPropertyHandle(46, "FocusProjectiles", x => x.ActorNetGuid).ObjectNetGuid();
 }

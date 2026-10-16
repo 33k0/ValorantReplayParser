@@ -77,7 +77,7 @@ Events are streamed to the sink and are provisional until `Read` returns success
 
 The event-project split is a breaking change in the current development version. See the [Unreleased migration guide](CHANGELOG.md#unreleased) for package and namespace changes, removed APIs, and the new enrichment lifecycle.
 
-The core parser emits only `ActorSpawned`, `ActorClosed`, `ExportGroupReceived`, `RpcReceived`, and `NetGuidExported`. Movement batches and effect RPC parameters remain native payloads; damage `EquippableUsed` is the recorded object GUID.
+The core parser emits only `ActorSpawned`, `ActorClosed`, `ExportGroupReceived`, `RpcReceived`, and `NetGuidExported`. Movement batches and effect RPC parameters remain native payloads. Object-reference fields, including damage `EquippableUsed`, expose `NetObjectReference` with the recorded `NetGuid` and its `Path` resolved at decode time; an unknown path is null. Nullable reference fields distinguish an absent update (null) from a recorded null object (`NetGuid == 0`).
 
 The separate `Replay.Valorant.Events` project (package `ValorantReplayParser.Events`) owns movement, shot, flash, nearsight, and wall events, their enrichers, and equipment-name resolution. Consumers explicitly wrap their sink:
 
@@ -233,6 +233,8 @@ Export replay events and movement as JSON:
 ```powershell
 dotnet run --project "src\CliReader\CliReader.csproj" -- export "C:\path\to\replay.vrf" --output "C:\path\to\export"
 ```
+
+JSON schema version 9 writes decoded object references as `{"net_guid": 123, "path": "..."}` in payloads, diagnostic values, and shot fields. Unknown paths are null. Consumers of schema version 8 must update fields that previously contained a GUID number.
 
 Show the full command or subcommand help:
 

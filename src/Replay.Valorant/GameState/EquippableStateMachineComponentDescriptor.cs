@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Unreal.Parsing;
 
 namespace Replay.Valorant.GameState;
@@ -10,8 +11,8 @@ public sealed class EquippableStateMachineComponentDescriptor
     public override ExportCategory Categories => ExportCategory.Inventory | ExportCategory.Gunplay;
     public override ExportGroupKind Kind => ExportGroupKind.Component;
 
-    public uint CurrentState { get; set; }
-    public uint? TransitionContext { get; set; }
+    public NetObjectReference CurrentState { get; set; }
+    public NetObjectReference? TransitionContext { get; set; }
     public float AuthStartWorldTime { get; set; }
 
     protected override void Configure()

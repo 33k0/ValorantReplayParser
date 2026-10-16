@@ -21,9 +21,7 @@ internal sealed class ValorantNearsightEventEnricher : IReplayEventSink
     private readonly Dictionary<uint, NearsightState> _states = [];
     private readonly Dictionary<uint, NearsightState> _stateBySourceActor = [];
     private readonly Dictionary<uint, NearsightState> _stateByAbilityActor = [];
-    private readonly Dictionary<uint, PlayerIdentity> _playersByState = [];
-    private readonly Dictionary<uint, uint> _playerStateByCharacter = [];
-    private readonly HashSet<uint> _playerCharacters = [];
+    private readonly PlayerIdentityTracker _players;
     private readonly HashSet<TargetHitKey> _emittedHits = [];
     private readonly Dictionary<TargetEffectKey, ActiveNearsightEffect> _activeEffects = [];
 
@@ -31,6 +29,7 @@ internal sealed class ValorantNearsightEventEnricher : IReplayEventSink
     {
         _inner = inner;
         _netGuidCache = netGuidCache;
+        _players = new PlayerIdentityTracker(netGuidCache);
     }
 
     public void Emit(ReplayEvent replayEvent)
@@ -121,10 +120,10 @@ internal sealed class ValorantNearsightEventEnricher : IReplayEventSink
                 TrackSource(exportGroup.ActorNetGuid, source);
                 break;
             case GenericAgentDescriptor agent:
-                TrackAgent(exportGroup.ActorNetGuid, agent);
+                _players.TrackAgent(exportGroup.ActorNetGuid, agent);
                 break;
             case BombPlayerStateDescriptor playerState:
-                TrackPlayerState(exportGroup.ActorNetGuid, playerState);
+                _players.TrackPlayerState(exportGroup.ActorNetGuid, playerState);
                 break;
         }
     }
@@ -136,15 +135,15 @@ internal sealed class ValorantNearsightEventEnricher : IReplayEventSink
             return;
         }
 
-        if (projectile.HasDecoded(nameof(INearsightProjectilePayload.Owner)) && projectile.Owner is > 0)
+        if (projectile.HasDecoded(nameof(INearsightProjectilePayload.Owner)) && projectile.Owner is { NetGuid: > 0 } owner)
         {
-            state.OwnerNetGuid = projectile.Owner;
-            _stateByAbilityActor[projectile.Owner.Value] = state;
+            state.OwnerNetGuid = owner.NetGuid;
+            _stateByAbilityActor[owner.NetGuid] = state;
         }
 
-        if (projectile.HasDecoded(nameof(INearsightProjectilePayload.Instigator)) && projectile.Instigator is > 0)
+        if (projectile.HasDecoded(nameof(INearsightProjectilePayload.Instigator)) && projectile.Instigator?.NetGuid is > 0)
         {
-            state.InstigatorNetGuid = projectile.Instigator;
+            state.InstigatorNetGuid = projectile.Instigator?.NetGuid;
         }
 
         EnsureCastEmitted(state);
@@ -177,15 +176,15 @@ internal sealed class ValorantNearsightEventEnricher : IReplayEventSink
             return;
         }
 
-        if (source.Owner is > 0)
+        if (source.Owner is { NetGuid: > 0 } owner)
         {
-            state.OwnerNetGuid ??= source.Owner;
-            _stateByAbilityActor[source.Owner.Value] = state;
+            state.OwnerNetGuid ??= owner.NetGuid;
+            _stateByAbilityActor[owner.NetGuid] = state;
         }
 
-        if (source.Instigator is > 0)
+        if (source.Instigator?.NetGuid is > 0)
         {
-            state.InstigatorNetGuid ??= source.Instigator;
+            state.InstigatorNetGuid ??= source.Instigator?.NetGuid;
         }
     }
 
@@ -204,7 +203,7 @@ internal sealed class ValorantNearsightEventEnricher : IReplayEventSink
 
     private void TrackEffectStarted(RpcReceived rpc, EffectManagerPlayContinuousParameters effect)
     {
-        if (!_playerCharacters.Contains(rpc.ActorNetGuid) ||
+        if (!_players.IsPlayerCharacter(rpc.ActorNetGuid) ||
             !string.Equals(effect.AttachSocket, "Head", StringComparison.OrdinalIgnoreCase))
         {
             return;
@@ -215,7 +214,7 @@ internal sealed class ValorantNearsightEventEnricher : IReplayEventSink
             ?.Value;
         var contextActor = effect.ObjectValues
             .FirstOrDefault(value => value.Name?.TagName == "FXC.EffectContext")
-            ?.Value;
+            ?.Value?.NetGuid;
         if (duration is not { } durationValue || !float.IsFinite(durationValue) || contextActor is not > 0)
         {
             return;
@@ -227,7 +226,7 @@ internal sealed class ValorantNearsightEventEnricher : IReplayEventSink
             return;
         }
 
-        var targetPlayerState = GetPlayerState(rpc.ActorNetGuid);
+        var targetPlayerState = _players.GetPlayerState(rpc.ActorNetGuid);
         if (_emittedHits.Add(new TargetHitKey(state.ActorNetGuid, rpc.ActorNetGuid)))
         {
             _inner.Emit(new ValorantNearsightPlayerHit(
@@ -237,11 +236,11 @@ internal sealed class ValorantNearsightEventEnricher : IReplayEventSink
                 state.Kind,
                 rpc.ActorNetGuid,
                 targetPlayerState,
-                GetSubject(targetPlayerState),
+                _players.GetSubject(targetPlayerState),
                 durationValue >= 0 ? durationValue : null,
                 durationValue < 0,
                 effect.EffectId,
-                effect.EffectContainer,
+                effect.EffectContainer?.NetGuid,
                 contextActor.Value,
                 effect.StartMovementTime,
                 resolution.Correlation,
@@ -272,7 +271,7 @@ internal sealed class ValorantNearsightEventEnricher : IReplayEventSink
             rpc.TimeSeconds,
             active.StartMovementTime,
             effect.StopMovementTime);
-        var targetPlayerState = GetPlayerState(active.TargetCharacterNetGuid);
+        var targetPlayerState = _players.GetPlayerState(active.TargetCharacterNetGuid);
         _inner.Emit(new ValorantNearsightPlayerEffectEnded(
             rpc.TimeSeconds,
             rpc.PacketId,
@@ -280,7 +279,7 @@ internal sealed class ValorantNearsightEventEnricher : IReplayEventSink
             active.State.Kind,
             active.TargetCharacterNetGuid,
             targetPlayerState,
-            GetSubject(targetPlayerState),
+            _players.GetSubject(targetPlayerState),
             active.EffectId,
             active.AppliedTimeSeconds,
             active.StartMovementTime,
@@ -336,8 +335,8 @@ internal sealed class ValorantNearsightEventEnricher : IReplayEventSink
             return;
         }
 
-        var caster = ResolveCaster(state);
-        var playerState = GetPlayerState(caster);
+        var caster = _players.ResolveCaster(state.OwnerNetGuid, state.InstigatorNetGuid);
+        var playerState = _players.GetPlayerState(caster);
         _inner.Emit(new ValorantNearsightCast(
             state.Spawn.TimeSeconds,
             state.Spawn.PacketId,
@@ -345,7 +344,7 @@ internal sealed class ValorantNearsightEventEnricher : IReplayEventSink
             state.Kind,
             caster,
             playerState,
-            GetSubject(playerState),
+            _players.GetSubject(playerState),
             state.Spawn.Location,
             state.Spawn.Rotation,
             state.Spawn.Velocity));
@@ -399,93 +398,6 @@ internal sealed class ValorantNearsightEventEnricher : IReplayEventSink
             location,
             evidence));
     }
-
-    private uint? ResolveCaster(NearsightState state)
-    {
-        if (state.InstigatorNetGuid is > 0)
-        {
-            return state.InstigatorNetGuid;
-        }
-
-        if (state.OwnerNetGuid is not > 0)
-        {
-            return null;
-        }
-
-        var current = state.OwnerNetGuid.Value;
-        for (var depth = 0; depth < MaxOuterDepth; depth++)
-        {
-            if (_playerCharacters.Contains(current) || _playerStateByCharacter.ContainsKey(current))
-            {
-                return current;
-            }
-
-            if (!_netGuidCache.TryGetOuterNetGuid(current, out var outer))
-            {
-                break;
-            }
-
-            current = outer.Value;
-        }
-
-        return state.OwnerNetGuid;
-    }
-
-    private void TrackAgent(uint characterNetGuid, GenericAgentDescriptor agent)
-    {
-        _playerCharacters.Add(characterNetGuid);
-        if (agent.HasDecoded(nameof(GenericAgentDescriptor.PlayerState)) && agent.PlayerState != 0)
-        {
-            SetCharacterPlayerState(characterNetGuid, agent.PlayerState);
-        }
-    }
-
-    private void TrackPlayerState(uint playerStateNetGuid, BombPlayerStateDescriptor playerState)
-    {
-        if (!_playersByState.TryGetValue(playerStateNetGuid, out var identity))
-        {
-            identity = new PlayerIdentity();
-            _playersByState.Add(playerStateNetGuid, identity);
-        }
-
-        if (playerState.HasDecoded(nameof(BombPlayerStateDescriptor.Subject)))
-        {
-            identity.Subject = playerState.Subject;
-        }
-
-        if (playerState.HasDecoded(nameof(BombPlayerStateDescriptor.PossessedCharacter)))
-        {
-            SetCharacterPlayerState(playerState.PossessedCharacter, playerStateNetGuid);
-        }
-        // Possession establishes ownership, not an agent body: cameras and drones
-        // also appear as PossessedCharacter. Process SpawnedCharacter independently.
-        if (playerState.HasDecoded(nameof(BombPlayerStateDescriptor.SpawnedCharacter)) &&
-            playerState.SpawnedCharacter != 0)
-        {
-            _playerCharacters.Add(playerState.SpawnedCharacter);
-            SetCharacterPlayerState(playerState.SpawnedCharacter, playerStateNetGuid);
-        }
-    }
-
-    private void SetCharacterPlayerState(uint characterNetGuid, uint playerStateNetGuid)
-    {
-        if (characterNetGuid == 0 || playerStateNetGuid == 0)
-        {
-            return;
-        }
-
-        _playerStateByCharacter[characterNetGuid] = playerStateNetGuid;
-    }
-
-    private uint? GetPlayerState(uint? characterNetGuid) =>
-        characterNetGuid is { } character && _playerStateByCharacter.TryGetValue(character, out var playerState)
-            ? playerState
-            : null;
-
-    private string? GetSubject(uint? playerStateNetGuid) =>
-        playerStateNetGuid is { } playerState && _playersByState.TryGetValue(playerState, out var identity)
-            ? identity.Subject
-            : null;
 
     private static float GetObservedDuration(
         float appliedTimeSeconds,
@@ -584,11 +496,6 @@ internal sealed class ValorantNearsightEventEnricher : IReplayEventSink
         public float? CloseTimeSeconds { get; set; }
         public uint? SourceActorNetGuid { get; set; }
         public ActorSpawned? SourceSpawn { get; set; }
-    }
-
-    private sealed class PlayerIdentity
-    {
-        public string? Subject { get; set; }
     }
 
     private sealed record ActiveNearsightEffect(

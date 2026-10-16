@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Unreal.Parsing;
 using Replay.Valorant.Combat;
 
@@ -8,9 +9,9 @@ public sealed class MulticastReceivePlayerTemporaryDeathEventPointParameters : P
 {
     public override string Path => "/Script/ShooterGame.ShooterGameState:MulticastReceivePlayerTemporaryDeathEvent_Point";
     public override ExportCategory Categories => ExportCategory.GameState | ExportCategory.Gunplay;
-    public uint? DamagerPlayer { get; set; }
-    public uint? DownedPlayer { get; set; }
-    public uint? TemporaryDeathEquippableUsed { get; set; }
+    public NetObjectReference? DamagerPlayer { get; set; }
+    public NetObjectReference? DownedPlayer { get; set; }
+    public NetObjectReference? TemporaryDeathEquippableUsed { get; set; }
     public bool? RecoversInstantly { get; set; }
 
     protected override void Configure()

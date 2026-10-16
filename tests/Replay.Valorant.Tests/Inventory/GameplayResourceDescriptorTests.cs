@@ -28,7 +28,7 @@ public sealed class GameplayResourceDescriptorTests
     {
         var descriptor = new ControllablePawnDescriptor(path);
         Assert.That(((ControllablePawnDescriptor)descriptor.CreatePayloadInstance()).Path, Is.EqualTo(path));
-        Assert.That(Decode(descriptor, "PlayerState", "54", 8).NetGuidValue, Is.EqualTo(42));
+        Assert.That(Decode(descriptor, "PlayerState", "54", 8).ObjectReferenceValue.NetGuid, Is.EqualTo(42));
         Assert.That(ValorantDescriptors.CreateCatalog().ExportGroupDescriptors.Any(d => d.Path == path), Is.True);
     }
 

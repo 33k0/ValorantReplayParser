@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 
@@ -37,7 +38,7 @@ public sealed class BombPlantedRpcParameters : ExportGroupDescriptor<BombPlanted
     public override ExportGroupKind Kind => ExportGroupKind.ClassNetCache;
     public override FieldStreamGrammar Grammar => FieldStreamGrammar.FunctionParameters;
     public FVector PlantLocation { get; set; }
-    public uint BombPlanter { get; set; }
+    public NetObjectReference BombPlanter { get; set; }
     public byte PlantSite { get; set; }
     protected override void Configure()
     {
@@ -54,6 +55,6 @@ public sealed class BombDefusedRpcParameters : ExportGroupDescriptor<BombDefused
     public override ExportCategory Categories => ExportCategory.GameState;
     public override ExportGroupKind Kind => ExportGroupKind.ClassNetCache;
     public override FieldStreamGrammar Grammar => FieldStreamGrammar.FunctionParameters;
-    public uint DefusingCharacter { get; set; }
+    public NetObjectReference DefusingCharacter { get; set; }
     protected override void Configure() => AddProperty(x => x.DefusingCharacter).ObjectNetGuid();
 }

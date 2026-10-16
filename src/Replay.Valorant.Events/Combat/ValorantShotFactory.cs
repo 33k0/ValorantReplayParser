@@ -1,3 +1,4 @@
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Valorant.Descriptors.Effects.Replay;
 
@@ -38,7 +39,7 @@ internal static class ValorantShotFactory
         return parameters.FloatValues?.FirstOrDefault(value => value.Name?.TagName == tagName)?.Float;
     }
 
-    private static uint? GetObject(ReplayPlayContinuousEffectAtLocationParameters parameters, string tagName)
+    private static NetObjectReference? GetObject(ReplayPlayContinuousEffectAtLocationParameters parameters, string tagName)
     {
         return parameters.ObjectValues?.FirstOrDefault(value => value.Name?.TagName == tagName)?.Object;
     }

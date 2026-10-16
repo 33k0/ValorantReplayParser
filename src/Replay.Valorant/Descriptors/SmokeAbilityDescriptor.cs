@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Unreal.Parsing;
 
 namespace Replay.Valorant.Descriptors;
@@ -9,8 +10,8 @@ public sealed class SmokeAbilityDescriptor : ExportGroupDescriptor<SmokeAbilityD
     public override ExportCategory Categories => ExportCategory.Ability | ExportCategory.Effects;
     public override ExportGroupKind Kind => ExportGroupKind.Actor;
 
-    public uint Owner { get; set; }
-    public uint Instigator { get; set; }
+    public NetObjectReference Owner { get; set; }
+    public NetObjectReference Instigator { get; set; }
 
     protected override void Configure()
     {

@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 
@@ -11,9 +12,9 @@ public sealed class FadeTrailDescriptor : ExportGroupDescriptor<FadeTrailDescrip
     public override string Path => TrailPath;
     public override ExportCategory Categories => ExportCategory.Ability;
     public override ExportGroupKind Kind => ExportGroupKind.Actor;
-    public uint? Owner { get; set; }
-    public uint? Instigator { get; set; }
-    public uint? TrackedActor { get; set; }
+    public NetObjectReference? Owner { get; set; }
+    public NetObjectReference? Instigator { get; set; }
+    public NetObjectReference? TrackedActor { get; set; }
     public bool? IsConsumed { get; set; }
     protected override void Configure()
     {

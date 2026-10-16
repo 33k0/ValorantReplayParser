@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 
@@ -9,8 +10,8 @@ public sealed class BreachFaultLineDescriptor : ExportGroupDescriptor<BreachFaul
     public override string Path => BreachFaultLineChargeParameters.ActorPath;
     public override ExportCategory Categories => ExportCategory.Ability | ExportCategory.Effects;
     public override ExportGroupKind Kind => ExportGroupKind.Actor;
-    public uint? Owner { get; set; }
-    public uint? Instigator { get; set; }
+    public NetObjectReference? Owner { get; set; }
+    public NetObjectReference? Instigator { get; set; }
     public FVector? CharacterLocation { get; set; }
     protected override void Configure()
     {

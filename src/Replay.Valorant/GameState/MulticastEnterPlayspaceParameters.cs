@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Unreal.Parsing;
 
 namespace Replay.Valorant.GameState;
@@ -10,8 +11,8 @@ public sealed class MulticastEnterPlayspaceParameters : ExportGroupDescriptor<Mu
     public override ExportGroupKind Kind => ExportGroupKind.ClassNetCache;
     public override FieldStreamGrammar Grammar => FieldStreamGrammar.FunctionParameters;
 
-    public uint? PlayspaceComponent { get; set; }
-    public uint? NewPlayspace { get; set; }
+    public NetObjectReference? PlayspaceComponent { get; set; }
+    public NetObjectReference? NewPlayspace { get; set; }
     public bool LeaveCurrentPlayspaces { get; set; }
     public bool ExecuteOnOwner { get; set; }
 

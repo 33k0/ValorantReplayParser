@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 using Replay.Valorant.Descriptors;
@@ -23,8 +24,8 @@ public static class WallPaths
 
 public interface IWallOwnedActor
 {
-    uint? Owner { get; }
-    uint? Instigator { get; }
+    NetObjectReference? Owner { get; }
+    NetObjectReference? Instigator { get; }
 }
 
 public abstract class WallOwnedActorDescriptor<TDescriptor> : ExportGroupDescriptor<TDescriptor>, IWallOwnedActor
@@ -33,8 +34,8 @@ public abstract class WallOwnedActorDescriptor<TDescriptor> : ExportGroupDescrip
     public override ExportCategory Categories => ExportCategory.Ability;
     public override ExportGroupKind Kind => ExportGroupKind.Actor;
 
-    public uint? Owner { get; set; }
-    public uint? Instigator { get; set; }
+    public NetObjectReference? Owner { get; set; }
+    public NetObjectReference? Instigator { get; set; }
 
     protected override void Configure()
     {
@@ -104,7 +105,7 @@ public sealed class VyseInitializeWallParameters : ExportGroupDescriptor<VyseIni
     public FVector? WallStartLocation { get; set; }
     public FVector? WallEndLocation { get; set; }
     public FVector? WallImpactNormal { get; set; }
-    public uint? EnemyTrigger { get; set; }
+    public NetObjectReference? EnemyTrigger { get; set; }
 
     protected override void Configure()
     {

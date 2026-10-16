@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Unreal.Parsing;
 
 namespace Replay.Valorant.GameState;
@@ -10,8 +11,8 @@ public sealed class OrbPickedUpRpcParameters : ExportGroupDescriptor<OrbPickedUp
     public override ExportGroupKind Kind => ExportGroupKind.ClassNetCache;
     public override FieldStreamGrammar Grammar => FieldStreamGrammar.FunctionParameters;
 
-    public uint OrbGatherer { get; set; }
-    public uint CollectableOrb { get; set; }
+    public NetObjectReference OrbGatherer { get; set; }
+    public NetObjectReference CollectableOrb { get; set; }
 
     protected override void Configure()
     {

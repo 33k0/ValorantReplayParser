@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 
@@ -12,14 +13,14 @@ public sealed class RazeForceParameters : ExportGroupDescriptor<RazeForceParamet
     public override FieldStreamGrammar Grammar => FieldStreamGrammar.FunctionParameters;
     public int? HandleNumber { get; set; }
     public uint? ModuleType { get; set; }
-    public uint? Source { get; set; }
+    public NetObjectReference? Source { get; set; }
     public FVector? SourceLocation { get; set; }
-    public uint? Module { get; set; }
+    public NetObjectReference? Module { get; set; }
     public float? Duration { get; set; }
-    public uint? Character { get; set; }
+    public NetObjectReference? Character { get; set; }
     public float? NetTimestamp { get; set; }
     public int? RespawnNumber { get; set; }
-    public uint? ContextActor { get; set; }
+    public NetObjectReference? ContextActor { get; set; }
     protected override void Configure()
     {
         AddPropertyHandle(0, x => x.HandleNumber).Int32();

@@ -12,7 +12,7 @@ public sealed class DamageLifeChangeEventTests
     {
         var raw = new ValorantRawPayload("LifeChangeEvents", bits, Convert.FromHexString(hex));
         Assert.That(DamageLifeChangeEvents.TryDecode(raw, out var entries), Is.True);
-        var selected = entries.Single(e => e?.ChangedComponent == section)!;
+        var selected = entries.Single(e => e?.ChangedComponent.NetGuid == section)!;
         Assert.Multiple(() =>
         {
             Assert.That(selected.LifeResult, Is.EqualTo(result));

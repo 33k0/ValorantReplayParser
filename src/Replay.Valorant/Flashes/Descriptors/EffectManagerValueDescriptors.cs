@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 
@@ -14,7 +15,7 @@ public sealed record EffectManagerFloatValue(FGameplayTag? Name, float? Value);
 
 public sealed record EffectManagerVectorValue(FGameplayTag? Name, FVector? Value);
 
-public sealed record EffectManagerObjectValue(FGameplayTag? Name, uint? Value);
+public sealed record EffectManagerObjectValue(FGameplayTag? Name, NetObjectReference? Value);
 
 public sealed class EffectManagerFunctionFloatValue
     : ExportGroupDescriptor<EffectManagerFunctionFloatValue>
@@ -46,7 +47,7 @@ public sealed class EffectManagerFunctionObjectValue
     : ExportGroupDescriptor<EffectManagerFunctionObjectValue>
 {
     public FGameplayTag? Name { get; set; }
-    public uint? Value { get; set; }
+    public NetObjectReference? Value { get; set; }
 
     protected override void Configure()
     {
@@ -94,7 +95,7 @@ public sealed class EffectManagerUpdateVectorValue : ExportGroupDescriptor<Effec
 public sealed class EffectManagerUpdateObjectValue : ExportGroupDescriptor<EffectManagerUpdateObjectValue>
 {
     public FGameplayTag? Name { get; set; }
-    public uint? Value { get; set; }
+    public NetObjectReference? Value { get; set; }
     protected override void Configure()
     {
         AddPropertyHandle(14, "58", x => x.Name).FGameplayTag();
@@ -105,7 +106,7 @@ public sealed class EffectManagerUpdateObjectValue : ExportGroupDescriptor<Effec
 public sealed class ActiveEffectObjectValue : ExportGroupDescriptor<ActiveEffectObjectValue>
 {
     public FGameplayTag? Name { get; set; }
-    public uint? Value { get; set; }
+    public NetObjectReference? Value { get; set; }
 
     protected override void Configure()
     {

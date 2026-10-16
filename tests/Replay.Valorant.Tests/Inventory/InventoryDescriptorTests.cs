@@ -33,8 +33,8 @@ public sealed class InventoryDescriptorTests
         Assert.Multiple(() =>
         {
             Assert.That(decoded.GetDecodedItemSlots().Count(), Is.EqualTo(16));
-            Assert.That(decoded.GetItemSlot(EAresItemSlot.Primary), Is.Zero);
-            Assert.That(decoded.GetItemSlot(EAresItemSlot.SecondaryStorage), Is.EqualTo(57));
+            Assert.That(decoded.GetItemSlot(EAresItemSlot.Primary)?.NetGuid, Is.Zero);
+            Assert.That(decoded.GetItemSlot(EAresItemSlot.SecondaryStorage)?.NetGuid, Is.EqualTo(57));
             Assert.That(decoded.ItemSlots, Has.Count.EqualTo(16));
             Assert.That(decoded.HasDecoded(nameof(AresInventoryDescriptor.PrimarySlot)), Is.True);
             Assert.That(archive.AtEnd, Is.True);
@@ -44,7 +44,7 @@ public sealed class InventoryDescriptorTests
     [Test]
     public void SparseSlotReferencesDistinguishAbsentFromExplicitRemoval()
     {
-        var descriptor = new AresInventoryDescriptor { PrimarySlot = 0, SecondarySlot = 42 };
+        var descriptor = new AresInventoryDescriptor { PrimarySlot = new(0, null), SecondarySlot = new(42, null) };
         descriptor.MarkDecoded(nameof(AresInventoryDescriptor.PrimarySlot));
         descriptor.MarkDecoded(nameof(AresInventoryDescriptor.SecondarySlot));
         Assert.That(descriptor.GetDecodedItemSlots(), Is.EqualTo(new[]
@@ -57,7 +57,7 @@ public sealed class InventoryDescriptorTests
     [Test]
     public void SlotChangesIgnoreValuesWithoutDecodedPropertyEvidence()
     {
-        var descriptor = new AresInventoryDescriptor { PrimarySlot = 42, SecondarySlot = 43 };
+        var descriptor = new AresInventoryDescriptor { PrimarySlot = new(42, null), SecondarySlot = new(43, null) };
         Assert.That(descriptor.GetDecodedItemSlots(), Is.Empty);
         descriptor.MarkDecoded(nameof(AresInventoryDescriptor.PrimarySlot));
         Assert.That(descriptor.GetDecodedItemSlots(), Is.EqualTo(new[] { (EAresItemSlot.Primary, 42u) }));
@@ -134,7 +134,7 @@ public sealed class InventoryDescriptorTests
         using var archive = new BitArchiveReader(new byte[] { 0x54 }, 8);
         var context = new FieldDecodeContext();
         var value = ((IFieldDecoder)descriptor.Fields.Single().Decoder!).Decode(ref context, archive);
-        Assert.That(value.NetGuidValue, Is.EqualTo(42));
+        Assert.That(value.ObjectReferenceValue.NetGuid, Is.EqualTo(42));
         Assert.That(archive.AtEnd, Is.True);
     }
 
@@ -150,9 +150,9 @@ public sealed class InventoryDescriptorTests
         Assert.Multiple(() =>
         {
             Assert.That(bound.FieldsByHandle.Skip(2).All(field => field.Enabled), Is.True);
-            Assert.That(bound.FieldsByHandle[2].TargetProperty!.PropertyType, Is.EqualTo(typeof(uint?)));
+            Assert.That(bound.FieldsByHandle[2].TargetProperty!.PropertyType, Is.EqualTo(typeof(NetObjectReference?)));
             Assert.That(bound.FieldsByHandle[3].TargetProperty!.PropertyType, Is.EqualTo(typeof(bool?)));
-            Assert.That(bound.FieldsByHandle[4].TargetProperty!.PropertyType, Is.EqualTo(typeof(uint?)));
+            Assert.That(bound.FieldsByHandle[4].TargetProperty!.PropertyType, Is.EqualTo(typeof(NetObjectReference?)));
             Assert.That(bound.FieldsByHandle[5].TargetProperty!.PropertyType, Is.EqualTo(typeof(EInventoryTransaction?)));
         });
     }

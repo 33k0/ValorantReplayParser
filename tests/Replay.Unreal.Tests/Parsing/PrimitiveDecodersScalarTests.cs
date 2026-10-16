@@ -173,6 +173,42 @@ public class PrimitiveDecodersScalarTests
         });
     }
 
+    [Test]
+    public void ObjectNetGuid_ResolvesFullPathFromCache()
+    {
+        var cache = new NetGuidCache();
+        cache.SetNetGuidPath(3, "/Game/Weapons/Pistol");
+        cache.SetNetGuidPath(5, "Pistol_C", new NetworkGuid(3));
+        var archive = CreateArchive(writer => writer.WriteIntPacked(5));
+        var context = new FieldDecodeContext
+        {
+            NetGuidCache = cache,
+        };
+
+        var value = PrimitiveDecoders.ObjectNetGuid.Decode(ref context, archive);
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(value.Kind, Is.EqualTo(DecodedFieldValueKind.ObjectReference));
+            Assert.That(value.ObjectReferenceValue, Is.EqualTo(new NetObjectReference(5, "/Game/Weapons/Pistol.Pistol_C")));
+            Assert.That(archive.AtEnd, Is.True);
+        });
+    }
+
+    [Test]
+    public void ObjectNetGuid_LeavesPathNullForUnknownObject()
+    {
+        var archive = CreateArchive(writer => writer.WriteIntPacked(5));
+        var context = new FieldDecodeContext
+        {
+            NetGuidCache = new NetGuidCache(),
+        };
+
+        var value = PrimitiveDecoders.ObjectNetGuid.Decode(ref context, archive);
+
+        Assert.That(value.ObjectReferenceValue, Is.EqualTo(new NetObjectReference(5, null)));
+    }
+
     private static NetGuidCache CreateTagCache(uint tagIndex, string tagName)
     {
         var exports = new NetFieldExport?[checked((int)tagIndex + 1)];

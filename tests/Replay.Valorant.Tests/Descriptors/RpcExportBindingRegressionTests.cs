@@ -54,8 +54,8 @@ public class RpcExportBindingRegressionTests
             Assert.That(damage.DamageTaken, Is.EqualTo(1));
             Assert.That(damage.DamageDealt, Is.EqualTo(999));
             Assert.That(damage.DamageKilledTarget, Is.True);
-            Assert.That(damage.DamageCauser, Is.EqualTo(49356));
-            Assert.That(damage.Character, Is.EqualTo(49366));
+            Assert.That(damage.DamageCauser.NetGuid, Is.EqualTo(49356));
+            Assert.That(damage.Character.NetGuid, Is.EqualTo(49366));
         });
     }
 

@@ -2,6 +2,7 @@ using Replay.Encoding.Archives;
 using Replay.Models.Descriptors;
 using Replay.Models.Errors;
 using Replay.Models.Events;
+using Replay.Models.Net;
 using Replay.Unreal.Parsing;
 
 namespace Replay.Unreal.Tests.Parsing;
@@ -194,9 +195,9 @@ public class FieldPayloadParserTests
         {
             Assert.That(result.DecodedFieldCount, Is.EqualTo(1));
             Assert.That(result.DiagnosticFields, Has.Count.EqualTo(1));
-            Assert.That(result.DiagnosticFields[0].Value.Kind, Is.EqualTo(DecodedFieldValueKind.NetGuid));
-            Assert.That(result.DiagnosticFields[0].Value.NetGuidValue, Is.EqualTo(42));
-            Assert.That(typedPayload.GuidField, Is.EqualTo(42));
+            Assert.That(result.DiagnosticFields[0].Value.Kind, Is.EqualTo(DecodedFieldValueKind.ObjectReference));
+            Assert.That(result.DiagnosticFields[0].Value.ObjectReferenceValue.NetGuid, Is.EqualTo(42));
+            Assert.That(typedPayload.GuidField.NetGuid, Is.EqualTo(42));
             Assert.That(payload.AtEnd, Is.True);
         });
     }
@@ -526,7 +527,7 @@ public class FieldPayloadParserTests
         public int KnownField { get; set; }
         public int IntField { get; set; }
         public float FloatField { get; set; }
-        public uint GuidField { get; set; }
+        public NetObjectReference GuidField { get; set; }
 
         protected override void Configure()
         {

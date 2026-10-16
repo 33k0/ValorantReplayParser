@@ -1,5 +1,6 @@
 using Replay.Encoding.Archives;
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Unreal.Parsing;
 using Replay.Valorant.Descriptors;
 
@@ -15,7 +16,7 @@ public sealed class DamageLifeChangeEvent : ExportGroupDescriptor<DamageLifeChan
 
     public override string Path => "/Script/ShooterGame.LifeChangeEvent";
     public override ExportCategory Categories => ExportCategory.Gunplay;
-    public uint ChangedComponent { get; set; }
+    public NetObjectReference ChangedComponent { get; set; }
     public float LifeResult { get; set; }
     public float DeltaLife { get; set; }
     public bool AliveAfterChange { get; set; }

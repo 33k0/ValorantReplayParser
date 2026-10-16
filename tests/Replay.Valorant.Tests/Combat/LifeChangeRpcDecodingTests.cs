@@ -34,8 +34,8 @@ public sealed class LifeChangeRpcDecodingTests
             Assert.Multiple(() =>
             {
                 Assert.That(archive.AtEnd, Is.True); Assert.That(entries, Has.Length.EqualTo(2));
-                Assert.That(entries[0]!.ChangedComponent, Is.EqualTo(21)); Assert.That(entries[0]!.LifeResult, Is.EqualTo(60));
-                Assert.That(entries[1]!.ChangedComponent, Is.EqualTo(22)); Assert.That(entries[1]!.DeltaLife, Is.EqualTo(-10));
+                Assert.That(entries[0]!.ChangedComponent.NetGuid, Is.EqualTo(21)); Assert.That(entries[0]!.LifeResult, Is.EqualTo(60));
+                Assert.That(entries[1]!.ChangedComponent.NetGuid, Is.EqualTo(22)); Assert.That(entries[1]!.DeltaLife, Is.EqualTo(-10));
                 Assert.That(entries[1]!.AliveAfterChange, Is.False);
                 Assert.That(entries[1]!.HasDecoded(nameof(HealLifeChangeEvent.AliveAfterChange)), Is.True);
             });
@@ -53,7 +53,7 @@ public sealed class LifeChangeRpcDecodingTests
         var entries = (SectionLifeChangeEvent?[])decoder.Decode(ref context, archive).ObjectValue!;
         Assert.Multiple(() =>
         {
-            Assert.That(archive.AtEnd, Is.True); Assert.That(entries[0]!.ChangedComponent, Is.EqualTo(21));
+            Assert.That(archive.AtEnd, Is.True); Assert.That(entries[0]!.ChangedComponent.NetGuid, Is.EqualTo(21));
             Assert.That(entries[0]!.LifeResult, Is.Zero); Assert.That(entries[0]!.HasDecoded(nameof(SectionLifeChangeEvent.LifeResult)), Is.True);
         });
     }

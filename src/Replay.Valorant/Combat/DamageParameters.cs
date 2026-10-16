@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Models.Replay;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
@@ -17,21 +18,21 @@ public abstract class DamageParameters<T> : ExportGroupDescriptor<T>
     public float DamageDealt { get; set; }
     public bool DamageKilledTarget { get; set; }
     public bool AliveAfterDamage { get; set; }
-    public uint EventInstigator { get; set; }
-    public uint DamageCauser { get; set; }
+    public NetObjectReference EventInstigator { get; set; }
+    public NetObjectReference DamageCauser { get; set; }
     public FVector? DamageOrigin { get; set; }
-    public uint? EquippableUsed { get; set; }
-    public uint DamageType { get; set; }
+    public NetObjectReference? EquippableUsed { get; set; }
+    public NetObjectReference DamageType { get; set; }
     public DamageLifeChangeEvent?[]? LifeChangeEvents { get; set; }
-    public uint ChangedComponent { get; set; }
+    public NetObjectReference ChangedComponent { get; set; }
     public float? LifeResult { get; set; }
     public float DeltaLife { get; set; }
     public bool AliveAfterChange { get; set; }
-    public uint EventInstigatorPawn { get; set; }
-    public uint DamagerPlayerState { get; set; }
-    public uint KillCreditPlayerState { get; set; }
+    public NetObjectReference EventInstigatorPawn { get; set; }
+    public NetObjectReference DamagerPlayerState { get; set; }
+    public NetObjectReference KillCreditPlayerState { get; set; }
     public EAresRegionalDamage? RegionalDamage { get; set; }
-    public uint Character { get; set; }
+    public NetObjectReference Character { get; set; }
     public float NetTimestamp { get; set; }
     public int RespawnNumber { get; set; }
     public int LifeChangeEventIndex { get; set; }

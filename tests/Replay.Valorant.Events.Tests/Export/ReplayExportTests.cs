@@ -121,6 +121,12 @@ public class ReplayExportTests
             Assert.That(shot.GetProperty("attack_vectors").GetArrayLength(), Is.EqualTo(2));
             Assert.That(shot.GetProperty("fire_mode").GetString(), Is.EqualTo("alternate"));
             Assert.That(shot.GetProperty("fire_mode_evidence").GetString(), Is.EqualTo("source:ZoomedFire"));
+            Assert.That(shot.GetProperty("wait_on_replication_actor").GetProperty("net_guid").GetUInt32(), Is.EqualTo(200));
+            Assert.That(shot.GetProperty("wait_on_replication_actor").GetProperty("path").ValueKind, Is.EqualTo(JsonValueKind.Null));
+            Assert.That(shot.GetProperty("firing_player_state").GetProperty("net_guid").GetUInt32(), Is.EqualTo(300));
+            Assert.That(shot.GetProperty("firing_state").GetProperty("net_guid").GetUInt32(), Is.EqualTo(400));
+            Assert.That(shot.GetProperty("firing_state").GetProperty("path").GetString(), Is.EqualTo("ZoomedFiringState"));
+            Assert.That(shot.GetProperty("effect_equippable").GetProperty("net_guid").GetUInt32(), Is.EqualTo(500));
             Assert.That(shot.GetProperty("equippable").GetProperty("net_guid").GetUInt32(), Is.EqualTo(500));
             Assert.That(shot.GetProperty("equippable").GetProperty("category").GetString(), Is.EqualTo("rifle"));
         });
@@ -299,6 +305,31 @@ public class ReplayExportTests
         });
     }
 
+    [TestCase(5u, "/Game/Effects/Flash.Flash_C")]
+    [TestCase(5u, null)]
+    [TestCase(0u, null)]
+    public void JsonNormalizer_WritesTypedAndDiagnosticObjectReferencesIdentically(uint netGuid, string? path)
+    {
+        var reference = new NetObjectReference(netGuid, path);
+        using var stream = new MemoryStream();
+        using (var writer = new Utf8JsonWriter(stream))
+        {
+            new ReplayJsonNormalizer().WriteValue(writer,
+                new object[] { reference, DecodedFieldValue.FromObjectReference(reference) });
+        }
+
+        using var document = JsonDocument.Parse(stream.ToArray());
+        var typed = document.RootElement[0];
+        var diagnostic = document.RootElement[1];
+        Assert.Multiple(() =>
+        {
+            Assert.That(typed.GetProperty("net_guid").GetUInt32(), Is.EqualTo(netGuid));
+            Assert.That(typed.GetProperty("path").GetString(), Is.EqualTo(path));
+            Assert.That(typed.EnumerateObject().Count(), Is.EqualTo(2));
+            Assert.That(diagnostic.GetRawText(), Is.EqualTo(typed.GetRawText()));
+        });
+    }
+
     [Test]
     public void JsonNormalizer_WritesMemoryAndTreatsNonInvokablePropertiesAsNull()
     {
@@ -404,7 +435,7 @@ public class ReplayExportTests
             var manifest = document.RootElement;
             Assert.Multiple(() =>
             {
-                Assert.That(manifest.GetProperty("schema_version").GetInt32(), Is.EqualTo(8));
+                Assert.That(manifest.GetProperty("schema_version").GetInt32(), Is.EqualTo(9));
                 Assert.That(manifest.GetProperty("source_sha256").GetString(), Has.Length.EqualTo(64));
                 Assert.That(manifest.GetProperty("replay_build").GetString(), Does.EndWith("release-13.01"));
                 Assert.That(manifest.GetProperty("duration_ms").GetInt32(), Is.EqualTo(60000));
@@ -537,7 +568,7 @@ public class ReplayExportTests
                 SourceId: "ZoomedFire",
                 IsLocalEffect: true,
                 IsTransient: false,
-                WaitOnReplicationActor: 200,
+                WaitOnReplicationActor: new(200, null),
                 AllianceFilter: EAresAlliance.AllianceEnemy,
                 Location: new FVector(1, 2, 3),
                 Rotation: new FRotator(4, 5, 6),
@@ -547,10 +578,10 @@ public class ReplayExportTests
                 TracerOption: 2,
                 BurstShotNumber: 3,
                 YawSwitch: 0,
-                FiringPlayerState: 300,
-                FiringState: 400,
+                FiringPlayerState: new(300, null),
+                FiringState: new(400, "ZoomedFiringState"),
                 AttackVectors: [new FVector(7, 8, 9), new FVector(10, 11, 12)],
-                EffectEquippable: 500,
+                EffectEquippable: new(500, null),
                 Equippable: new ValorantEquippable(500, "Vandal", ValorantEquippableCategory.Rifle, "/Game/Vandal"),
                 FireMode: ValorantShotFireMode.Alternate,
                 FireModeEvidence: "source:ZoomedFire"));

@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 
@@ -20,27 +21,27 @@ public sealed class BombCombatReportComponentDescriptor : ExportGroupDescriptor<
     public CombatReportArrayUpdate<ParticipantInteractionUpdate>? Interactions { get; set; }
     public string? ParticipantSubject { get; set; }
     public string? ParticipantTeamName { get; set; }
-    public uint ParticipantCharacterIcon { get; set; }
+    public NetObjectReference ParticipantCharacterIcon { get; set; }
     public float DamageDealt { get; set; }
     public int HitsDealt { get; set; }
     public float DamageRecieved { get; set; }
     public int HitsRecieved { get; set; }
     public bool DidKill { get; set; }
     public byte AssistType { get; set; }
-    public uint ParticipantsKillerState { get; set; }
+    public NetObjectReference ParticipantsKillerState { get; set; }
     public bool WasKiller { get; set; }
     public CombatReportArrayUpdate<CombatInteractionUpdate>? DealtIteractions { get; set; }
-    public uint DamageType { get; set; }
+    public NetObjectReference DamageType { get; set; }
     public CombatReportArrayUpdate<RegionalDamageInteractionUpdate>? RegionalDamageInteractions { get; set; }
     public byte Region { get; set; }
     public int Hits { get; set; }
     public float Damage { get; set; }
     public bool IsWallPen { get; set; }
     public bool IsKill { get; set; }
-    public uint DestroyedArmor { get; set; }
+    public NetObjectReference DestroyedArmor { get; set; }
     public CombatReportArrayUpdate<CombatInteractionUpdate>? ReceivedInteractions { get; set; }
     public int CombatReportIndex { get; set; }
-    public uint ResurrectorPlayerState { get; set; }
+    public NetObjectReference ResurrectorPlayerState { get; set; }
     public bool Died { get; set; }
     public FVector? DeathLocation { get; set; }
 

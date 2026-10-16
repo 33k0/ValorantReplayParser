@@ -1,6 +1,7 @@
 using Replay.Encoding.Net;
 using Replay.Models.Descriptors;
 using Replay.Models.Events;
+using Replay.Models.Net;
 using Replay.Valorant.Combat;
 using Replay.Valorant.Events.Combat;
 using Replay.Valorant.GameState;
@@ -20,18 +21,18 @@ public class ValorantShotEventEnricherTests
             "/Game/Equippables/Guns/Rifles/AK/AssaultRifle_AK.AssaultRifle_AK_C",
             0, null, null, null, null));
 
-        var playerState = new BombPlayerStateDescriptor { PossessedCharacter = 20 };
+        var playerState = new BombPlayerStateDescriptor { PossessedCharacter = new(20, null) };
         playerState.MarkDecoded(nameof(BombPlayerStateDescriptor.PossessedCharacter));
         enricher.Emit(ExportGroup(10, playerState));
 
-        var inventory = new AresInventoryDescriptor { Character = 20, CurrentEquippable = 500 };
+        var inventory = new AresInventoryDescriptor { Character = new(20, null), CurrentEquippable = new(500, null) };
         inventory.MarkDecoded(nameof(AresInventoryDescriptor.Character));
         inventory.MarkDecoded(nameof(AresInventoryDescriptor.CurrentEquippable));
         enricher.Emit(ExportGroup(20, inventory));
 
         enricher.Emit(new ValorantShotReceived(1, 2, 30, 0, 4, new ValorantShot(
             null, null, null, null, null, null, null, null, null, null, null, null, null, null, null,
-            10, null, [], 500, null)));
+            new(10, null), null, [], new(500, null), null)));
 
         var shot = sink.Events.OfType<ValorantShotReceived>().Single().Shot;
 
@@ -54,7 +55,7 @@ public class ValorantShotEventEnricherTests
         cache.SetNetGuidPath(368, path);
         var enricher = new ValorantShotEventEnricher(sink, cache);
 
-        enricher.Emit(Shot(firingState: 368));
+        enricher.Emit(Shot(firingState: new(368, null)));
 
         var shot = sink.Events.OfType<ValorantShotReceived>().Single().Shot;
         Assert.Multiple(() =>
@@ -73,7 +74,7 @@ public class ValorantShotEventEnricherTests
         cache.SetNetGuidPath(369, "BasePistol_FXC_AltFire");
         var enricher = new ValorantShotEventEnricher(sink, cache);
 
-        enricher.Emit(Shot(firingState: 368));
+        enricher.Emit(Shot(firingState: new(368, null)));
 
         Assert.That(sink.Events.OfType<ValorantShotReceived>().Single().Shot.FireMode,
             Is.EqualTo(ValorantShotFireMode.Alternate));
@@ -85,7 +86,7 @@ public class ValorantShotEventEnricherTests
         var sink = new CapturingReplayEventSink();
         var enricher = new ValorantShotEventEnricher(sink, new NetGuidCache());
 
-        enricher.Emit(Shot(firingState: 368));
+        enricher.Emit(Shot(firingState: new(368, null)));
 
         var shot = sink.Events.OfType<ValorantShotReceived>().Single().Shot;
         Assert.Multiple(() =>
@@ -107,10 +108,10 @@ public class ValorantShotEventEnricherTests
             Is.EqualTo(ValorantShotFireMode.Alternate));
     }
 
-    private static ValorantShotReceived Shot(uint? firingState = null, string? sourceId = null) => new(
+    private static ValorantShotReceived Shot(NetObjectReference? firingState = null, string? sourceId = null) => new(
         1, 2, 30, 0, 4, new ValorantShot(
             null, null, sourceId, null, null, null, null, null, null, null, null, null, null, null, null,
-            10, firingState, [], 500, null));
+            new(10, null), firingState, [], new(500, null), null));
 
     private static ExportGroupReceived ExportGroup(uint actorNetGuid, ExportGroupDescriptor payload) => new(
         0, 0, actorNetGuid, 0, 0, true, false, 0, payload.Path, payload.Kind, payload.Categories,

@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 
@@ -6,7 +7,7 @@ namespace Replay.Valorant.Combat;
 
 public abstract class PointDamageParameters<T> : DamageParameters<T> where T : PointDamageParameters<T>
 {
-    public uint DamagedComponent { get; set; }
+    public NetObjectReference DamagedComponent { get; set; }
     public string? DamagedBone { get; set; }
     public bool IsWallPenetration { get; set; }
     public float FalloffMultiplier { get; set; }

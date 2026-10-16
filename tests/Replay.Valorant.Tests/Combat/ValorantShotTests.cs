@@ -77,7 +77,7 @@ public class ValorantShotTests
             Assert.That(parameters.EffectId, Is.EqualTo(4));
             Assert.That(parameters.IsLocalEffect, Is.False);
             Assert.That(parameters.IsTransient, Is.True);
-            Assert.That(parameters.WaitOnReplicationActor, Is.EqualTo(17));
+            Assert.That(parameters.WaitOnReplicationActor?.NetGuid, Is.EqualTo(17));
             Assert.That(parameters.AllianceFilter, Is.EqualTo(EAresAlliance.AllianceAny));
             Assert.That(parameters.StartMovementTime, Is.EqualTo(7.3303437f));
             Assert.That(archive.AtEnd, Is.True);

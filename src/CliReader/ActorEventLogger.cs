@@ -287,7 +287,7 @@ internal sealed class ActorEventLogger : IReplayEventSink
         DecodedFieldValueKind.Float => value.FloatValue.ToString("G", CultureInfo.InvariantCulture),
         DecodedFieldValueKind.Double => value.DoubleValue.ToString("G", CultureInfo.InvariantCulture),
         DecodedFieldValueKind.String => value.StringValue ?? string.Empty,
-        DecodedFieldValueKind.NetGuid => string.Create(CultureInfo.InvariantCulture, $"net:{value.NetGuidValue}"),
+        DecodedFieldValueKind.ObjectReference => string.Create(CultureInfo.InvariantCulture, $"net:{value.ObjectReferenceValue.NetGuid}"),
         DecodedFieldValueKind.Vector => FormatVector(value.VectorValue),
         DecodedFieldValueKind.Rotator => FormatRotator(value.RotatorValue),
         DecodedFieldValueKind.Object => value.ObjectValue?.ToString() ?? "<null>",

@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Unreal.Parsing;
 
 namespace Replay.Valorant.Descriptors.Agents;
@@ -11,6 +12,6 @@ public sealed class AbilityObjectParameters(string path, string parameter) : Exp
     public override ExportGroupKind Kind => ExportGroupKind.ClassNetCache;
     public override FieldStreamGrammar Grammar => FieldStreamGrammar.FunctionParameters;
     public override object CreatePayloadInstance() => new AbilityObjectParameters(path, parameter);
-    public uint? Actor { get; set; }
+    public NetObjectReference? Actor { get; set; }
     protected override void Configure() => AddPropertyHandle(0, parameter, x => x.Actor).ObjectNetGuid();
 }

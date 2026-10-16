@@ -85,21 +85,21 @@ internal sealed class ValorantShotEventEnricher : IReplayEventSink
     {
         if (playerState.HasDecoded(nameof(BombPlayerStateDescriptor.PossessedCharacter)))
         {
-            SetCharacter(playerStateNetGuid, playerState.PossessedCharacter);
+            SetCharacter(playerStateNetGuid, playerState.PossessedCharacter.NetGuid);
             return;
         }
 
         if (playerState.HasDecoded(nameof(BombPlayerStateDescriptor.SpawnedCharacter)))
         {
-            SetCharacter(playerStateNetGuid, playerState.SpawnedCharacter);
+            SetCharacter(playerStateNetGuid, playerState.SpawnedCharacter.NetGuid);
         }
     }
 
     private void TrackInventory(uint actorNetGuid, AresInventoryDescriptor inventory)
     {
         var characterNetGuid = inventory.HasDecoded(nameof(AresInventoryDescriptor.Character)) &&
-                              inventory.Character != 0
-            ? inventory.Character
+                              inventory.Character.NetGuid != 0
+            ? inventory.Character.NetGuid
             : actorNetGuid;
         if (characterNetGuid == 0)
         {
@@ -108,13 +108,13 @@ internal sealed class ValorantShotEventEnricher : IReplayEventSink
 
         if (inventory.HasDecoded(nameof(AresInventoryDescriptor.CurrentEquippable)))
         {
-            SetSelectedEquippable(characterNetGuid, inventory.CurrentEquippable);
+            SetSelectedEquippable(characterNetGuid, inventory.CurrentEquippable.NetGuid);
             return;
         }
 
         if (inventory.HasDecoded(nameof(AresInventoryDescriptor.NewCurrentEquippable)))
         {
-            SetSelectedEquippable(characterNetGuid, inventory.NewCurrentEquippable);
+            SetSelectedEquippable(characterNetGuid, inventory.NewCurrentEquippable.NetGuid);
         }
     }
 
@@ -128,19 +128,19 @@ internal sealed class ValorantShotEventEnricher : IReplayEventSink
 
     private ValorantEquippable? ResolveShotEquippable(ValorantShot shot)
     {
-        var fromEffect = ResolveEquippable(shot.EffectEquippable);
+        var fromEffect = ResolveEquippable(shot.EffectEquippable?.NetGuid);
         if (fromEffect is not null)
         {
             return fromEffect;
         }
 
-        var fromFiringState = ResolveFromFiringState(shot.FiringState);
+        var fromFiringState = ResolveFromFiringState(shot.FiringState?.NetGuid);
         if (fromFiringState is not null)
         {
             return fromFiringState;
         }
 
-        if (shot.FiringPlayerState is not { } playerStateNetGuid ||
+        if (shot.FiringPlayerState?.NetGuid is not { } playerStateNetGuid ||
             !_characterByPlayerState.TryGetValue(playerStateNetGuid, out var characterNetGuid) ||
             !_selectedEquippableByCharacter.TryGetValue(characterNetGuid, out var equippableNetGuid))
         {
@@ -238,7 +238,7 @@ internal static class ValorantShotFireModeResolver
                 $"source:{shot.SourceId}");
         }
 
-        if (shot.FiringState is not { } firingState || firingState == 0)
+        if (shot.FiringState?.NetGuid is not { } firingState || firingState == 0)
         {
             return ValorantShotFireModeResolution.Unknown;
         }

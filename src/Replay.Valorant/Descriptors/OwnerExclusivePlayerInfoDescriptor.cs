@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Unreal.Parsing;
 using Replay.Valorant.GameState;
 
@@ -10,8 +11,8 @@ public sealed class OwnerExclusivePlayerInfoDescriptor : ExportGroupDescriptor<O
     public override ExportCategory Categories => ExportCategory.Economy;
     public override ExportGroupKind Kind => ExportGroupKind.Actor;
 
-    public uint? Owner { get; set; }
-    public uint? AresController { get; set; }
+    public NetObjectReference? Owner { get; set; }
+    public NetObjectReference? AresController { get; set; }
     public int? EndOfRoundBeforeRewardsMoney { get; set; }
     public bool? LoadoutFinalized { get; set; }
     public AresPlayerRoundInfo[]? RoundInfos { get; set; }

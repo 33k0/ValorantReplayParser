@@ -20,8 +20,8 @@ public class DamageEquippableTests
 
         Assert.Multiple(() =>
         {
-            Assert.That(value.Kind, Is.EqualTo(DecodedFieldValueKind.NetGuid));
-            Assert.That(value.NetGuidValue, Is.EqualTo(17));
+            Assert.That(value.Kind, Is.EqualTo(DecodedFieldValueKind.ObjectReference));
+            Assert.That(value.ObjectReferenceValue.NetGuid, Is.EqualTo(17));
             Assert.That(archive.AtEnd, Is.True);
         });
     }

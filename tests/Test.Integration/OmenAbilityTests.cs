@@ -49,7 +49,7 @@ public class OmenAbilityTests
         _ = ValorantReplayReader.CreateDefault(new NullLoggerFactory(), eventSink, parseNothingProfile).Read(archive);
         Assert.Multiple(() =>
         {
-            Assert.That(coveConsumer.ReceivedCalls().All(_ => _.GetArguments().Cast<DarkCoverAbilityDescriptor>().First().Instigator is 134 or null), Is.True);
+            Assert.That(coveConsumer.ReceivedCalls().All(_ => _.GetArguments().Cast<DarkCoverAbilityDescriptor>().First().Instigator?.NetGuid is 134 or null), Is.True);
             Assert.That(coveConsumer.ReceivedCalls().Select(_ => _.GetArguments().Cast<DarkCoverAbilityDescriptor>().First().ReplicatedMovement).Count(_ => _ is not null), Is.EqualTo(1074));
             Assert.That(coveConsumer.ReceivedCalls().Select(_ => _.GetArguments().Cast<DarkCoverAbilityDescriptor>().First().ReplicatedMovement).Count(_ => _ is null), Is.EqualTo(2));
         });

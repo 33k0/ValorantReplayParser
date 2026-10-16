@@ -118,7 +118,7 @@ public class EconomyDescriptorTests
 
         var decoded = ((IFieldDecoder)field.Decoder!).Decode(ref context, archive);
 
-        Assert.That(decoded.NetGuidValue, Is.EqualTo(42));
+        Assert.That(decoded.ObjectReferenceValue.NetGuid, Is.EqualTo(42));
         Assert.That(archive.AtEnd, Is.True);
         using var truncated = new BitArchiveReader(new byte[] { 0x01 }, 8);
         Assert.Throws<ArchiveReadException>(() => ((IFieldDecoder)field.Decoder).Decode(ref context, truncated));

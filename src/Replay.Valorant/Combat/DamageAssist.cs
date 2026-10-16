@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 
@@ -11,8 +12,8 @@ public sealed class DamageAssist : ExportGroupDescriptor<DamageAssist>
     public DamageAssist(uint firstHandle) => _firstHandle = firstHandle;
     public override object CreatePayloadInstance() => new DamageAssist(_firstHandle);
     public byte? AssistType { get; set; }
-    public uint? Assister { get; set; }
-    public uint? AssistingEquippableClass { get; set; }
+    public NetObjectReference? Assister { get; set; }
+    public NetObjectReference? AssistingEquippableClass { get; set; }
     public FGameplayTag? AssistTag { get; set; }
 
     protected override void Configure()

@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Unreal.Parsing;
 
 namespace Replay.Valorant.Inventory;
@@ -9,9 +10,9 @@ public sealed class PurchasedItemComponentDescriptor : ExportGroupDescriptor<Pur
     public override ExportCategory Categories => ExportCategory.Inventory | ExportCategory.Economy;
     public override ExportGroupKind Kind => ExportGroupKind.Component;
 
-    public uint? Purchaseable { get; set; }
+    public NetObjectReference? Purchaseable { get; set; }
     public bool? IsCurrentSessionPurchase { get; set; }
-    public uint? PurchasingPlayerState { get; set; }
+    public NetObjectReference? PurchasingPlayerState { get; set; }
     public EInventoryTransaction? PurchasableTransactionSource { get; set; }
 
     protected override void Configure()

@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 using Replay.Valorant.Combat;
@@ -12,8 +13,8 @@ public sealed class ActiveEffectInfoDescriptor : ExportGroupDescriptor<ActiveEff
     public string? SourceId { get; set; }
     public bool? IsLocalEffect { get; set; }
     public bool? IsTransient { get; set; }
-    public uint? EffectType { get; set; }
-    public uint? WaitOnReplicationActor { get; set; }
+    public NetObjectReference? EffectType { get; set; }
+    public NetObjectReference? WaitOnReplicationActor { get; set; }
     public ActiveEffectFloatValue[]? ActiveFloatValues { get; set; }
     public ActiveEffectObjectValue[]? ActiveObjectValues { get; set; }
     public FVector? Translation { get; set; }

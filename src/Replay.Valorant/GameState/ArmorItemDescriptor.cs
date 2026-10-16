@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Unreal.Parsing;
 
 namespace Replay.Valorant.GameState;
@@ -10,10 +11,10 @@ public abstract class ArmorItemDescriptor<TDescriptor> : ExportGroupDescriptor<T
     public override ExportGroupKind Kind => ExportGroupKind.Actor;
 
     public int MaximumAmount { get; set; }
-    public uint Owner { get; set; }
-    public uint MyPawn { get; set; }
+    public NetObjectReference Owner { get; set; }
+    public NetObjectReference MyPawn { get; set; }
     public byte InInventory { get; set; }
-    public uint AttachedDamageSection { get; set; }
+    public NetObjectReference AttachedDamageSection { get; set; }
 
     protected override void Configure()
     {

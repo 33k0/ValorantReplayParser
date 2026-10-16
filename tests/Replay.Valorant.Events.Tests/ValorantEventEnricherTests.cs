@@ -1,6 +1,7 @@
 using Replay.Encoding.Archives;
 using Replay.Models.Descriptors;
 using Replay.Models.Events;
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 using Replay.Valorant.Descriptors;
@@ -26,7 +27,7 @@ public class ValorantEventEnricherTests
         var rpc = Rpc(new ReplayPlayContinuousEffectAtLocationParameters
         {
             EffectId = 42,
-            ObjectValues = [new EffectDataObject { Name = new FGameplayTag(0, "FiringState.FiringState"), Object = 600 }],
+            ObjectValues = [new EffectDataObject { Name = new FGameplayTag(0, "FiringState.FiringState"), Object = new NetObjectReference(600, null) }],
         });
 
         events.Emit(rpc);

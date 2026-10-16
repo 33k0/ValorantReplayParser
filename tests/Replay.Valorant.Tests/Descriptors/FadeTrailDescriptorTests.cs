@@ -55,7 +55,7 @@ public sealed class FadeTrailDescriptorTests
     {
         Assert.That(new FadeTrailDescriptor().TrackedActor, Is.Null);
         Assert.That(new FadeTrailDescriptor().IsConsumed, Is.Null);
-        Assert.That(Decode(new FadeTrailDescriptor(), "TrackedActor", [0]).NetGuidValue, Is.Zero);
+        Assert.That(Decode(new FadeTrailDescriptor(), "TrackedActor", [0]).ObjectReferenceValue.NetGuid, Is.Zero);
         Assert.That(Decode(new FadeTrailDescriptor(), "IsConsumed", [0], 1).BoolValue, Is.False);
         Assert.That(Decode(new FadeTrailDescriptor(), "IsConsumed", [1], 1).BoolValue, Is.True);
     }

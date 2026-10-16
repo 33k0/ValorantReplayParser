@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 
@@ -11,7 +12,7 @@ public sealed class MulticastResetForRespawnParameters : ExportGroupDescriptor<M
     public override ExportGroupKind Kind => ExportGroupKind.ClassNetCache;
     public override FieldStreamGrammar Grammar => FieldStreamGrammar.FunctionParameters;
 
-    public uint? ShooterCharacter { get; set; }
+    public NetObjectReference? ShooterCharacter { get; set; }
     public FQuat? Rotation { get; set; }
     public FVector? Translation { get; set; }
     public FVector? Scale3D { get; set; }

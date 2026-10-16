@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Unreal.Parsing;
 
 namespace Replay.Valorant.Descriptors;
@@ -7,7 +8,7 @@ namespace Replay.Valorant.Descriptors;
 public sealed class ReplicatedObjectReference(uint handle, string exportName)
     : ExportGroupDescriptor<ReplicatedObjectReference>
 {
-    public uint? NetGuid { get; set; }
+    public NetObjectReference? NetGuid { get; set; }
     public override object CreatePayloadInstance() => new ReplicatedObjectReference(handle, exportName);
     protected override void Configure() => AddPropertyHandle(handle, exportName, x => x.NetGuid).ObjectNetGuid();
 }

@@ -6,7 +6,7 @@ namespace CliReader.JsonExport;
 
 internal sealed class ReplayExportManifestWriter
 {
-    private const int SchemaVersion = 8;
+    private const int SchemaVersion = 9;
 
     public void Write(
         string outputDirectory,

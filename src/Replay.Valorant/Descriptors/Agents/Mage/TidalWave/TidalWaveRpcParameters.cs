@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Unreal.Parsing;
 
 namespace Replay.Valorant.Descriptors.Agents.Mage.TidalWave;
@@ -18,7 +19,7 @@ public sealed class MulticastInitializeParameters
     public double? VelocityIn { get; set; }
     public double? AnchorSpacingIn { get; set; }
     public int? NumCrossfadeAnchorsIn { get; set; }
-    public uint? PreviousChunk { get; set; }
+    public NetObjectReference? PreviousChunk { get; set; }
 
     protected override void Configure()
     {

@@ -84,8 +84,8 @@ public class ValorantWallEventEnricherTests
     private static T Owned<T>(T descriptor, uint owner, uint instigator)
         where T : WallOwnedActorDescriptor<T>
     {
-        descriptor.Owner = owner;
-        descriptor.Instigator = instigator;
+        descriptor.Owner = new(owner, null);
+        descriptor.Instigator = new(instigator, null);
         descriptor.MarkDecoded(nameof(descriptor.Owner));
         descriptor.MarkDecoded(nameof(descriptor.Instigator));
         return descriptor;
@@ -104,7 +104,7 @@ public class ValorantWallEventEnricherTests
         WallStartLocation = new FVector(1, 2, 0),
         WallEndLocation = new FVector(5, 2, 0),
         WallImpactNormal = new FVector(1, 0, 0),
-        EnemyTrigger = trigger,
+        EnemyTrigger = new(trigger, null),
     };
 
     private static void RegisterPlayer(
@@ -115,7 +115,7 @@ public class ValorantWallEventEnricherTests
     {
         var descriptor = new BombPlayerStateDescriptor
         {
-            PossessedCharacter = characterNetGuid,
+            PossessedCharacter = new(characterNetGuid, null),
             Subject = subject,
         };
         descriptor.MarkDecoded(nameof(BombPlayerStateDescriptor.PossessedCharacter));

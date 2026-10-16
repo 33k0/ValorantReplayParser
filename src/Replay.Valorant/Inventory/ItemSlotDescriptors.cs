@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Unreal.Parsing;
 
 namespace Replay.Valorant.Inventory;
@@ -8,7 +9,7 @@ public sealed class ItemSlotDescriptor : ExportGroupDescriptor<ItemSlotDescripto
     public override string Path => "/Script/ShooterGame.ItemSlot";
     public override ExportCategory Categories => ExportCategory.Inventory;
 
-    public uint? Contents { get; set; }
+    public NetObjectReference? Contents { get; set; }
 
     protected override void Configure() =>
         AddPropertyHandle(0, x => x.Contents).ObjectNetGuid();

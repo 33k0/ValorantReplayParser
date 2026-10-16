@@ -7,7 +7,7 @@
         <RootNamespace>Replay.Valorant</RootNamespace>
         <IsPackable>true</IsPackable>
         <PackageId>ValorantReplayParser</PackageId>
-        <Description>VALORANT replay (.vrf) parsing with typed gameplay events and replay metadata. Experimental API.</Description>
+        <Description>VALORANT replay (.vrf) parsing with native decoded events and replay metadata. Experimental API.</Description>
     </PropertyGroup>
 
     <Import Project="$(MSBuildThisFileDirectory)..\..\build\LibraryPackage.props" />

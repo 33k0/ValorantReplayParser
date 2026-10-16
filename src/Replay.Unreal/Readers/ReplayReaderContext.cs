@@ -4,6 +4,7 @@ using Replay.Encoding.Net;
 using Replay.Models.Descriptors;
 using Replay.Models.Diagnostics;
 using Replay.Models.Events;
+using Replay.Models.Net;
 using Replay.Models.Replay;
 using Replay.Unreal.Bunches;
 using Replay.Unreal.Bunches.Payload;
@@ -51,6 +52,10 @@ internal sealed class ReplayReaderContext : IDisposable
     public BunchPayloadStats BunchPayloadStats { get; }
     public IReplayEventSink EventSink { get; }
     public float CurrentTimeSeconds { get; internal set; }
+    internal int CurrentPacketId { get; set; } = -1;
+
+    internal void EmitNetGuidExported(uint netGuid, string path, NetworkGuid outerNetGuid) =>
+        EventSink.Emit(new NetGuidExported(CurrentTimeSeconds, CurrentPacketId, netGuid, path, outerNetGuid.Value));
     public Dictionary<uint, ActorChannelState> ChannelStates { get; } = [];
     public List<ActorChannelState> ActorChannelOpens { get; } = [];
     public BunchPayloadPipeline BunchPayloadPipeline { get; }

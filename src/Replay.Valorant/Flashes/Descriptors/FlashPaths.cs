@@ -1,6 +1,6 @@
 namespace Replay.Valorant.Flashes.Descriptors;
 
-internal static class FlashPaths
+public static class FlashPaths
 {
     public const string SkyeProjectile =
         "/Game/Characters/Guide/S0/Ability_E/Projectile_Guide_E_HawkFlash.Projectile_Guide_E_HawkFlash_C";

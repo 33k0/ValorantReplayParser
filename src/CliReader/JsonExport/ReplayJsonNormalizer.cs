@@ -2,6 +2,7 @@ using System.Collections;
 using System.Reflection;
 using System.Text.Json;
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 
 namespace CliReader.JsonExport;
@@ -132,6 +133,12 @@ internal sealed class ReplayJsonNormalizer
     {
         switch (value)
         {
+            case NetObjectReference reference:
+                writer.WriteStartObject();
+                writer.WriteNumber("net_guid", reference.NetGuid);
+                writer.WriteString("path", reference.Path);
+                writer.WriteEndObject();
+                return true;
             case FVector vector:
                 WriteVector(writer, vector);
                 return true;
@@ -285,7 +292,7 @@ internal sealed class ReplayJsonNormalizer
             DecodedFieldValueKind.Float => value.FloatValue,
             DecodedFieldValueKind.Double => value.DoubleValue,
             DecodedFieldValueKind.String => value.StringValue,
-            DecodedFieldValueKind.ObjectReference => value.ObjectReferenceValue.NetGuid,
+            DecodedFieldValueKind.ObjectReference => value.ObjectReferenceValue,
             DecodedFieldValueKind.Vector => value.VectorValue,
             DecodedFieldValueKind.Rotator => value.RotatorValue,
             DecodedFieldValueKind.RepMovement => value.RepMovementValue,

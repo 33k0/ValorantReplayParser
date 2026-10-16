@@ -6,10 +6,9 @@ using Replay.Valorant.Combat;
 
 namespace Replay.Valorant.Flashes.Descriptors;
 
-public sealed class EffectManagerPlayContinuousParameters
-    : ExportGroupDescriptor<EffectManagerPlayContinuousParameters>, IEffectDataPayload, IDecodedPayloadEventEmitter
+public abstract class EffectManagerPlayParameters<T> : ExportGroupDescriptor<T>, IEffectDataPayload, IDecodedPayloadEventEmitter
+    where T : EffectManagerPlayParameters<T>
 {
-    public override string Path => "/Script/ShooterGame.EffectManagerComponent:MulticastPlayContinuousEffect";
     public override ExportCategory Categories => ExportCategory.Effects;
     public override ExportGroupKind Kind => ExportGroupKind.ClassNetCache;
     public override FieldStreamGrammar Grammar => FieldStreamGrammar.FunctionParameters;
@@ -17,11 +16,6 @@ public sealed class EffectManagerPlayContinuousParameters
     public NetObjectReference? EffectContainer { get; set; }
     /// <summary>Wire object name resolved from the GUID cache; null when absent/unresolved.</summary>
     public string? EffectContainerPath { get; set; }
-    public void EmitDecodedEvents(ref FieldDecodeContext context)
-    {
-        if (HasDecoded(nameof(EffectContainer)) && EffectContainer is { } guid &&
-            context.NetGuidCache?.TryGetPath(guid.NetGuid, out var path) == true) EffectContainerPath = path;
-    }
     public NetObjectReference? WaitOnReplicationActor { get; set; }
     public EffectManagerFunctionFloatValue[]? FunctionFloatValues { get; set; }
     public EffectManagerFunctionVectorValue[]? FunctionVectorValues { get; set; }
@@ -30,10 +24,6 @@ public sealed class EffectManagerPlayContinuousParameters
     public FQuat? Rotation { get; set; }
     public FVector? Scale3D { get; set; }
     public string? AttachSocket { get; set; }
-    public ulong? EffectId { get; set; }
-    public string? SourceId { get; set; }
-    public bool? IsLocalEffect { get; set; }
-    public bool? IsTransient { get; set; }
     public NetObjectReference? ClientControllerThatTriggered { get; set; }
     public float? StartMovementTime { get; set; }
     public EAresAlliance? AllianceFilter { get; set; }
@@ -43,85 +33,68 @@ public sealed class EffectManagerPlayContinuousParameters
 
     public IReadOnlyList<EffectManagerObjectValue> ObjectValues =>
         EffectManagerValueMapper.Map(FunctionObjectValues);
+
+    public void EmitDecodedEvents(ref FieldDecodeContext context)
+    {
+        if (HasDecoded(nameof(EffectContainer)) && EffectContainer is { } guid &&
+            context.NetGuidCache?.TryGetPath(guid.NetGuid, out var path) == true) EffectContainerPath = path;
+    }
+
+    protected void AddSharedFields()
+    {
+        AddPropertyHandle(0, x => x.EffectContainer).ObjectNetGuid();
+        AddPropertyHandle(1, x => x.WaitOnReplicationActor).ObjectNetGuid();
+        AddPropertyHandle(2, "FloatValues", x => x.FunctionFloatValues)
+            .RepLayoutDynamicArray<EffectManagerFunctionFloatValue>();
+        AddPropertyHandle(6, "VectorValues", x => x.FunctionVectorValues)
+            .RepLayoutDynamicArray<EffectManagerFunctionVectorValue>();
+        AddPropertyHandle(10, "ObjectValues", x => x.FunctionObjectValues)
+            .RepLayoutDynamicArray<EffectManagerFunctionObjectValue>();
+        AddPropertyHandle(22, "249", x => x.Rotation).NormalizedQuaternion();
+        AddPropertyHandle(23, x => x.Translation).FVector();
+        AddPropertyHandle(24, x => x.Scale3D).FVector();
+        AddPropertyHandle(25, x => x.AttachSocket).FName();
+    }
+
+    protected void AddTriggerFields(uint firstHandle)
+    {
+        AddPropertyHandle(firstHandle, x => x.ClientControllerThatTriggered).ObjectNetGuid();
+        AddPropertyHandle(firstHandle + 1, x => x.StartMovementTime).Float();
+        AddPropertyHandle(firstHandle + 2, x => x.AllianceFilter).EnumRemainingBits();
+    }
+}
+
+public sealed class EffectManagerPlayContinuousParameters : EffectManagerPlayParameters<EffectManagerPlayContinuousParameters>
+{
+    public override string Path => "/Script/ShooterGame.EffectManagerComponent:MulticastPlayContinuousEffect";
+
+    public ulong? EffectId { get; set; }
+    public string? SourceId { get; set; }
+    public bool? IsLocalEffect { get; set; }
+    public bool? IsTransient { get; set; }
 
     public IReadOnlyList<EffectManagerVectorValue> VectorValues =>
         EffectManagerValueMapper.Map(FunctionVectorValues);
 
     protected override void Configure()
     {
-        AddPropertyHandle(0, x => x.EffectContainer).ObjectNetGuid();
-        AddPropertyHandle(1, x => x.WaitOnReplicationActor).ObjectNetGuid();
-        AddPropertyHandle(2, "FloatValues", x => x.FunctionFloatValues)
-            .RepLayoutDynamicArray<EffectManagerFunctionFloatValue>();
-        AddPropertyHandle(6, "VectorValues", x => x.FunctionVectorValues)
-            .RepLayoutDynamicArray<EffectManagerFunctionVectorValue>();
-        AddPropertyHandle(10, "ObjectValues", x => x.FunctionObjectValues)
-            .RepLayoutDynamicArray<EffectManagerFunctionObjectValue>();
-        AddPropertyHandle(22, "249", x => x.Rotation).NormalizedQuaternion();
-        AddPropertyHandle(23, x => x.Translation).FVector();
-        AddPropertyHandle(24, x => x.Scale3D).FVector();
-        AddPropertyHandle(25, x => x.AttachSocket).FName();
+        AddSharedFields();
         AddPropertyHandle(26, "EffectID", x => x.EffectId).UInt64();
         AddPropertyHandle(27, "SourceID", x => x.SourceId).FName();
         AddPropertyHandle(28, "bLocalEffect", x => x.IsLocalEffect).Bool();
         AddPropertyHandle(29, "bTransient", x => x.IsTransient).Bool();
-        AddPropertyHandle(30, x => x.ClientControllerThatTriggered).ObjectNetGuid();
-        AddPropertyHandle(31, x => x.StartMovementTime).Float();
-        AddPropertyHandle(32, x => x.AllianceFilter).EnumRemainingBits();
+        AddTriggerFields(30);
     }
 }
 
-public sealed class EffectManagerPlayOneShotParameters
-    : ExportGroupDescriptor<EffectManagerPlayOneShotParameters>, IEffectDataPayload, IDecodedPayloadEventEmitter
+public sealed class EffectManagerPlayOneShotParameters : EffectManagerPlayParameters<EffectManagerPlayOneShotParameters>
 {
     public override string Path => "/Script/ShooterGame.EffectManagerComponent:MulticastPlayOneShotEffect";
-    public override ExportCategory Categories => ExportCategory.Effects;
-    public override ExportGroupKind Kind => ExportGroupKind.ClassNetCache;
-    public override FieldStreamGrammar Grammar => FieldStreamGrammar.FunctionParameters;
-
-    public NetObjectReference? EffectContainer { get; set; }
-    /// <summary>Wire object name resolved from the GUID cache; null when absent/unresolved.</summary>
-    public string? EffectContainerPath { get; set; }
-    public void EmitDecodedEvents(ref FieldDecodeContext context)
-    {
-        if (HasDecoded(nameof(EffectContainer)) && EffectContainer is { } guid &&
-            context.NetGuidCache?.TryGetPath(guid.NetGuid, out var path) == true) EffectContainerPath = path;
-    }
-    public NetObjectReference? WaitOnReplicationActor { get; set; }
-    public EffectManagerFunctionFloatValue[]? FunctionFloatValues { get; set; }
-    public EffectManagerFunctionObjectValue[]? FunctionObjectValues { get; set; }
-    public EffectManagerFunctionVectorValue[]? FunctionVectorValues { get; set; }
-    public FQuat? Rotation { get; set; }
-    public string? AttachSocket { get; set; }
-    public FVector? Translation { get; set; }
-    public FVector? Scale3D { get; set; }
-    public NetObjectReference? ClientControllerThatTriggered { get; set; }
-    public float? StartMovementTime { get; set; }
-    public EAresAlliance? AllianceFilter { get; set; }
-
-    public IReadOnlyList<EffectManagerFloatValue> FloatValues =>
-        EffectManagerValueMapper.Map(FunctionFloatValues);
-
-    public IReadOnlyList<EffectManagerObjectValue> ObjectValues =>
-        EffectManagerValueMapper.Map(FunctionObjectValues);
 
     protected override void Configure()
     {
-        AddPropertyHandle(0, x => x.EffectContainer).ObjectNetGuid();
-        AddPropertyHandle(1, x => x.WaitOnReplicationActor).ObjectNetGuid();
-        AddPropertyHandle(2, "FloatValues", x => x.FunctionFloatValues)
-            .RepLayoutDynamicArray<EffectManagerFunctionFloatValue>();
-        AddPropertyHandle(6, "VectorValues", x => x.FunctionVectorValues)
-            .RepLayoutDynamicArray<EffectManagerFunctionVectorValue>();
-        AddPropertyHandle(10, "ObjectValues", x => x.FunctionObjectValues)
-            .RepLayoutDynamicArray<EffectManagerFunctionObjectValue>();
-        AddPropertyHandle(22, "249", x => x.Rotation).NormalizedQuaternion();
-        AddPropertyHandle(23, x => x.Translation).FVector();
-        AddPropertyHandle(24, x => x.Scale3D).FVector();
-        AddPropertyHandle(25, x => x.AttachSocket).FName();
-        AddPropertyHandle(26, x => x.ClientControllerThatTriggered).ObjectNetGuid();
-        AddPropertyHandle(27, x => x.StartMovementTime).Float();
-        AddPropertyHandle(28, x => x.AllianceFilter).EnumRemainingBits();
+        AddSharedFields();
+        AddTriggerFields(26);
     }
 }
 

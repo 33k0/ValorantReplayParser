@@ -80,7 +80,8 @@ $packageProjects = @(
     @{ Id = 'ValorantReplayParser.Models'; Project = 'src/Replay.Models/Replay.Models.csproj'; Assembly = 'Replay.Models' },
     @{ Id = 'ValorantReplayParser.Encoding'; Project = 'src/Replay.Encoding/Replay.Encoding.csproj'; Assembly = 'Replay.Encoding' },
     @{ Id = 'ValorantReplayParser.Unreal'; Project = 'src/Replay.Unreal/Replay.Unreal.csproj'; Assembly = 'Replay.Unreal' },
-    @{ Id = 'ValorantReplayParser'; Project = 'src/Replay.Valorant/Replay.Valorant.csproj'; Assembly = 'Replay.Valorant' }
+    @{ Id = 'ValorantReplayParser'; Project = 'src/Replay.Valorant/Replay.Valorant.csproj'; Assembly = 'Replay.Valorant' },
+    @{ Id = 'ValorantReplayParser.Events'; Project = 'src/Replay.Valorant.Events/Replay.Valorant.Events.csproj'; Assembly = 'Replay.Valorant.Events' }
 )
 
 foreach ($package in $packageProjects) {
@@ -158,19 +159,21 @@ $expectedDescriptions = @{
     'ValorantReplayParser.Models' = 'Shared models and public data contracts for VALORANT replay parsing.'
     'ValorantReplayParser.Encoding' = 'Wire decoding primitives, Unreal archives, and VALORANT payload transforms.'
     'ValorantReplayParser.Unreal' = 'VALORANT replay container, header, chunk, and network parsing.'
-    'ValorantReplayParser' = 'VALORANT replay (.vrf) parsing with typed gameplay events and replay metadata. Experimental API.'
+    'ValorantReplayParser' = 'VALORANT replay (.vrf) parsing with native decoded events and replay metadata. Experimental API.'
+    'ValorantReplayParser.Events' = 'High-level VALORANT gameplay events derived from native replay events.'
 }
 
 $expectedDependencies = @{
     'ValorantReplayParser.Encoding' = @('ValorantReplayParser.Models')
     'ValorantReplayParser.Unreal' = @('ValorantReplayParser.Encoding', 'ValorantReplayParser.Models')
     'ValorantReplayParser' = @('ValorantReplayParser.Models', 'ValorantReplayParser.Unreal')
+    'ValorantReplayParser.Events' = @('ValorantReplayParser')
 }
 
 $nupkgFiles = @(Get-ChildItem -LiteralPath $packageDirectory -Filter '*.nupkg' -File)
 $snupkgFiles = @(Get-ChildItem -LiteralPath $packageDirectory -Filter '*.snupkg' -File)
-Require ($nupkgFiles.Count -eq 4) "Expected exactly four .nupkg files, found $($nupkgFiles.Count)."
-Require ($snupkgFiles.Count -eq 4) "Expected exactly four .snupkg files, found $($snupkgFiles.Count)."
+Require ($nupkgFiles.Count -eq $packageProjects.Count) "Expected $($packageProjects.Count) .nupkg files, found $($nupkgFiles.Count)."
+Require ($snupkgFiles.Count -eq $packageProjects.Count) "Expected $($packageProjects.Count) .snupkg files, found $($snupkgFiles.Count)."
 
 $packageMetadata = @{}
 foreach ($package in $packageProjects) {
@@ -213,7 +216,7 @@ foreach ($package in $packageProjects) {
         Require ($dependency.Version.Contains($Version)) "$packageFileName references $dependencyId at unexpected version '$($dependency.Version)'."
     }
     $oldPackageDependency = $metadata.Dependencies | Where-Object {
-        $_.Id -in @('Replay.Models', 'Replay.Encoding', 'Replay.Unreal', 'Replay.Valorant')
+        $_.Id -in @('Replay.Models', 'Replay.Encoding', 'Replay.Unreal', 'Replay.Valorant', 'Replay.Valorant.Events')
     } | Select-Object -First 1
     Require ($null -eq $oldPackageDependency) "$packageFileName still references an old default project package ID."
 
@@ -294,4 +297,4 @@ if (-not (Test-Path -LiteralPath $smokeOutput -PathType Leaf)) {
 }
 Invoke-CheckedCommand 'dotnet' @($smokeOutput, $ReplayPath)
 
-Write-Host "Verified four $Version packages and an isolated consumer using $ReplayPath."
+Write-Host "Verified $($packageProjects.Count) $Version packages and an isolated consumer using $ReplayPath."

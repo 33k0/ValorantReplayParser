@@ -23,6 +23,7 @@ internal sealed class BunchPayloadPipeline : IDisposable
     public void HandleBunchPayload(ref RawBunchHeader header, FBitArchive payload)
     {
         ObjectDisposedException.ThrowIf(_isDisposed, this);
+        _context.CurrentPacketId = header.PacketId;
         var context = new BunchPayloadContext(_context, header, payload);
         try
         {
@@ -65,7 +66,7 @@ internal sealed class BunchPayloadPipeline : IDisposable
     private static (BunchPayloadProcessor Processor, IPartialBunchAccumulator Accumulator) CreateProcessor(
         ReplayReaderContext context)
     {
-        var packageMapReader = new PackageMapReader(context.NetGuidCache);
+        var packageMapReader = new PackageMapReader(context.NetGuidCache, context.EmitNetGuidExported);
         var partialBunchAccumulator = new PartialBunchAccumulator(
             diagnosticCallback: context.Diagnostics.Add);
         var propertyPayloadDecoder = new PropertyPayloadDecoder(PayloadTransformSupport.DefaultRegistry);

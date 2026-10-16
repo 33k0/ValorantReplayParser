@@ -90,7 +90,71 @@ public class NetGuidCacheTests
         var cache = new NetGuidCache();
         cache.SetNetGuidPath(5, "Pistol_C", new NetworkGuid(3));
 
-        Assert.That(cache.TryGetFullPath(5, out _), Is.False);
+        Assert.That(cache.TryGetFullPath(5, out var missingPath), Is.False);
+        Assert.That(missingPath, Is.Null);
+
+        cache.SetNetGuidPath(3, "/Game/Weapons/Pistol");
+
+        Assert.That(cache.TryGetFullPath(5, out var fullPath), Is.True);
+        Assert.That(fullPath, Is.EqualTo("/Game/Weapons/Pistol.Pistol_C"));
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public void TryGetFullPath_CyclicOutersReturnFalseAndCanBeRepaired(bool selfCycle)
+    {
+        var cache = new NetGuidCache();
+        cache.SetNetGuidPath(3, "Root", new NetworkGuid(selfCycle ? 3u : 5u));
+        cache.SetNetGuidPath(5, "Child", new NetworkGuid(3));
+
+        Assert.That(cache.TryGetFullPath(5, out var cyclicPath), Is.False);
+        Assert.That(cyclicPath, Is.Null);
+
+        cache.SetNetGuidPath(3, "Root");
+
+        Assert.That(cache.TryGetFullPath(5, out var repairedPath), Is.True);
+        Assert.That(repairedPath, Is.EqualTo("Root.Child"));
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public void TryGetFullPath_LimitsDepthEvenWhenAncestorsAreCached(bool cacheAncestors)
+    {
+        var cache = new NetGuidCache();
+        cache.SetNetGuidPath(3, "Root");
+        for (uint index = 1; index <= 16; index++)
+        {
+            cache.SetNetGuidPath(3 + index * 2, $"Child{index}", new NetworkGuid(1 + index * 2));
+            if (cacheAncestors && index < 16)
+            {
+                Assert.That(cache.TryGetFullPath(3 + index * 2, out _), Is.True);
+            }
+        }
+
+        Assert.That(cache.TryGetFullPath(35, out var beyondLimit), Is.False);
+        Assert.That(beyondLimit, Is.Null);
+        Assert.That(cache.TryGetFullPath(33, out var atLimit), Is.True);
+        Assert.That(atLimit, Does.EndWith(".Child15"));
+    }
+
+    [Test]
+    public void TryGetFullPath_ChangingOuterInvalidatesDescendantsAndDetectsCycles()
+    {
+        var cache = new NetGuidCache();
+        cache.SetNetGuidPath(3, "FirstRoot");
+        cache.SetNetGuidPath(5, "Child", new NetworkGuid(3));
+        cache.SetNetGuidPath(7, "Inner", new NetworkGuid(5));
+        Assert.That(cache.TryGetFullPath(7, out var original), Is.True);
+        Assert.That(original, Is.EqualTo("FirstRoot.Child:Inner"));
+
+        cache.SetNetGuidPath(9, "SecondRoot");
+        cache.SetNetGuidPath(5, "Child", new NetworkGuid(9));
+        Assert.That(cache.TryGetFullPath(7, out var changed), Is.True);
+        Assert.That(changed, Is.EqualTo("SecondRoot.Child:Inner"));
+
+        cache.SetNetGuidPath(9, "SecondRoot", new NetworkGuid(7));
+        Assert.That(cache.TryGetFullPath(7, out var cyclic), Is.False);
+        Assert.That(cyclic, Is.Null);
     }
 
     [Test]
@@ -150,6 +214,7 @@ public class NetGuidCacheTests
         var cache = new NetGuidCache();
         cache.AddExportGroup(CreateGroup());
         cache.SetNetGuidPath(17, "/Game/Test.Test_C");
+        Assert.That(cache.TryGetFullPath(17, out _), Is.True);
 
         cache.Clear();
 
@@ -159,6 +224,8 @@ public class NetGuidCacheTests
             Assert.That(cache.ExportGroupsByPathIndex, Is.Empty);
             Assert.That(cache.PathByNetGuid, Is.Empty);
             Assert.That(cache.OuterNetGuidByNetGuid, Is.Empty);
+            Assert.That(cache.TryGetFullPath(17, out var fullPath), Is.False);
+            Assert.That(fullPath, Is.Null);
         });
     }
 

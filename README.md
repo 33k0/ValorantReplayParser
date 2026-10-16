@@ -3,7 +3,7 @@
 ![Build](https://github.com/michel-giehl/ValorantReplayParser/actions/workflows/build.yml/badge.svg?branch=main) ![Test](https://github.com/michel-giehl/ValorantReplayParser/actions/workflows/integration.yml/badge.svg?branch=main) [![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=michel-giehl_ValorantReplayParser&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=michel-giehl_ValorantReplayParser)
 <a href="https://discord.gg/QSRSfcege7"><img src="https://discordapp.com/api/guilds/764106279752826930/widget.png?style=banner2"/></a>
 
-`ValorantReplayParser` reads VALORANT replay files (`.vrf`) and emits typed gameplay events and replay metadata. It is a narrow, VALORANT-specific parser, not a general Unreal Engine replay parser.
+`ValorantReplayParser` reads VALORANT replay files (`.vrf`) and emits native decoded events and replay metadata. It is a narrow, VALORANT-specific parser, not a general Unreal Engine replay parser.
 
 The NuGet release `0.1.0-alpha.2` is experimental. Replay formats and the public API may change as the reverse-engineered format understanding improves. A replay version passing the compatibility checks does not mean every gameplay feature in that replay is decoded. See the [release notes and migration guide](https://github.com/michel-giehl/ValorantReplayParser/blob/main/CHANGELOG.md) before upgrading from `0.1.0-alpha.1`.
 
@@ -71,7 +71,30 @@ sealed class ConsoleEventSink : IReplayEventSink
 
 Malformed replay structure, invalid required reads, unsupported full-parse versions, and resource-limit violations fail with a `ReplayParseException` subtype. A returned result means the container was traversed under those rules; it does not promise that every known or unknown VALORANT feature was semantically decoded or that the file contains a complete match.
 
-Events are streamed to the sink and are provisional until `Read` returns successfully. If a later parse error occurs, events already emitted cannot be rolled back. Some semantic enrichers defer events until related replay data is available, so event timestamps are not guaranteed to increase globally in emission order. If the sink throws, parsing stops and the original sink exception is propagated.
+Events are streamed to the sink and are provisional until `Read` returns successfully. If a later parse error occurs, events already emitted cannot be rolled back. If the sink throws, parsing stops and the original sink exception is propagated.
+
+## High-level gameplay events
+
+The event-project split is a breaking change in the current development version. See the [Unreleased migration guide](CHANGELOG.md#unreleased) for package and namespace changes, removed APIs, and the new enrichment lifecycle.
+
+The core parser emits only `ActorSpawned`, `ActorClosed`, `ExportGroupReceived`, `RpcReceived`, and `NetGuidExported`. Movement batches and effect RPC parameters remain native payloads. Object-reference fields, including damage `EquippableUsed`, expose `NetObjectReference` with the recorded `NetGuid` and its `Path` resolved at decode time; an unknown path is null. Nullable reference fields distinguish an absent update (null) from a recorded null object (`NetGuid == 0`).
+
+The separate `Replay.Valorant.Events` project (package `ValorantReplayParser.Events`) owns movement, shot, flash, nearsight, and wall events, their enrichers, and equipment-name resolution. Consumers explicitly wrap their sink:
+
+```csharp
+using Replay.Valorant;
+using Replay.Valorant.Events;
+
+var events = new ValorantEventEnricher(new ConsoleEventSink());
+var reader = new ValorantReplayReader(eventSink: events);
+using var stream = File.OpenRead("path/to/replay.vrf");
+var result = reader.Read(stream);
+events.Complete();
+```
+
+Create a fresh enricher for each replay. Call `Complete()` after a successful read to flush deferred events; repeated completion calls have no effect. The enricher forwards native events alongside derived events. Deferred events can have earlier timestamps than events already delivered. GUID exports include native paths and outer GUIDs so enrichment can also run over a previously captured native event stream.
+
+Derived event namespaces now live under `Replay.Valorant.Events`, for example `Replay.Valorant.Events.Combat.ValorantShotReceived` and `Replay.Valorant.Events.Movement.RemoteCharacterMovementReceived`. Wire descriptors remain in `Replay.Valorant`. CLI logging and JSON export opt into enrichment automatically.
 
 ## Inventory and economy descriptors
 
@@ -185,7 +208,8 @@ Starting from `CreateCatalog()` also preserves VALORANT's stable-subobject class
 - `Replay.Models`: shared models, parse results, constants, context contracts, and parser errors.
 - `Replay.Encoding`: byte/bit archives, `FBinaryArchive`, payload transforms, and Oodle decompression.
 - `Replay.Unreal`: replay-info, chunk scanning, replay-header parsing, and the replay-container pipeline.
-- `Replay.Valorant`: VALORANT models, export groups, RPCs, ClassNetCaches, and gameplay interpretation.
+- `Replay.Valorant`: native VALORANT models, export groups, RPCs, and ClassNetCaches.
+- `Replay.Valorant.Events`: derived gameplay events, enrichment, and equipment-name resolution.
 - `CliReader`: CLI/demo entry point.
 - `*.Tests`: NUnit test projects.
 
@@ -209,6 +233,8 @@ Export replay events and movement as JSON:
 ```powershell
 dotnet run --project "src\CliReader\CliReader.csproj" -- export "C:\path\to\replay.vrf" --output "C:\path\to\export"
 ```
+
+JSON schema version 9 writes decoded object references as `{"net_guid": 123, "path": "..."}` in payloads, diagnostic values, and shot fields. Unknown paths are null. Consumers of schema version 8 must update fields that previously contained a GUID number.
 
 Show the full command or subcommand help:
 

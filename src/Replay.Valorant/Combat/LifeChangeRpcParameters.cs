@@ -4,21 +4,27 @@ using Replay.Unreal.Parsing;
 
 namespace Replay.Valorant.Combat;
 
-public sealed class HealLifeChangeEvent : ExportGroupDescriptor<HealLifeChangeEvent>
+public abstract class LifeChangeEvent<T> : ExportGroupDescriptor<T> where T : LifeChangeEvent<T>
 {
-    public override string Path => "/Script/ShooterGame.LifeChangeEvent:Heal";
     public override ExportCategory Categories => ExportCategory.Gunplay;
     public NetObjectReference ChangedComponent { get; set; }
     public float LifeResult { get; set; }
     public float DeltaLife { get; set; }
     public bool AliveAfterChange { get; set; }
-    protected override void Configure()
+
+    protected void AddSharedFields(uint firstHandle)
     {
-        AddPropertyHandle(2, x => x.ChangedComponent).ObjectNetGuid();
-        AddPropertyHandle(3, x => x.LifeResult).Float();
-        AddPropertyHandle(4, x => x.DeltaLife).Float();
-        AddPropertyHandle(5, "bAliveAfterChange", x => x.AliveAfterChange).Bool();
+        AddPropertyHandle(firstHandle, x => x.ChangedComponent).ObjectNetGuid();
+        AddPropertyHandle(firstHandle + 1, x => x.LifeResult).Float();
+        AddPropertyHandle(firstHandle + 2, x => x.DeltaLife).Float();
+        AddPropertyHandle(firstHandle + 3, "bAliveAfterChange", x => x.AliveAfterChange).Bool();
     }
+}
+
+public sealed class HealLifeChangeEvent : LifeChangeEvent<HealLifeChangeEvent>
+{
+    public override string Path => "/Script/ShooterGame.LifeChangeEvent:Heal";
+    protected override void Configure() => AddSharedFields(2);
 }
 
 public abstract class HealParameters<T> : ExportGroupDescriptor<T> where T : HealParameters<T>
@@ -52,22 +58,12 @@ public sealed class MulticastNotifyOverhealDecayParameters : HealParameters<Mult
     protected override void Configure() => AddSharedFields("DecayApplied", "DecayCauser");
 }
 
-public sealed class SectionLifeChangeEvent : ExportGroupDescriptor<SectionLifeChangeEvent>
+public sealed class SectionLifeChangeEvent : LifeChangeEvent<SectionLifeChangeEvent>
 {
     public override string Path => "/Script/ShooterGame.LifeChangeEvent:SectionLifeChange";
-    public override ExportCategory Categories => ExportCategory.Gunplay;
-    public NetObjectReference ChangedComponent { get; set; }
-    public float LifeResult { get; set; }
-    public float DeltaLife { get; set; }
-    public bool AliveAfterChange { get; set; }
-    protected override void Configure()
-    {
-        AddPropertyHandle(1, x => x.ChangedComponent).ObjectNetGuid();
-        AddPropertyHandle(2, x => x.LifeResult).Float();
-        AddPropertyHandle(3, x => x.DeltaLife).Float();
-        AddPropertyHandle(4, "bAliveAfterChange", x => x.AliveAfterChange).Bool();
-    }
+    protected override void Configure() => AddSharedFields(1);
 }
+
 public sealed class MulticastSectionLifeChangeParameters : ExportGroupDescriptor<MulticastSectionLifeChangeParameters>
 {
     public override string Path => "/Script/ShooterGame.DamageableComponent:MulticastSectionLifeChange";

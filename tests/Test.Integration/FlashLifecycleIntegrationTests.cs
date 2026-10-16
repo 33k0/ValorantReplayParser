@@ -1,7 +1,8 @@
 using Replay.Encoding.Archives;
 using Replay.Models.Events;
 using Replay.Valorant;
-using Replay.Valorant.Flashes;
+using Replay.Valorant.Events;
+using Replay.Valorant.Events.Flashes;
 using Replay.Valorant.Flashes.Descriptors;
 
 namespace Test.Integration;
@@ -35,7 +36,9 @@ public class FlashLifecycleIntegrationTests
         var sink = new CapturingReplayEventSink();
         using var stream = File.OpenRead(replayPath);
         using var archive = new FBinaryArchive(stream);
-        var context = ValorantReplayReader.CreateDefault(loggerFactory: null, eventSink: sink).Read(archive);
+        var events = new ValorantEventEnricher(sink);
+        var context = ValorantReplayReader.CreateDefault(loggerFactory: null, eventSink: events).Read(archive);
+        events.Complete();
 
         var casts = sink.Events.OfType<ValorantFlashCast>().ToArray();
         var paths = sink.Events.OfType<ValorantFlashPathUpdated>().ToArray();
@@ -136,7 +139,9 @@ public class FlashLifecycleIntegrationTests
         var sink = new CapturingReplayEventSink();
         using var stream = File.OpenRead(replayPath);
         using var archive = new FBinaryArchive(stream);
-        var context = ValorantReplayReader.CreateDefault(loggerFactory: null, eventSink: sink).Read(archive);
+        var events = new ValorantEventEnricher(sink);
+        var context = ValorantReplayReader.CreateDefault(loggerFactory: null, eventSink: events).Read(archive);
+        events.Complete();
 
         var casts = sink.Events.OfType<ValorantFlashCast>().ToArray();
         var paths = sink.Events.OfType<ValorantFlashPathUpdated>().ToArray();

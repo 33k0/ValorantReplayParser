@@ -76,7 +76,9 @@ public class BunchPayloadPipelineTests
     [Test]
     public void PackageMapExports_PopulateNetGuidCache()
     {
-        var context = CreateContext();
+        var sink = new CapturingReplayEventSink();
+        var context = CreateContext(sink);
+        context.CurrentTimeSeconds = 1.25f;
         var reader = new RawPacketReader();
         var packet = BuildPacket(w =>
         {
@@ -95,6 +97,8 @@ public class BunchPayloadPipelineTests
             Assert.That(context.NetGuidCache.PathByNetGuid[TestNetGuid], Is.EqualTo(TestPath));
             Assert.That(context.BunchPayloadStats.PackageMapExportBunchCount, Is.EqualTo(1));
             Assert.That(context.BunchPayloadStats.ExportedNetGuidCount, Is.EqualTo(1));
+            Assert.That(sink.Events.OfType<NetGuidExported>().Single(),
+                Is.EqualTo(new NetGuidExported(1.25f, 0, TestNetGuid, TestPath, 0)));
         });
     }
 

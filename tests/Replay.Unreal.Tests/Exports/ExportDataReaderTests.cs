@@ -198,12 +198,15 @@ public class ExportDataReaderTests
         AddInt32(bytes, payload.Length);
         bytes.AddRange(payload);
 
-        new ExportDataReader(new FBinaryArchive(bytes.ToArray()), cache).ReadExportGuids();
+        var exported = new List<(uint Guid, string Path, uint Outer)>();
+        new ExportDataReader(new FBinaryArchive(bytes.ToArray()), cache,
+            netGuidExported: (guid, path, outer) => exported.Add((guid, path, outer.Value))).ReadExportGuids();
 
         Assert.Multiple(() =>
         {
             Assert.That(cache.TryGetPath(17, out var pathName), Is.True);
             Assert.That(pathName, Is.EqualTo("/Game/Test.Test_C"));
+            Assert.That(exported, Is.EqualTo(new[] { (17u, "/Game/Test.Test_C", 0u) }));
         });
     }
 

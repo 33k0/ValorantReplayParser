@@ -59,12 +59,14 @@ internal sealed class PlaybackPacketReader
 
         var timeSeconds = _archive.ReadSingle();
         _context.CurrentTimeSeconds = timeSeconds;
+        _context.CurrentPacketId = -1;
 
         new ExportDataReader(
             _archive,
             _context.NetGuidCache,
             _context.LoggerFactory?.CreateLogger<ExportDataReader>(),
-            _context.ExportBindingRegistry.OnExportGroupChanged).Read();
+            _context.ExportBindingRegistry.OnExportGroupChanged,
+            _context.EmitNetGuidExported).Read();
 
         new StreamingLevelFixesReader(_context, _archive).Read();
         ReadExternalData();

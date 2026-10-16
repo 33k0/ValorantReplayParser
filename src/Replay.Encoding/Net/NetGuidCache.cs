@@ -5,6 +5,8 @@ namespace Replay.Encoding.Net;
 
 public sealed class NetGuidCache
 {
+    private const int MaxFullPathDepth = 16;
+
     private readonly Dictionary<string, NetFieldExportGroup> _exportGroupsByPath = new(StringComparer.Ordinal);
     private readonly Dictionary<uint, NetFieldExportGroup> _exportGroupsByPathIndex = [];
     private readonly Dictionary<uint, string> _pathByNetGuid = [];
@@ -116,7 +118,13 @@ public sealed class NetGuidCache
             return true;
         }
 
-        if (!_pathByNetGuid.TryGetValue(netGuid, out var pathName))
+        return TryGetFullPath(netGuid, 0, out fullPath);
+    }
+
+    private bool TryGetFullPath(uint netGuid, int depth, [NotNullWhen(true)] out string? fullPath)
+    {
+        fullPath = null;
+        if (depth >= MaxFullPathDepth || !_pathByNetGuid.TryGetValue(netGuid, out var pathName))
         {
             return false;
         }
@@ -125,7 +133,8 @@ public sealed class NetGuidCache
         {
             fullPath = pathName;
         }
-        else if (TryGetFullPath(outerNetGuid.Value, out var outerPath))
+        // Walk cached ancestors too so the depth limit does not depend on lookup order.
+        else if (TryGetFullPath(outerNetGuid.Value, depth + 1, out var outerPath))
         {
             fullPath = string.Concat(outerPath, IsInPackage(outerNetGuid.Value) ? ":" : ".", pathName);
         }

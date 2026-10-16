@@ -3,10 +3,11 @@ using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 using Replay.Valorant.Descriptors;
+using Replay.Valorant.Descriptors.Agents;
 
 namespace Replay.Valorant.Nearsights.Descriptors;
 
-internal static class NearsightPaths
+public static class NearsightPaths
 {
     public const string OmenProjectile =
         "/Game/Characters/Wraith/S0/Ability_Q/Projectile_Wraith_Q_NearsightMissile.Projectile_Wraith_Q_NearsightMissile_C";
@@ -20,7 +21,7 @@ internal static class NearsightPaths
         "/Game/Characters/Mage/S0/Ability_4/GameObject_Mage_4_SplashGrenade.GameObject_Mage_4_SplashGrenade_C";
 }
 
-internal interface INearsightProjectilePayload
+public interface INearsightProjectilePayload
 {
     FRepMovement? ReplicatedMovement { get; }
     NetObjectReference? Owner { get; }
@@ -28,24 +29,10 @@ internal interface INearsightProjectilePayload
     bool HasDecoded(string propertyName);
 }
 
-public abstract class NearsightProjectileDescriptor<TDescriptor> : ExportGroupDescriptor<TDescriptor>,
+public abstract class NearsightProjectileDescriptor<TDescriptor> : SparseAbilityProjectileDescriptor<TDescriptor>,
     INearsightProjectilePayload
     where TDescriptor : NearsightProjectileDescriptor<TDescriptor>
 {
-    public override ExportCategory Categories => ExportCategory.Ability | ExportCategory.Effects;
-    public override ExportGroupKind Kind => ExportGroupKind.Actor;
-
-    public FRepMovement? ReplicatedMovement { get; set; }
-    public NetObjectReference? Owner { get; set; }
-    public NetObjectReference? Instigator { get; set; }
-
-    protected override void Configure()
-    {
-        AddPropertyHandle(10, x => x.ReplicatedMovement, ExportCategory.Movement)
-            .ReplicatedMovement(ERotatorQuantization.ByteComponents);
-        AddPropertyHandle(11, x => x.Owner, ExportCategory.Ability).ObjectNetGuid();
-        AddPropertyHandle(13, x => x.Instigator, ExportCategory.Ability).ObjectNetGuid();
-    }
 }
 
 public sealed class OmenNearsightProjectileDescriptor
@@ -66,7 +53,7 @@ public sealed class HarborNearsightProjectileDescriptor
     public override string Path => NearsightPaths.HarborProjectile;
 }
 
-internal interface INearsightSourcePayload
+public interface INearsightSourcePayload
 {
     NetObjectReference? Owner { get; }
     NetObjectReference? Instigator { get; }

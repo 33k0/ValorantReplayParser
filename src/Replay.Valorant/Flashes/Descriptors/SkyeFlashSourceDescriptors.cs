@@ -4,7 +4,7 @@ using Replay.Unreal.Parsing;
 
 namespace Replay.Valorant.Flashes.Descriptors;
 
-internal interface IFlashSourcePayload
+public interface IFlashSourcePayload
 {
     NetObjectReference? Owner { get; }
     NetObjectReference? Instigator { get; }

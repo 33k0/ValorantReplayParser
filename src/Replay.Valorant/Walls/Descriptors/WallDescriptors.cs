@@ -6,7 +6,7 @@ using Replay.Valorant.Descriptors;
 
 namespace Replay.Valorant.Walls.Descriptors;
 
-internal static class WallPaths
+public static class WallPaths
 {
     public const string SageAbility =
         "/Game/Characters/Thorne/S0/Ability_E/Ability_Thorne_E_Wall_Fortifying.Ability_Thorne_E_Wall_Fortifying_C";
@@ -22,7 +22,7 @@ internal static class WallPaths
         "/Game/Characters/Nox/S0/Ability_Q/GameObject_Nox_Wall.GameObject_Nox_Wall_C";
 }
 
-internal interface IWallOwnedActor
+public interface IWallOwnedActor
 {
     NetObjectReference? Owner { get; }
     NetObjectReference? Instigator { get; }

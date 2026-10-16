@@ -21,7 +21,7 @@ public abstract class DamageParameters<T> : ExportGroupDescriptor<T>
     public NetObjectReference EventInstigator { get; set; }
     public NetObjectReference DamageCauser { get; set; }
     public FVector? DamageOrigin { get; set; }
-    public ValorantEquippable? EquippableUsed { get; set; }
+    public NetObjectReference? EquippableUsed { get; set; }
     public NetObjectReference DamageType { get; set; }
     public DamageLifeChangeEvent?[]? LifeChangeEvents { get; set; }
     public NetObjectReference ChangedComponent { get; set; }
@@ -49,7 +49,7 @@ public abstract class DamageParameters<T> : ExportGroupDescriptor<T>
         AddPropertyHandle(4 + offset, x => x.EventInstigator, ExportCategory.Gunplay).ObjectNetGuid();
         AddPropertyHandle(5 + offset, x => x.DamageCauser, ExportCategory.Gunplay).ObjectNetGuid();
         AddPropertyHandle(6 + offset, x => x.DamageOrigin, ExportCategory.Gunplay).FVectorNetQuantize100();
-        AddPropertyHandle(7 + offset, x => x.EquippableUsed, ExportCategory.Gunplay).Decode(ValorantPayloadDecoders.Equippable);
+        AddPropertyHandle(7 + offset, x => x.EquippableUsed, ExportCategory.Gunplay).ObjectNetGuid();
         AddPropertyHandle(8 + offset, x => x.DamageType, ExportCategory.Gunplay).ObjectNetGuid();
         AddPropertyHandle(9 + offset, x => x.LifeChangeEvents, ExportCategory.Gunplay).RepLayoutDynamicArray(
             new VersionedDefinition<DamageLifeChangeEvent>(new(offset)));

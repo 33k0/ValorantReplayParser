@@ -1,3 +1,4 @@
+using System.Runtime.ExceptionServices;
 using Replay.Encoding.Archives;
 using Replay.Models.Descriptors;
 using Replay.Models.Events;
@@ -5,7 +6,6 @@ using Replay.Models.Replay;
 using Replay.Unreal.Header;
 using Replay.Valorant;
 using Snapshooter.NUnit;
-using System.Runtime.ExceptionServices;
 
 namespace Test.Integration;
 
@@ -102,6 +102,9 @@ public class ReplayReaderIntegrationTests
             Assert.That(spawnedEvents, Is.Not.Empty);
             Assert.That(closedEvents, Is.Not.Empty);
             Assert.That(exportGroupEvents, Is.Not.Empty);
+            Assert.That(eventSink.Events.OfType<NetGuidExported>(), Is.Not.Empty);
+            Assert.That(eventSink.Events.All(e =>
+                e is ActorSpawned or ActorClosed or ExportGroupReceived or RpcReceived or NetGuidExported), Is.True);
             Assert.That(spawnedEvents.All(replayEvent => replayEvent.TimeSeconds >= 0f), Is.True);
             Assert.That(spawnedEvents.All(replayEvent =>
                 replayEvent.TimeSeconds <= result.Metadata.ReplayInfo.LengthInMs / 1000f + 1f), Is.True);

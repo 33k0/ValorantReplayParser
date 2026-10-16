@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using Microsoft.Extensions.Logging;
 using Replay.Encoding.Archives;
 using Replay.Valorant;
+using Replay.Valorant.Events;
 
 namespace CliReader.JsonExport;
 
@@ -34,10 +35,12 @@ internal sealed class ReplayExportRunner
         try
         {
             using var archive = new FBinaryArchive(file);
+            var events = new ValorantEventEnricher(sink);
             result = ValorantReplayReader.CreateDefault(
                 _loggerFactory,
-                sink,
+                events,
                 options.ParseProfile).Read(archive);
+            events.Complete();
         }
         finally
         {

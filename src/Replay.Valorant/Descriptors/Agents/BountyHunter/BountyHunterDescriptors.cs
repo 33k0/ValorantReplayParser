@@ -13,6 +13,7 @@ public static class BountyHunterDescriptors
             new BountyHunterAgentDescriptor(),
             new FadeRevealProjectileDescriptor(),
             new FadeRevealDeviceDescriptor(),
+            new FadeTrailDescriptor(),
             Equipment("/Game/Characters/BountyHunter/S0/Ability_4/Ability_BountyHunter_4_WolfHoundBendable.Ability_BountyHunter_4_WolfHoundBendable_C"),
             PawnProjectile("/Game/Characters/BountyHunter/S0/Ability_4/Pawn_BountyHunter_4_WolfHound.Pawn_BountyHunter_4_WolfHound_C"),
             Equipment("/Game/Characters/BountyHunter/S0/Ability_E/Ability_E_BountyHunter_ReconDivebomb.Ability_E_BountyHunter_ReconDivebomb_C"),
@@ -27,6 +28,7 @@ public static class BountyHunterDescriptors
 
     public static IReadOnlyList<ClassNetCacheDescriptor> CreateClassNetCacheDescriptors() =>
     [
+        new FadeTrailClassNetCacheDescriptor(),
         Rpc("/Game/Characters/BountyHunter/S0/Ability_4/Ability_BountyHunter_4_WolfHoundBendable.Ability_BountyHunter_4_WolfHoundBendable_C", MulticastOnItemMovedToPersistentData, 1),
         Rpc("/Game/Characters/BountyHunter/S0/Ability_E/Ability_E_BountyHunter_ReconDivebomb.Ability_E_BountyHunter_ReconDivebomb_C", MulticastOnItemMovedToPersistentData, 2),
         Rpc("/Game/Characters/BountyHunter/S0/Ability_E/Projectile_E_BountyHunter_Divebomb.Projectile_E_BountyHunter_Divebomb_C", "HideProjectileMesh", 0),

@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Unreal.Parsing;
 
 namespace Replay.Valorant.Descriptors;
@@ -9,8 +10,8 @@ public sealed class AresAbilitySystemComponentDescriptor : ExportGroupDescriptor
     public override ExportCategory Categories => ExportCategory.Ability;
     public override ExportGroupKind Kind => ExportGroupKind.Component;
 
-    public uint Owner { get; set; }
-    public uint Instigator { get; set; }
+    public NetObjectReference Owner { get; set; }
+    public NetObjectReference Instigator { get; set; }
     public uint AresAttributeSet { get; set; }
 
     protected override void Configure()

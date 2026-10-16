@@ -60,7 +60,7 @@ internal static class DecodedValueAssigner
             DecodedFieldValueKind.Float => value.FloatValue,
             DecodedFieldValueKind.Double => value.DoubleValue,
             DecodedFieldValueKind.String => value.StringValue,
-            DecodedFieldValueKind.NetGuid => value.NetGuidValue,
+            DecodedFieldValueKind.ObjectReference => value.ObjectReferenceValue,
             DecodedFieldValueKind.Guid => value.GuidValue,
             DecodedFieldValueKind.Vector => value.VectorValue,
             DecodedFieldValueKind.Rotator => value.RotatorValue,

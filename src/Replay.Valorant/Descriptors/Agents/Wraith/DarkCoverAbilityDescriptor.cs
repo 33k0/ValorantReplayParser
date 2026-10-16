@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 
@@ -9,8 +10,8 @@ public class DarkCoverAbilityDescriptor : ExportGroupDescriptor<DarkCoverAbility
     public override string Path => "/Game/Characters/Wraith/S0/Ability_4/Zone_Wraith_4_Smoke.Zone_Wraith_4_Smoke_C";
     public override ExportCategory Categories => ExportCategory.Ability;
 
-    public uint? Instigator { get; set; }
-    public uint? Owner { get; set; }
+    public NetObjectReference? Instigator { get; set; }
+    public NetObjectReference? Owner { get; set; }
     public FRepMovement? ReplicatedMovement { get; set; }
     
     protected override void Configure()

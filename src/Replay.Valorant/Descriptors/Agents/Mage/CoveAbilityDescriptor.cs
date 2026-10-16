@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 
@@ -9,8 +10,8 @@ public class CoveAbilityDescriptor : ExportGroupDescriptor<CoveAbilityDescriptor
     public override string Path => "/Game/Characters/Mage/S0/Ability_E/GameObject_Mage_E_WorldSmoke.GameObject_Mage_E_WorldSmoke_C";
     public override ExportCategory Categories => ExportCategory.Ability;
 
-    public uint? Instigator { get; set; }
-    public uint? Owner { get; set; }
+    public NetObjectReference? Instigator { get; set; }
+    public NetObjectReference? Owner { get; set; }
     public FRepMovement? ReplicatedMovement { get; set; }
     
     protected override void Configure()

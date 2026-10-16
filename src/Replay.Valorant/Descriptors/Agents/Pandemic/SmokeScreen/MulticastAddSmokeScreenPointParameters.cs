@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 
@@ -16,7 +17,7 @@ public sealed class MulticastAddSmokeScreenPointParameters : ExportGroupDescript
     public FVector Scale3D { get; set; }
     public FVector ProjectileLocation { get; set; }
     public double ValveDistance { get; set; }
-    public uint CreatingProjectile { get; set; }
+    public NetObjectReference CreatingProjectile { get; set; }
 
     protected override void Configure()
     {

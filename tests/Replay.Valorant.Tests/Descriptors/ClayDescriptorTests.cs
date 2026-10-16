@@ -51,7 +51,7 @@ public sealed class ClayDescriptorTests
         var value = Decode(new ClayAgentDescriptor(), "FocusProjectiles", base64, 64);
         var references = (ClayFocusProjectileReference[])value.ObjectValue!;
         Assert.That(references, Has.Length.EqualTo(1));
-        Assert.That(references[0].ActorNetGuid, Is.EqualTo(expected));
+        Assert.That(references[0].ActorNetGuid?.NetGuid, Is.EqualTo(expected));
     }
 
     [Test]

@@ -30,7 +30,7 @@ public class SpikeDescriptorTests
         var context = new FieldDecodeContext();
         var decoder = (IFieldDecoder)field.Decoder!;
         var decoded = decoder.Decode(ref context, archive);
-        Assert.That(decoded.NetGuidValue, Is.EqualTo(42));
+        Assert.That(decoded.ObjectReferenceValue.NetGuid, Is.EqualTo(42));
         Assert.That(archive.AtEnd, Is.True);
         using var truncated = new BitArchiveReader(Array.Empty<byte>(), 0);
         Assert.Throws<ArchiveReadException>(() => decoder.Decode(ref context, truncated));

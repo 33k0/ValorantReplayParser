@@ -9,6 +9,7 @@ public sealed class NetGuidCache
     private readonly Dictionary<uint, NetFieldExportGroup> _exportGroupsByPathIndex = [];
     private readonly Dictionary<uint, string> _pathByNetGuid = [];
     private readonly Dictionary<uint, NetworkGuid> _outerNetGuidByNetGuid = [];
+    private readonly Dictionary<uint, string> _fullPathByNetGuid = [];
 
     public IReadOnlyDictionary<string, NetFieldExportGroup> ExportGroupsByPath => _exportGroupsByPath;
 
@@ -77,7 +78,14 @@ public sealed class NetGuidCache
         _exportGroupsByPathIndex.TryGetValue(pathNameIndex, out group);
 
     public void SetNetGuidPath(uint netGuid, string pathName, NetworkGuid outerNetGuid = default)
-     {
+    {
+        _outerNetGuidByNetGuid.TryGetValue(netGuid, out var oldOuterNetGuid);
+        if (_pathByNetGuid.TryGetValue(netGuid, out var oldPathName) &&
+            (oldPathName != pathName || oldOuterNetGuid != outerNetGuid))
+        {
+            _fullPathByNetGuid.Clear();
+        }
+
         _pathByNetGuid[netGuid] = pathName;
         if (outerNetGuid.IsValid)
         {
@@ -87,7 +95,7 @@ public sealed class NetGuidCache
         {
             _outerNetGuidByNetGuid.Remove(netGuid);
         }
-     }
+    }
 
     public bool TryGetPath(uint netGuid, out string pathName)
     {
@@ -100,6 +108,40 @@ public sealed class NetGuidCache
         pathName = string.Empty;
         return false;
     }
+
+    public bool TryGetFullPath(uint netGuid, [NotNullWhen(true)] out string? fullPath)
+    {
+        if (_fullPathByNetGuid.TryGetValue(netGuid, out fullPath))
+        {
+            return true;
+        }
+
+        if (!_pathByNetGuid.TryGetValue(netGuid, out var pathName))
+        {
+            return false;
+        }
+
+        if (!_outerNetGuidByNetGuid.TryGetValue(netGuid, out var outerNetGuid) || outerNetGuid.IsDynamic)
+        {
+            fullPath = pathName;
+        }
+        else if (TryGetFullPath(outerNetGuid.Value, out var outerPath))
+        {
+            fullPath = string.Concat(outerPath, IsInPackage(outerNetGuid.Value) ? ":" : ".", pathName);
+        }
+        else
+        {
+            return false;
+        }
+
+        _fullPathByNetGuid[netGuid] = fullPath;
+        return true;
+    }
+
+    private bool IsInPackage(uint netGuid) =>
+        _outerNetGuidByNetGuid.TryGetValue(netGuid, out var outerNetGuid) &&
+        !outerNetGuid.IsDynamic &&
+        !_outerNetGuidByNetGuid.ContainsKey(outerNetGuid.Value);
 
     public bool TryGetOuterNetGuid(uint netGuid, out NetworkGuid outerNetGuid) =>
         _outerNetGuidByNetGuid.TryGetValue(netGuid, out outerNetGuid);
@@ -135,6 +177,7 @@ public sealed class NetGuidCache
         _exportGroupsByPathIndex.Clear();
         _pathByNetGuid.Clear();
         _outerNetGuidByNetGuid.Clear();
+        _fullPathByNetGuid.Clear();
     }
 
     private static void CopyExports(NetFieldExport?[] source, NetFieldExport?[] destination)

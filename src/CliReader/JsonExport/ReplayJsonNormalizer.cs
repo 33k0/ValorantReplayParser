@@ -285,7 +285,7 @@ internal sealed class ReplayJsonNormalizer
             DecodedFieldValueKind.Float => value.FloatValue,
             DecodedFieldValueKind.Double => value.DoubleValue,
             DecodedFieldValueKind.String => value.StringValue,
-            DecodedFieldValueKind.NetGuid => value.NetGuidValue,
+            DecodedFieldValueKind.ObjectReference => value.ObjectReferenceValue.NetGuid,
             DecodedFieldValueKind.Vector => value.VectorValue,
             DecodedFieldValueKind.Rotator => value.RotatorValue,
             DecodedFieldValueKind.RepMovement => value.RepMovementValue,

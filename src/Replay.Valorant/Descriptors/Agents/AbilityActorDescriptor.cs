@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 
@@ -15,32 +16,32 @@ public sealed class AbilityActorDescriptor(
     public override ExportCategory Categories => ExportCategory.Ability | ExportCategory.Effects;
     public override ExportGroupKind Kind => ExportGroupKind.Actor;
     public override object CreatePayloadInstance() => new AbilityActorDescriptor(path, exportedFields, rotatorQuantization);
-    public uint? Owner { get; set; }
-    public uint? Instigator { get; set; }
-    public uint? CreatedByCharacter { get; set; }
-    public uint? AttachParent { get; set; }
-    public uint? AttachComponent { get; set; }
+    public NetObjectReference? Owner { get; set; }
+    public NetObjectReference? Instigator { get; set; }
+    public NetObjectReference? CreatedByCharacter { get; set; }
+    public NetObjectReference? AttachParent { get; set; }
+    public NetObjectReference? AttachComponent { get; set; }
     public FVector? RelativeScale3D { get; set; }
     public int? CosmeticRandomSeed { get; set; }
-    public uint? DeployedActor { get; set; }
-    public uint? FlashTrap { get; set; }
-    public uint? Target { get; set; }
+    public NetObjectReference? DeployedActor { get; set; }
+    public NetObjectReference? FlashTrap { get; set; }
+    public NetObjectReference? Target { get; set; }
     public bool? IsBurrowed { get; set; }
     public bool? IsAlive { get; set; }
     public bool? InPersistentData { get; set; }
     public bool? Hidden { get; set; }
-    public uint? MotherNode { get; set; }
-    public uint? ActiveTether { get; set; }
-    public uint? Cocoon { get; set; }
-    public uint? GameObjectSpline { get; set; }
-    public uint? SplineObject { get; set; }
-    public uint? Projectile { get; set; }
-    public uint? WarningActor { get; set; }
-    public uint? AssignedPlayspace { get; set; }
-    public uint? OwningPrimaryDataAsset { get; set; }
-    public uint? CurrentUsableTarget { get; set; }
-    public uint? SpawnedDeployable { get; set; }
-    public uint? SeekingMissileActor { get; set; }
+    public NetObjectReference? MotherNode { get; set; }
+    public NetObjectReference? ActiveTether { get; set; }
+    public NetObjectReference? Cocoon { get; set; }
+    public NetObjectReference? GameObjectSpline { get; set; }
+    public NetObjectReference? SplineObject { get; set; }
+    public NetObjectReference? Projectile { get; set; }
+    public NetObjectReference? WarningActor { get; set; }
+    public NetObjectReference? AssignedPlayspace { get; set; }
+    public NetObjectReference? OwningPrimaryDataAsset { get; set; }
+    public NetObjectReference? CurrentUsableTarget { get; set; }
+    public NetObjectReference? SpawnedDeployable { get; set; }
+    public NetObjectReference? SeekingMissileActor { get; set; }
     public bool? IsOwnerAlive { get; set; }
     public bool? IsPlacedInWorld { get; set; }
     public bool? IsRecording { get; set; }

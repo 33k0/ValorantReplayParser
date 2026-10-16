@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Unreal.Parsing;
 
 namespace Replay.Valorant.GameState;
@@ -11,8 +12,8 @@ public sealed class MulticastReceivePlayerResurrectEventParameters
     public override ExportGroupKind Kind => ExportGroupKind.ClassNetCache;
     public override FieldStreamGrammar Grammar => FieldStreamGrammar.FunctionParameters;
 
-    public uint ResurrectorPlayer { get; set; }
-    public uint ResurrectedPlayer { get; set; }
+    public NetObjectReference ResurrectorPlayer { get; set; }
+    public NetObjectReference ResurrectedPlayer { get; set; }
     public int KillNumberInRoundForResurrector { get; set; }
     public int KillNumberInRoundForResurrected { get; set; }
 

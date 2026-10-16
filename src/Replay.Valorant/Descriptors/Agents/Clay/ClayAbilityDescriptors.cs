@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 
@@ -11,13 +12,13 @@ public abstract class ClayActorDescriptor : ExportGroupDescriptor<ClayActorDescr
     public override ExportGroupKind Kind => ExportGroupKind.Actor;
     protected virtual bool IsAbility => false;
     protected virtual bool IsMoving => !IsAbility;
-    public uint? Owner { get; set; }
-    public uint? Instigator { get; set; }
-    public uint? CreatedByCharacter { get; set; }
+    public NetObjectReference? Owner { get; set; }
+    public NetObjectReference? Instigator { get; set; }
+    public NetObjectReference? CreatedByCharacter { get; set; }
     public bool? IsInPersistentData { get; set; }
     public FRepMovement? ReplicatedMovement { get; set; }
-    public uint? AttachParent { get; set; }
-    public uint? AttachComponent { get; set; }
+    public NetObjectReference? AttachParent { get; set; }
+    public NetObjectReference? AttachComponent { get; set; }
     public FVector? RelativeScale3D { get; set; }
     public FVector? LocationOffset { get; set; }
     public FRotator? RotationOffset { get; set; }
@@ -82,7 +83,7 @@ public sealed class ClayBoomBotPawnDescriptor : ClayActorDescriptor
 {
     public override string Path => ClayPaths.BoomBotPawn;
     public bool? ReplicateMovement { get; set; }
-    public uint? Controller { get; set; }
+    public NetObjectReference? Controller { get; set; }
     public float? ReplayLastTransformUpdateTimeStamp { get; set; }
     public FVector? ReplicatedGravityDirection { get; set; }
     public byte? ReplicatedMovementMode { get; set; }

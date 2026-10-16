@@ -65,6 +65,68 @@ public class NetGuidCacheTests
     }
 
     [Test]
+    public void TryGetFullPath_JoinsOutersLikeGetPathName()
+    {
+        var cache = new NetGuidCache();
+        cache.SetNetGuidPath(3, "/Game/Weapons/Pistol");
+        cache.SetNetGuidPath(5, "Pistol_C", new NetworkGuid(3));
+        cache.SetNetGuidPath(7, "FiringState", new NetworkGuid(5));
+        cache.SetNetGuidPath(9, "Inner", new NetworkGuid(7));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cache.TryGetFullPath(3, out var package), Is.True);
+            Assert.That(package, Is.EqualTo("/Game/Weapons/Pistol"));
+            Assert.That(cache.TryGetFullPath(5, out var asset), Is.True);
+            Assert.That(asset, Is.EqualTo("/Game/Weapons/Pistol.Pistol_C"));
+            Assert.That(cache.TryGetFullPath(9, out var inner), Is.True);
+            Assert.That(inner, Is.EqualTo("/Game/Weapons/Pistol.Pistol_C:FiringState.Inner"));
+        });
+    }
+
+    [Test]
+    public void TryGetFullPath_FailsWhenAnOuterIsUnknown()
+    {
+        var cache = new NetGuidCache();
+        cache.SetNetGuidPath(5, "Pistol_C", new NetworkGuid(3));
+
+        Assert.That(cache.TryGetFullPath(5, out _), Is.False);
+    }
+
+    [Test]
+    public void TryGetFullPath_StartsBelowDynamicOuter()
+    {
+        var cache = new NetGuidCache();
+        cache.SetNetGuidPath(5, "FiringState", new NetworkGuid(10));
+        cache.SetNetGuidPath(7, "Inner", new NetworkGuid(5));
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cache.TryGetFullPath(5, out var firingState), Is.True);
+            Assert.That(firingState, Is.EqualTo("FiringState"));
+            Assert.That(cache.TryGetFullPath(7, out var inner), Is.True);
+            Assert.That(inner, Is.EqualTo("FiringState.Inner"));
+        });
+    }
+
+    [Test]
+    public void TryGetFullPath_FollowsChangedOuter()
+    {
+        var cache = new NetGuidCache();
+        cache.SetNetGuidPath(3, "/Game/Weapons/Pistol");
+        cache.SetNetGuidPath(5, "Pistol_C", new NetworkGuid(3));
+        _ = cache.TryGetFullPath(5, out _);
+
+        cache.SetNetGuidPath(3, "/Game/Weapons/Rifle");
+
+        Assert.Multiple(() =>
+        {
+            Assert.That(cache.TryGetFullPath(5, out var fullPath), Is.True);
+            Assert.That(fullPath, Is.EqualTo("/Game/Weapons/Rifle.Pistol_C"));
+        });
+    }
+
+    [Test]
     public void SetNetGuidPath_StoresOuterNetGuid()
     {
         var cache = new NetGuidCache();

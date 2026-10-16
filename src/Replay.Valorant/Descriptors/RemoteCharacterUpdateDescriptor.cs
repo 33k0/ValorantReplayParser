@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Unreal.Parsing;
 
 namespace Replay.Valorant.Descriptors;
@@ -10,7 +11,7 @@ public sealed class RemoteCharacterUpdateDescriptor : ExportGroupDescriptor<Remo
     public override ExportGroupKind Kind => ExportGroupKind.FastArray;
 
     public uint ShooterCharacterNetGuidValue { get; set; }
-    public uint ShooterCharacterNetGuid { get; set; }
+    public NetObjectReference ShooterCharacterNetGuid { get; set; }
     public uint ComponentDataStream { get; set; }
 
     protected override void Configure()

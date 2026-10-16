@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Models.Replay;
 using Replay.Unreal.Parsing;
 using Replay.Valorant.Descriptors;
@@ -13,7 +14,7 @@ public sealed class BombGameStateDescriptor : ExportGroupDescriptor<BombGameStat
 
     public double ReplicatedWorldTimeSecondsDouble { get; set; }
     public string? MatchState { get; set; }
-    public uint WinningTeam { get; set; }
+    public NetObjectReference WinningTeam { get; set; }
     public byte CompletionState { get; set; }
     public ValorantRawPayload? TeamEconomy { get; set; }
     public float DisplayRemainingTime { get; set; }

@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 
@@ -11,8 +12,8 @@ public sealed class SovaRevealProjectileDescriptor : ExportGroupDescriptor<SovaR
     public override ExportCategory Categories => ExportCategory.Ability | ExportCategory.Effects;
     public override ExportGroupKind Kind => ExportGroupKind.Actor;
     public FRepMovement? ReplicatedMovement { get; set; }
-    public uint? Owner { get; set; }
-    public uint? Instigator { get; set; }
+    public NetObjectReference? Owner { get; set; }
+    public NetObjectReference? Instigator { get; set; }
     protected override void Configure()
     {
         AddPropertyHandle(10, x => x.ReplicatedMovement, ExportCategory.Movement)
@@ -29,8 +30,8 @@ public sealed class FadeRevealProjectileDescriptor : ExportGroupDescriptor<FadeR
     public override ExportCategory Categories => ExportCategory.Ability | ExportCategory.Effects;
     public override ExportGroupKind Kind => ExportGroupKind.Actor;
     public FRepMovement? ReplicatedMovement { get; set; }
-    public uint? Owner { get; set; }
-    public uint? Instigator { get; set; }
+    public NetObjectReference? Owner { get; set; }
+    public NetObjectReference? Instigator { get; set; }
     protected override void Configure()
     {
         AddPropertyHandle(10, x => x.ReplicatedMovement, ExportCategory.Movement)
@@ -45,8 +46,8 @@ public abstract class RevealDeviceDescriptor<T> : ExportGroupDescriptor<T>
 {
     public override ExportCategory Categories => ExportCategory.Ability | ExportCategory.Effects;
     public override ExportGroupKind Kind => ExportGroupKind.Actor;
-    public uint? Owner { get; set; }
-    public uint? Instigator { get; set; }
+    public NetObjectReference? Owner { get; set; }
+    public NetObjectReference? Instigator { get; set; }
     protected override void Configure()
     {
         AddPropertyHandle(11, x => x.Owner, ExportCategory.Ability).ObjectNetGuid();

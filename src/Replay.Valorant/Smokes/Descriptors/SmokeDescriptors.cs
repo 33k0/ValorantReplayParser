@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 using Replay.Valorant.Descriptors;
@@ -11,8 +12,8 @@ public abstract class SmokeOwnedActorDescriptor<TDescriptor> : ExportGroupDescri
     public override ExportCategory Categories => ExportCategory.Ability | ExportCategory.Effects;
     public override ExportGroupKind Kind => ExportGroupKind.Actor;
 
-    public uint? Owner { get; set; }
-    public uint? Instigator { get; set; }
+    public NetObjectReference? Owner { get; set; }
+    public NetObjectReference? Instigator { get; set; }
 
     protected override void Configure()
     {
@@ -46,7 +47,7 @@ public abstract class SmokeAbilityDescriptor<TDescriptor> : SmokeOwnedActorDescr
 {
     public FVector? RelativeScale3D { get; set; }
     public bool? IsInPersistentData { get; set; }
-    public uint? CreatedByCharacter { get; set; }
+    public NetObjectReference? CreatedByCharacter { get; set; }
 
     protected override void ConfigureBeforeOwnership() =>
         AddPropertyHandle(6, x => x.RelativeScale3D, ExportCategory.Ability).FVectorNetQuantize100();

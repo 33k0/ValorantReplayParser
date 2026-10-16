@@ -57,9 +57,9 @@ public class ValorantShotTests
             Assert.That(shot.AmmoRemaining, Is.EqualTo(11));
             Assert.That(shot.TracerOption, Is.EqualTo(1));
             Assert.That(shot.RandomSeed, Is.EqualTo(-894045900));
-            Assert.That(shot.FiringState, Is.EqualTo(368));
-            Assert.That(shot.FiringPlayerState, Is.EqualTo(92));
-            Assert.That(shot.EffectEquippable, Is.EqualTo(500));
+            Assert.That(shot.FiringState?.NetGuid, Is.EqualTo(368));
+            Assert.That(shot.FiringPlayerState?.NetGuid, Is.EqualTo(92));
+            Assert.That(shot.EffectEquippable?.NetGuid, Is.EqualTo(500));
             Assert.That(shot.AttackVectors, Is.EqualTo(new[] { attackVector1, attackVector2, attackVector10 }));
         });
     }
@@ -134,13 +134,13 @@ public class ValorantShotTests
             Assert.That(shotEvent.Shot.EffectId, Is.EqualTo(4));
             Assert.That(shotEvent.Shot.IsLocalEffect, Is.False);
             Assert.That(shotEvent.Shot.IsTransient, Is.True);
-            Assert.That(shotEvent.Shot.WaitOnReplicationActor, Is.EqualTo(17));
+            Assert.That(shotEvent.Shot.WaitOnReplicationActor?.NetGuid, Is.EqualTo(17));
             Assert.That(shotEvent.Shot.AllianceFilter, Is.EqualTo(EAresAlliance.AllianceAny));
             Assert.That(shotEvent.Shot.NumProjectiles, Is.EqualTo(1));
             Assert.That(shotEvent.Shot.AmmoRemaining, Is.EqualTo(11));
-            Assert.That(shotEvent.Shot.FiringState, Is.EqualTo(368));
-            Assert.That(shotEvent.Shot.FiringPlayerState, Is.EqualTo(92));
-            Assert.That(shotEvent.Shot.EffectEquippable, Is.EqualTo(500));
+            Assert.That(shotEvent.Shot.FiringState?.NetGuid, Is.EqualTo(368));
+            Assert.That(shotEvent.Shot.FiringPlayerState?.NetGuid, Is.EqualTo(92));
+            Assert.That(shotEvent.Shot.EffectEquippable?.NetGuid, Is.EqualTo(500));
             Assert.That(archive.AtEnd, Is.True);
         });
     }
@@ -246,7 +246,7 @@ public class ValorantShotTests
         new() { Name = new FGameplayTag(0, tagName), Vector = value };
 
     private static EffectDataObject ObjectValue(string tagName, uint value) =>
-        new() { Name = new FGameplayTag(0, tagName), Object = value };
+        new() { Name = new FGameplayTag(0, tagName), Object = new(value, null) };
 
     private static void WriteFloatValues(BitWriter writer, IReadOnlyList<(uint TagIndex, float Value)> values)
     {

@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Unreal.Parsing;
 
 namespace Replay.Valorant.Descriptors.Agents.Pandemic.SmokeScreen;
@@ -8,8 +9,8 @@ public class SmokeScreenManagerDescriptor : ExportGroupDescriptor<SmokeScreenMan
     public override string Path => "/Game/Characters/Pandemic/S0/Ability_E/GameObject_Pandemic_E_SmokeScreenManager.GameObject_Pandemic_E_SmokeScreenManager_C";
     public override ExportCategory Categories => ExportCategory.Ability;
     
-    public uint Owner { get; set; }
-    public uint Instigator { get; set; }
+    public NetObjectReference Owner { get; set; }
+    public NetObjectReference Instigator { get; set; }
     public double CurrentFuelLevel { get; set; }
     public bool WallActivated { get; set; }
     

@@ -19,10 +19,10 @@ public class WingmanDescriptorTests
         var field = registry.GetBoundGroup(WingmanDescriptor.ExportPath)!.FieldsByHandle[handle];
         Assert.That(field.Enabled, Is.True);
         Assert.That(field.TargetProperty!.Name, Is.EqualTo(name));
-        Assert.That(field.TargetProperty.PropertyType, Is.EqualTo(typeof(uint)));
+        Assert.That(field.TargetProperty.PropertyType, Is.EqualTo(typeof(NetObjectReference)));
         using var archive = new BitArchiveReader(new byte[] { 0x54 }, 8);
         var context = new FieldDecodeContext();
-        Assert.That(field.Decoder!.Decode(ref context, archive).NetGuidValue, Is.EqualTo(42));
+        Assert.That(field.Decoder!.Decode(ref context, archive).ObjectReferenceValue.NetGuid, Is.EqualTo(42));
         Assert.That(archive.AtEnd, Is.True);
         using var truncated = new BitArchiveReader(new byte[] { 0x01 }, 8);
         Assert.Throws<ArchiveReadException>(() => field.Decoder!.Decode(ref context, truncated));

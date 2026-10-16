@@ -1,12 +1,13 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Unreal.Parsing;
 
 namespace Replay.Valorant.Flashes.Descriptors;
 
 internal interface IFlashSourcePayload
 {
-    uint? Owner { get; }
-    uint? Instigator { get; }
+    NetObjectReference? Owner { get; }
+    NetObjectReference? Instigator { get; }
 }
 
 public sealed class SkyeFlashSourceDescriptor : ExportGroupDescriptor<SkyeFlashSourceDescriptor>, IFlashSourcePayload
@@ -15,8 +16,8 @@ public sealed class SkyeFlashSourceDescriptor : ExportGroupDescriptor<SkyeFlashS
     public override ExportCategory Categories => ExportCategory.Ability | ExportCategory.Effects;
     public override ExportGroupKind Kind => ExportGroupKind.Actor;
 
-    public uint? Owner { get; set; }
-    public uint? Instigator { get; set; }
+    public NetObjectReference? Owner { get; set; }
+    public NetObjectReference? Instigator { get; set; }
 
     protected override void Configure()
     {
@@ -31,8 +32,8 @@ public sealed class VyseFlashSourceDescriptor : ExportGroupDescriptor<VyseFlashS
     public override ExportCategory Categories => ExportCategory.Ability | ExportCategory.Effects;
     public override ExportGroupKind Kind => ExportGroupKind.Actor;
 
-    public uint? Owner { get; set; }
-    public uint? Instigator { get; set; }
+    public NetObjectReference? Owner { get; set; }
+    public NetObjectReference? Instigator { get; set; }
 
     protected override void Configure()
     {

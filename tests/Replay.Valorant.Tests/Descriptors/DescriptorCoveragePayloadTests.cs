@@ -145,7 +145,7 @@ public sealed class DescriptorCoveragePayloadTests
         Assert.Multiple(() =>
         {
             Assert.That(values.Single()!.RoundNumber, Is.EqualTo(7));
-            Assert.That(values.Single()!.PenalizedPlayers!.Single()!.NetGuid, Is.EqualTo(42));
+            Assert.That(values.Single()!.PenalizedPlayers!.Single()!.NetGuid?.NetGuid, Is.EqualTo(42));
             Assert.That(archive.AtEnd, Is.True);
         });
     }

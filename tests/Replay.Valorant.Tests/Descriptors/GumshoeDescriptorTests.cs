@@ -44,10 +44,10 @@ public sealed class GumshoeDescriptorTests
     public void RecordedOwnersAndPairReferencesConsumeBoundedPayloads()
     {
         // 3f0a3366, packets 5189, 224246, 37836/37838. Exact field payloads.
-        Assert.That(Decode(new TripWireGameObjectDescriptor(), "Owner", "FRY=", 16).NetGuidValue, Is.EqualTo(1418));
-        Assert.That(Decode(new InterrogateHatDescriptor(), "Owner", "ORY=", 16).NetGuidValue, Is.EqualTo(1436));
-        Assert.That(Decode(new TripwireEnemyParameters(), "PairedWire", "6Vg=", 16).NetGuidValue, Is.EqualTo(5748));
-        Assert.That(Decode(new TripwireEnemyParameters(), "PairedWire", "sVg=", 16).NetGuidValue, Is.EqualTo(5720));
+        Assert.That(Decode(new TripWireGameObjectDescriptor(), "Owner", "FRY=", 16).ObjectReferenceValue.NetGuid, Is.EqualTo(1418));
+        Assert.That(Decode(new InterrogateHatDescriptor(), "Owner", "ORY=", 16).ObjectReferenceValue.NetGuid, Is.EqualTo(1436));
+        Assert.That(Decode(new TripwireEnemyParameters(), "PairedWire", "6Vg=", 16).ObjectReferenceValue.NetGuid, Is.EqualTo(5748));
+        Assert.That(Decode(new TripwireEnemyParameters(), "PairedWire", "sVg=", 16).ObjectReferenceValue.NetGuid, Is.EqualTo(5720));
         Assert.That(new TripwireEnemyParameters().Grammar, Is.EqualTo(FieldStreamGrammar.FunctionParameters));
         Assert.Throws<ArchiveReadException>(() => Decode(new TripwireEnemyParameters(), "PairedWire", "6Q==", 8));
     }
@@ -63,7 +63,7 @@ public sealed class GumshoeDescriptorTests
         Assert.That(Decode(camera, "Possessed", "AA==", 1).BoolValue, Is.False);
         Assert.That(Decode(camera, "IsDeployed", "AQ==", 1).BoolValue, Is.True);
         Assert.That(Decode(new TripWireGameObjectDescriptor(), "Deployed", "AQ==", 1).BoolValue, Is.True);
-        Assert.That(Decode(new CameraTrackingDartDescriptor(), "Target", "l3o=", 16).NetGuidValue, Is.EqualTo(7883));
+        Assert.That(Decode(new CameraTrackingDartDescriptor(), "Target", "l3o=", 16).ObjectReferenceValue.NetGuid, Is.EqualTo(7883));
         Assert.That(camera.HasDecoded(nameof(camera.Possessed)), Is.False);
     }
 
@@ -88,14 +88,14 @@ public sealed class GumshoeDescriptorTests
         var cache = new NetGuidCache();
         cache.SetNetGuidPath(7239, "FXC_Gumshoe_X_Telegraph_Timer_Prototype_Reping_C");
         var context = new FieldDecodeContext { NetGuidCache = cache };
-        var payload = new EffectManagerPlayContinuousParameters { EffectContainer = 7239 };
+        var payload = new EffectManagerPlayContinuousParameters { EffectContainer = new(7239, null) };
         payload.EmitDecodedEvents(ref context);
         Assert.That(payload.EffectContainerPath, Is.Null);
         payload.MarkDecoded(nameof(payload.EffectContainer));
         payload.EmitDecodedEvents(ref context);
-        Assert.That(payload.EffectContainer, Is.EqualTo(7239));
+        Assert.That(payload.EffectContainer?.NetGuid, Is.EqualTo(7239));
         Assert.That(payload.EffectContainerPath, Is.EqualTo("FXC_Gumshoe_X_Telegraph_Timer_Prototype_Reping_C"));
-        var unknown = new EffectManagerPlayOneShotParameters { EffectContainer = 123 };
+        var unknown = new EffectManagerPlayOneShotParameters { EffectContainer = new(123, null) };
         unknown.MarkDecoded(nameof(unknown.EffectContainer));
         unknown.EmitDecodedEvents(ref context);
         Assert.That(unknown.EffectContainerPath, Is.Null);

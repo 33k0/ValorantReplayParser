@@ -33,8 +33,8 @@ public sealed class ZoneOwnershipDescriptorTests
         // Minimal field stream using the observed Owner=11 / Instigator=13 bindings and
         // the Meddle references from 3f0a3366 (zone 25116). No gameplay interpretation here.
         var actor = Parse(path, "MGCqDwU4QKIdAAA=", 81);
-        Assert.That(actor.Owner, Is.EqualTo(25066));
-        Assert.That(actor.Instigator, Is.EqualTo(1000));
+        Assert.That(actor.Owner?.NetGuid, Is.EqualTo(25066));
+        Assert.That(actor.Instigator?.NetGuid, Is.EqualTo(1000));
         Assert.That(actor.HasDecoded(nameof(actor.Owner)), Is.True);
         Assert.That(actor.HasDecoded(nameof(actor.Instigator)), Is.True);
     }
@@ -49,7 +49,7 @@ public sealed class ZoneOwnershipDescriptorTests
         Assert.That(absent.DecodedProperties, Is.Empty);
         var cleared = Parse(path, "OCAAAAA=", 33);
         Assert.That(cleared.Owner, Is.Null);
-        Assert.That(cleared.Instigator, Is.Zero);
+        Assert.That(cleared.Instigator?.NetGuid, Is.Zero);
         Assert.That(cleared.HasDecoded(nameof(cleared.Instigator)), Is.True);
         Assert.Throws<InvalidReplayDataException>(() => Parse(path, "MGCqDwU4QKIdAAA=", 64));
     }

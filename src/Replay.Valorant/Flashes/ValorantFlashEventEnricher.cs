@@ -157,14 +157,14 @@ internal sealed class ValorantFlashEventEnricher : IReplayEventSink
             state.BreachExitLocation = exit;
         }
 
-        if (projectile.HasDecoded(nameof(IFlashProjectilePayload.Owner)) && projectile.Owner is > 0)
+        if (projectile.HasDecoded(nameof(IFlashProjectilePayload.Owner)) && projectile.Owner?.NetGuid is > 0)
         {
-            state.OwnerNetGuid = projectile.Owner;
+            state.OwnerNetGuid = projectile.Owner?.NetGuid;
         }
 
-        if (projectile.HasDecoded(nameof(IFlashProjectilePayload.Instigator)) && projectile.Instigator is > 0)
+        if (projectile.HasDecoded(nameof(IFlashProjectilePayload.Instigator)) && projectile.Instigator?.NetGuid is > 0)
         {
-            state.InstigatorNetGuid = projectile.Instigator;
+            state.InstigatorNetGuid = projectile.Instigator?.NetGuid;
         }
 
         EnsureCastEmitted(state);
@@ -198,14 +198,14 @@ internal sealed class ValorantFlashEventEnricher : IReplayEventSink
             return;
         }
 
-        if (source.Owner is > 0)
+        if (source.Owner?.NetGuid is > 0)
         {
-            state.OwnerNetGuid = source.Owner;
+            state.OwnerNetGuid = source.Owner?.NetGuid;
         }
 
-        if (source.Instigator is > 0)
+        if (source.Instigator?.NetGuid is > 0)
         {
-            state.InstigatorNetGuid = source.Instigator;
+            state.InstigatorNetGuid = source.Instigator?.NetGuid;
         }
 
         _flashBySourceActor[sourceActorNetGuid] = state;
@@ -293,7 +293,7 @@ internal sealed class ValorantFlashEventEnricher : IReplayEventSink
             ?.Value;
         var contextActor = effectData.ObjectValues?
             .FirstOrDefault(value => value.Name?.TagName == "FXC.EffectContext")
-            ?.Value;
+            ?.Value?.NetGuid;
         if (duration is not { } durationValue ||
             !float.IsFinite(durationValue) ||
             durationValue < 0 ||
@@ -367,8 +367,8 @@ internal sealed class ValorantFlashEventEnricher : IReplayEventSink
             }
 
             var resolution = ResolveFlash(
-                blind.CausingActor,
-                blind.BlindConfig,
+                blind.CausingActor?.NetGuid,
+                blind.BlindConfig?.NetGuid,
                 exportGroup.TimeSeconds);
             if (resolution.State is { } resolvedFlash)
             {
@@ -409,15 +409,15 @@ internal sealed class ValorantFlashEventEnricher : IReplayEventSink
                 exportGroup.TimeSeconds,
                 exportGroup.PacketId,
                 resolution.State?.ActorNetGuid,
-                resolution.State?.Kind ?? ResolveKindFromBlindConfig(blind.BlindConfig),
+                resolution.State?.Kind ?? ResolveKindFromBlindConfig(blind.BlindConfig?.NetGuid),
                 exportGroup.ActorNetGuid,
                 playerStateNetGuid,
                 GetSubject(playerStateNetGuid),
                 duration,
                 blind.BlindId,
                 blind.EffectId,
-                blind.BlindConfig,
-                blind.CausingActor,
+                blind.BlindConfig?.NetGuid,
+                blind.CausingActor?.NetGuid,
                 blind.StartNetMovementTime,
                 resolution.Correlation,
                 duration.HasValue
@@ -550,9 +550,9 @@ internal sealed class ValorantFlashEventEnricher : IReplayEventSink
     private void TrackAgent(uint characterNetGuid, GenericAgentDescriptor agent)
     {
         _playerCharacters.Add(characterNetGuid);
-        if (agent.HasDecoded(nameof(GenericAgentDescriptor.PlayerState)) && agent.PlayerState != 0)
+        if (agent.HasDecoded(nameof(GenericAgentDescriptor.PlayerState)) && agent.PlayerState.NetGuid != 0)
         {
-            SetCharacterPlayerState(characterNetGuid, agent.PlayerState);
+            SetCharacterPlayerState(characterNetGuid, agent.PlayerState.NetGuid);
         }
     }
 
@@ -571,15 +571,15 @@ internal sealed class ValorantFlashEventEnricher : IReplayEventSink
 
         if (playerState.HasDecoded(nameof(BombPlayerStateDescriptor.PossessedCharacter)))
         {
-            SetCharacterPlayerState(playerState.PossessedCharacter, playerStateNetGuid);
+            SetCharacterPlayerState(playerState.PossessedCharacter.NetGuid, playerStateNetGuid);
         }
         // Possession establishes ownership, not an agent body: cameras and drones
         // also appear as PossessedCharacter. Process SpawnedCharacter independently.
         if (playerState.HasDecoded(nameof(BombPlayerStateDescriptor.SpawnedCharacter)) &&
-            playerState.SpawnedCharacter != 0)
+            playerState.SpawnedCharacter.NetGuid != 0)
         {
-            _playerCharacters.Add(playerState.SpawnedCharacter);
-            SetCharacterPlayerState(playerState.SpawnedCharacter, playerStateNetGuid);
+            _playerCharacters.Add(playerState.SpawnedCharacter.NetGuid);
+            SetCharacterPlayerState(playerState.SpawnedCharacter.NetGuid, playerStateNetGuid);
         }
     }
 

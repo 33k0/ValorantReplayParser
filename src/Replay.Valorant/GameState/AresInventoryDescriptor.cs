@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Unreal.Parsing;
 using Replay.Valorant.Inventory;
 
@@ -11,39 +12,39 @@ public sealed class AresInventoryDescriptor : ExportGroupDescriptor<AresInventor
     public override ExportGroupKind Kind => ExportGroupKind.Component;
 
     public bool IsActive { get; set; }
-    public uint? PrimarySlot { get; set; }
-    public uint? SecondarySlot { get; set; }
-    public uint? MeleeSlot { get; set; }
-    public uint? GrenadeAbilitySlot { get; set; }
-    public uint? Ability1Slot { get; set; }
-    public uint? Ability2Slot { get; set; }
-    public uint? PassiveSlot { get; set; }
-    public uint? LevelSlot { get; set; }
-    public uint? InvisibleSlot { get; set; }
-    public uint? UltimateSlot { get; set; }
-    public uint? UnarmedSlot { get; set; }
-    public uint? ArmorSlot { get; set; }
-    public uint? BackpackSlot { get; set; }
-    public uint? TotemSlot { get; set; }
-    public uint? PrimaryStorageSlot { get; set; }
-    public uint? SecondaryStorageSlot { get; set; }
-    public uint NewCurrentEquippable { get; set; }
-    public uint Character { get; set; }
+    public NetObjectReference? PrimarySlot { get; set; }
+    public NetObjectReference? SecondarySlot { get; set; }
+    public NetObjectReference? MeleeSlot { get; set; }
+    public NetObjectReference? GrenadeAbilitySlot { get; set; }
+    public NetObjectReference? Ability1Slot { get; set; }
+    public NetObjectReference? Ability2Slot { get; set; }
+    public NetObjectReference? PassiveSlot { get; set; }
+    public NetObjectReference? LevelSlot { get; set; }
+    public NetObjectReference? InvisibleSlot { get; set; }
+    public NetObjectReference? UltimateSlot { get; set; }
+    public NetObjectReference? UnarmedSlot { get; set; }
+    public NetObjectReference? ArmorSlot { get; set; }
+    public NetObjectReference? BackpackSlot { get; set; }
+    public NetObjectReference? TotemSlot { get; set; }
+    public NetObjectReference? PrimaryStorageSlot { get; set; }
+    public NetObjectReference? SecondaryStorageSlot { get; set; }
+    public NetObjectReference NewCurrentEquippable { get; set; }
+    public NetObjectReference Character { get; set; }
     public float NetTimestamp { get; set; }
     public int RespawnNumber { get; set; }
-    public uint CurrentEquippable { get; set; }
+    public NetObjectReference CurrentEquippable { get; set; }
     public int CorrectionIndex { get; set; }
     public int LastSeenClientCorrectionIndex { get; set; }
 
     /// <summary>Replicated slot references in EAresItemSlot order; null entries were absent from this update.</summary>
-    public IReadOnlyList<uint?> ItemSlots =>
+    public IReadOnlyList<NetObjectReference?> ItemSlots =>
     [
         PrimarySlot, SecondarySlot, MeleeSlot, GrenadeAbilitySlot, Ability1Slot, Ability2Slot,
         PassiveSlot, LevelSlot, InvisibleSlot, UltimateSlot, UnarmedSlot, ArmorSlot,
         BackpackSlot, TotemSlot, PrimaryStorageSlot, SecondaryStorageSlot,
     ];
 
-    public uint? GetItemSlot(EAresItemSlot slot) => slot switch
+    public NetObjectReference? GetItemSlot(EAresItemSlot slot) => slot switch
     {
         EAresItemSlot.Primary => PrimarySlot,
         EAresItemSlot.Secondary => SecondarySlot,
@@ -69,7 +70,7 @@ public sealed class AresInventoryDescriptor : ExportGroupDescriptor<AresInventor
         for (var index = 0; index < (int)EAresItemSlot.Count; index++)
         {
             var slot = (EAresItemSlot)index;
-            yield return (slot, GetItemSlot(slot));
+            yield return (slot, GetItemSlot(slot)?.NetGuid);
         }
     }
 

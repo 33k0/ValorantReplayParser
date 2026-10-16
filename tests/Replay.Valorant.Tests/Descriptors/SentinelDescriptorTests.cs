@@ -78,7 +78,7 @@ public sealed class SentinelDescriptorTests
         Assert.That(actor.Fields.Any(f => f.PropertyName == "Owner"), Is.False);
         Assert.That(DecodeField(actor, "IsBurrowed", "AA==", 1).BoolValue, Is.False);
         Assert.That(DecodeField(actor, "IsBurrowed", "AQ==", 1).BoolValue, Is.True);
-        Assert.That(DecodeField(actor, "Target", "FRY=", 16).NetGuidValue, Is.EqualTo(1418));
+        Assert.That(DecodeField(actor, "Target", "FRY=", 16).ObjectReferenceValue.NetGuid, Is.EqualTo(1418));
         Assert.Throws<ArchiveReadException>(() => DecodeField(actor, "Target", "FRY=", 8));
         Assert.That(actor.HasDecoded(nameof(actor.IsBurrowed)), Is.False);
     }

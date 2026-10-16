@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 
@@ -11,8 +12,8 @@ public sealed class EquippableGroundPickupDescriptor : ExportGroupDescriptor<Equ
     public override string Path => ExportPath;
     public override ExportCategory Categories => ExportCategory.GameState;
     public override ExportGroupKind Kind => ExportGroupKind.Actor;
-    public uint MyEquippable { get; set; }
-    public uint LastOwner { get; set; }
+    public NetObjectReference MyEquippable { get; set; }
+    public NetObjectReference LastOwner { get; set; }
     protected override void Configure()
     {
         AddProperty(x => x.MyEquippable).ObjectNetGuid();
@@ -26,7 +27,7 @@ public sealed class EquippablePickupProjectileDescriptor : ExportGroupDescriptor
     public override string Path => ExportPath;
     public override ExportCategory Categories => ExportCategory.GameState;
     public override ExportGroupKind Kind => ExportGroupKind.Actor;
-    public uint MyEquippable { get; set; }
+    public NetObjectReference MyEquippable { get; set; }
     public FRepMovement? ReplicatedMovement { get; set; }
     protected override void Configure()
     {
@@ -42,7 +43,7 @@ public sealed class BombPickedUpRpcParameters : ExportGroupDescriptor<BombPicked
     public override ExportCategory Categories => ExportCategory.GameState;
     public override ExportGroupKind Kind => ExportGroupKind.ClassNetCache;
     public override FieldStreamGrammar Grammar => FieldStreamGrammar.FunctionParameters;
-    public uint NewBombHolder { get; set; }
+    public NetObjectReference NewBombHolder { get; set; }
     protected override void Configure() => AddProperty(x => x.NewBombHolder).ObjectNetGuid();
 }
 
@@ -53,6 +54,6 @@ public sealed class BombDroppedRpcParameters : ExportGroupDescriptor<BombDropped
     public override ExportCategory Categories => ExportCategory.GameState;
     public override ExportGroupKind Kind => ExportGroupKind.ClassNetCache;
     public override FieldStreamGrammar Grammar => FieldStreamGrammar.FunctionParameters;
-    public uint OldBombHolder { get; set; }
+    public NetObjectReference OldBombHolder { get; set; }
     protected override void Configure() => AddProperty(x => x.OldBombHolder).ObjectNetGuid();
 }

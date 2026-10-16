@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 
@@ -22,7 +23,7 @@ public sealed class CableGeometryParameters(string path, string kind) : ExportGr
     public bool? IsLastSegment { get; set; }
     public bool? IsBounce { get; set; }
     public bool? IsTeleport { get; set; }
-    public uint? ObjectReference { get; set; }
+    public NetObjectReference? ObjectReference { get; set; }
     protected override void Configure()
     {
         if (kind == "wall")

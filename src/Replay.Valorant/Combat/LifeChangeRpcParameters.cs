@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Unreal.Parsing;
 
 namespace Replay.Valorant.Combat;
@@ -7,7 +8,7 @@ public sealed class HealLifeChangeEvent : ExportGroupDescriptor<HealLifeChangeEv
 {
     public override string Path => "/Script/ShooterGame.LifeChangeEvent:Heal";
     public override ExportCategory Categories => ExportCategory.Gunplay;
-    public uint ChangedComponent { get; set; }
+    public NetObjectReference ChangedComponent { get; set; }
     public float LifeResult { get; set; }
     public float DeltaLife { get; set; }
     public bool AliveAfterChange { get; set; }
@@ -27,9 +28,9 @@ public abstract class HealParameters<T> : ExportGroupDescriptor<T> where T : Hea
     public override FieldStreamGrammar Grammar => FieldStreamGrammar.FunctionParameters;
     public float Amount { get; set; }
     public HealLifeChangeEvent?[]? LifeChanges { get; set; }
-    public uint EventInstigator { get; set; }
-    public uint EventInstigatorPawn { get; set; }
-    public uint Causer { get; set; }
+    public NetObjectReference EventInstigator { get; set; }
+    public NetObjectReference EventInstigatorPawn { get; set; }
+    public NetObjectReference Causer { get; set; }
     protected void AddSharedFields(string amountName, string causerName)
     {
         AddPropertyHandle(0, amountName, x => x.Amount).Float();
@@ -55,7 +56,7 @@ public sealed class SectionLifeChangeEvent : ExportGroupDescriptor<SectionLifeCh
 {
     public override string Path => "/Script/ShooterGame.LifeChangeEvent:SectionLifeChange";
     public override ExportCategory Categories => ExportCategory.Gunplay;
-    public uint ChangedComponent { get; set; }
+    public NetObjectReference ChangedComponent { get; set; }
     public float LifeResult { get; set; }
     public float DeltaLife { get; set; }
     public bool AliveAfterChange { get; set; }
@@ -75,7 +76,7 @@ public sealed class MulticastSectionLifeChangeParameters : ExportGroupDescriptor
     public override FieldStreamGrammar Grammar => FieldStreamGrammar.FunctionParameters;
     public SectionLifeChangeEvent?[]? LifeChanges { get; set; }
     public bool AliveOnServer { get; set; }
-    public uint Character { get; set; }
+    public NetObjectReference Character { get; set; }
     public float NetTimestamp { get; set; }
     public int RespawnNumber { get; set; }
     public int LifeChangeEventIndex { get; set; }

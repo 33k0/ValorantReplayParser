@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 using Replay.Valorant.Descriptors;
@@ -22,8 +23,8 @@ internal static class NearsightPaths
 internal interface INearsightProjectilePayload
 {
     FRepMovement? ReplicatedMovement { get; }
-    uint? Owner { get; }
-    uint? Instigator { get; }
+    NetObjectReference? Owner { get; }
+    NetObjectReference? Instigator { get; }
     bool HasDecoded(string propertyName);
 }
 
@@ -35,8 +36,8 @@ public abstract class NearsightProjectileDescriptor<TDescriptor> : ExportGroupDe
     public override ExportGroupKind Kind => ExportGroupKind.Actor;
 
     public FRepMovement? ReplicatedMovement { get; set; }
-    public uint? Owner { get; set; }
-    public uint? Instigator { get; set; }
+    public NetObjectReference? Owner { get; set; }
+    public NetObjectReference? Instigator { get; set; }
 
     protected override void Configure()
     {
@@ -67,8 +68,8 @@ public sealed class HarborNearsightProjectileDescriptor
 
 internal interface INearsightSourcePayload
 {
-    uint? Owner { get; }
-    uint? Instigator { get; }
+    NetObjectReference? Owner { get; }
+    NetObjectReference? Instigator { get; }
 }
 
 public abstract class NearsightSourceDescriptor<TDescriptor> : ExportGroupDescriptor<TDescriptor>,
@@ -78,8 +79,8 @@ public abstract class NearsightSourceDescriptor<TDescriptor> : ExportGroupDescri
     public override ExportCategory Categories => ExportCategory.Ability | ExportCategory.Effects;
     public override ExportGroupKind Kind => ExportGroupKind.Actor;
 
-    public uint? Owner { get; set; }
-    public uint? Instigator { get; set; }
+    public NetObjectReference? Owner { get; set; }
+    public NetObjectReference? Instigator { get; set; }
 
     protected override void Configure()
     {

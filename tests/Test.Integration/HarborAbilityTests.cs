@@ -122,7 +122,7 @@ public class HarborAbilityTests
         _ = ValorantReplayReader.CreateDefault(new NullLoggerFactory(), eventSink, parseNothingProfile).Read(archive);
         Assert.Multiple(() =>
         {
-            Assert.That(coveConsumer.ReceivedCalls().All(_ => _.GetArguments().Cast<CoveAbilityDescriptor>().First().Instigator is 134 or null), Is.True);
+            Assert.That(coveConsumer.ReceivedCalls().All(_ => _.GetArguments().Cast<CoveAbilityDescriptor>().First().Instigator?.NetGuid is 134 or null), Is.True);
             Assert.That(coveConsumer.ReceivedCalls().Select(_ => _.GetArguments().Cast<CoveAbilityDescriptor>().First().ReplicatedMovement).Count(_ => _ is not null), Is.EqualTo(1276));
             Assert.That(coveConsumer.ReceivedCalls().Select(_ => _.GetArguments().Cast<CoveAbilityDescriptor>().First().ReplicatedMovement).Count(_ => _ is null), Is.EqualTo(1));
         });
@@ -149,7 +149,7 @@ public class HarborAbilityTests
             Assert.That(eventSink.WallStartLingers, Has.Count.EqualTo(5));
 
             Assert.That(eventSink.ActorListTransitions.Any(value =>
-                value.Actors?.Any(actor => actor?.NetGuid is > 0) == true), Is.True);
+                value.Actors?.Any(actor => actor?.NetGuid?.NetGuid is > 0) == true), Is.True);
             Assert.That(eventSink.TransformTransitions.Any(value =>
                 value is { Rotation: not null, Translation.Bits: 64 }), Is.True);
             Assert.That(eventSink.WallStartLingers.All(value =>

@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Unreal.Parsing;
 using static Replay.Valorant.Descriptors.Agents.AbilityDescriptorRegistration;
 
@@ -31,8 +32,8 @@ public sealed class SnakeBitePatchDescriptor : ExportGroupDescriptor<SnakeBitePa
     public override string Path => SnakeBiteDescriptors.Patch;
     public override ExportCategory Categories => ExportCategory.Ability;
     public override ExportGroupKind Kind => ExportGroupKind.Actor;
-    public uint? Owner { get; set; }
-    public uint? Instigator { get; set; }
+    public NetObjectReference? Owner { get; set; }
+    public NetObjectReference? Instigator { get; set; }
     // Retain the wire flag without claiming it identifies a damaged/vulnerable target.
     public bool? HasSuccessfullyHit { get; set; }
 

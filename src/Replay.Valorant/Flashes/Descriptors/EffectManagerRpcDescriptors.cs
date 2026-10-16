@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 using Replay.Valorant.Combat;
@@ -13,15 +14,15 @@ public sealed class EffectManagerPlayContinuousParameters
     public override ExportGroupKind Kind => ExportGroupKind.ClassNetCache;
     public override FieldStreamGrammar Grammar => FieldStreamGrammar.FunctionParameters;
 
-    public uint? EffectContainer { get; set; }
+    public NetObjectReference? EffectContainer { get; set; }
     /// <summary>Wire object name resolved from the GUID cache; null when absent/unresolved.</summary>
     public string? EffectContainerPath { get; set; }
     public void EmitDecodedEvents(ref FieldDecodeContext context)
     {
         if (HasDecoded(nameof(EffectContainer)) && EffectContainer is { } guid &&
-            context.NetGuidCache?.TryGetPath(guid, out var path) == true) EffectContainerPath = path;
+            context.NetGuidCache?.TryGetPath(guid.NetGuid, out var path) == true) EffectContainerPath = path;
     }
-    public uint? WaitOnReplicationActor { get; set; }
+    public NetObjectReference? WaitOnReplicationActor { get; set; }
     public EffectManagerFunctionFloatValue[]? FunctionFloatValues { get; set; }
     public EffectManagerFunctionVectorValue[]? FunctionVectorValues { get; set; }
     public EffectManagerFunctionObjectValue[]? FunctionObjectValues { get; set; }
@@ -33,7 +34,7 @@ public sealed class EffectManagerPlayContinuousParameters
     public string? SourceId { get; set; }
     public bool? IsLocalEffect { get; set; }
     public bool? IsTransient { get; set; }
-    public uint? ClientControllerThatTriggered { get; set; }
+    public NetObjectReference? ClientControllerThatTriggered { get; set; }
     public float? StartMovementTime { get; set; }
     public EAresAlliance? AllianceFilter { get; set; }
 
@@ -78,15 +79,15 @@ public sealed class EffectManagerPlayOneShotParameters
     public override ExportGroupKind Kind => ExportGroupKind.ClassNetCache;
     public override FieldStreamGrammar Grammar => FieldStreamGrammar.FunctionParameters;
 
-    public uint? EffectContainer { get; set; }
+    public NetObjectReference? EffectContainer { get; set; }
     /// <summary>Wire object name resolved from the GUID cache; null when absent/unresolved.</summary>
     public string? EffectContainerPath { get; set; }
     public void EmitDecodedEvents(ref FieldDecodeContext context)
     {
         if (HasDecoded(nameof(EffectContainer)) && EffectContainer is { } guid &&
-            context.NetGuidCache?.TryGetPath(guid, out var path) == true) EffectContainerPath = path;
+            context.NetGuidCache?.TryGetPath(guid.NetGuid, out var path) == true) EffectContainerPath = path;
     }
-    public uint? WaitOnReplicationActor { get; set; }
+    public NetObjectReference? WaitOnReplicationActor { get; set; }
     public EffectManagerFunctionFloatValue[]? FunctionFloatValues { get; set; }
     public EffectManagerFunctionObjectValue[]? FunctionObjectValues { get; set; }
     public EffectManagerFunctionVectorValue[]? FunctionVectorValues { get; set; }
@@ -94,7 +95,7 @@ public sealed class EffectManagerPlayOneShotParameters
     public string? AttachSocket { get; set; }
     public FVector? Translation { get; set; }
     public FVector? Scale3D { get; set; }
-    public uint? ClientControllerThatTriggered { get; set; }
+    public NetObjectReference? ClientControllerThatTriggered { get; set; }
     public float? StartMovementTime { get; set; }
     public EAresAlliance? AllianceFilter { get; set; }
 
@@ -162,7 +163,7 @@ public sealed class EffectManagerUpdateContinuousParameters
     public string? SourceId { get; set; }
     public bool? IsLocalEffect { get; set; }
     public bool? IsTransient { get; set; }
-    public uint? WaitOnReplicationActor { get; set; }
+    public NetObjectReference? WaitOnReplicationActor { get; set; }
     public EffectManagerUpdateFloatValue[]? UpdateFloatValues { get; set; }
     public EffectManagerUpdateVectorValue[]? UpdateVectorValues { get; set; }
     public EffectManagerUpdateObjectValue[]? UpdateObjectValues { get; set; }

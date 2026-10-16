@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Unreal.Parsing;
 
 namespace Replay.Valorant.Economy;
@@ -11,7 +12,7 @@ public enum AresGunRequestState : byte
 
 public interface IGunRequestParameters
 {
-    uint? RequestedGun { get; }
+    NetObjectReference? RequestedGun { get; }
     AresGunRequestState? RequestState { get; }
 }
 
@@ -24,7 +25,7 @@ public abstract class GunRequestParameters<TDescriptor>
     public override FieldStreamGrammar Grammar => FieldStreamGrammar.FunctionParameters;
 
     // FAresGunRequest is flattened into function parameter handles in the replay.
-    public uint? RequestedGun { get; set; }
+    public NetObjectReference? RequestedGun { get; set; }
     public AresGunRequestState? RequestState { get; set; }
 
     protected override void Configure()
@@ -47,7 +48,7 @@ public sealed class NetMulticastFulfillGunRequestParameters
     public const string ExportPath = "/Script/ShooterGame.GunRequestComponent:NetMulticastFulfillGunRequest";
     public override string Path => ExportPath;
 
-    public uint? FulfillingPlayer { get; set; }
+    public NetObjectReference? FulfillingPlayer { get; set; }
 
     protected override void Configure()
     {

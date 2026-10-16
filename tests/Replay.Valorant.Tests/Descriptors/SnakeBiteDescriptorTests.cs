@@ -54,8 +54,8 @@ public sealed class SnakeBiteDescriptorTests
         var patch = new SnakeBitePatchDescriptor();
         Assert.That(patch.Owner, Is.Null);
         Assert.That(patch.HasSuccessfullyHit, Is.Null);
-        Assert.That(Decode(patch, nameof(patch.Owner), "7D14", 16).NetGuidValue, Is.EqualTo(1342));
-        Assert.That(Decode(patch, nameof(patch.Instigator), "5D14", 16).NetGuidValue, Is.EqualTo(1326));
+        Assert.That(Decode(patch, nameof(patch.Owner), "7D14", 16).ObjectReferenceValue.NetGuid, Is.EqualTo(1342));
+        Assert.That(Decode(patch, nameof(patch.Instigator), "5D14", 16).ObjectReferenceValue.NetGuid, Is.EqualTo(1326));
         Assert.That(Decode(patch, nameof(patch.HasSuccessfullyHit), "01", 1).BoolValue, Is.True);
         Assert.That(Decode(patch, nameof(patch.HasSuccessfullyHit), "00", 1).BoolValue, Is.False);
         Assert.Throws<ArchiveReadException>(() => Decode(patch, nameof(patch.Owner), "7D14", 8));

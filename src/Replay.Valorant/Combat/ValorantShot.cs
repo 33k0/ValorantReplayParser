@@ -1,3 +1,4 @@
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 
 namespace Replay.Valorant.Combat;
@@ -8,7 +9,7 @@ public sealed record ValorantShot(
     string? SourceId,
     bool? IsLocalEffect,
     bool? IsTransient,
-    uint? WaitOnReplicationActor,
+    NetObjectReference? WaitOnReplicationActor,
     EAresAlliance? AllianceFilter,
     FVector? Location,
     FRotator? Rotation,
@@ -18,14 +19,14 @@ public sealed record ValorantShot(
     float? TracerOption,
     float? BurstShotNumber,
     float? YawSwitch,
-    uint? FiringPlayerState,
-    uint? FiringState,
+    NetObjectReference? FiringPlayerState,
+    NetObjectReference? FiringState,
     IReadOnlyList<FVector> AttackVectors,
-    uint? EffectEquippable,
+    NetObjectReference? EffectEquippable,
     ValorantEquippable? Equippable,
     ValorantShotFireMode FireMode = ValorantShotFireMode.Unknown,
     string? FireModeEvidence = null,
-    uint? EffectContainer = null);
+    NetObjectReference? EffectContainer = null);
 
 public enum ValorantShotFireMode
 {

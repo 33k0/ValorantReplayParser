@@ -11,7 +11,7 @@ public enum DecodedFieldValueKind
     Float,
     Double,
     String,
-    NetGuid,
+    ObjectReference,
     Guid,
     Vector,
     Transform,

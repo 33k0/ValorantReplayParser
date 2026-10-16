@@ -136,15 +136,15 @@ internal sealed class ValorantNearsightEventEnricher : IReplayEventSink
             return;
         }
 
-        if (projectile.HasDecoded(nameof(INearsightProjectilePayload.Owner)) && projectile.Owner is > 0)
+        if (projectile.HasDecoded(nameof(INearsightProjectilePayload.Owner)) && projectile.Owner is { NetGuid: > 0 } owner)
         {
-            state.OwnerNetGuid = projectile.Owner;
-            _stateByAbilityActor[projectile.Owner.Value] = state;
+            state.OwnerNetGuid = owner.NetGuid;
+            _stateByAbilityActor[owner.NetGuid] = state;
         }
 
-        if (projectile.HasDecoded(nameof(INearsightProjectilePayload.Instigator)) && projectile.Instigator is > 0)
+        if (projectile.HasDecoded(nameof(INearsightProjectilePayload.Instigator)) && projectile.Instigator?.NetGuid is > 0)
         {
-            state.InstigatorNetGuid = projectile.Instigator;
+            state.InstigatorNetGuid = projectile.Instigator?.NetGuid;
         }
 
         EnsureCastEmitted(state);
@@ -177,15 +177,15 @@ internal sealed class ValorantNearsightEventEnricher : IReplayEventSink
             return;
         }
 
-        if (source.Owner is > 0)
+        if (source.Owner is { NetGuid: > 0 } owner)
         {
-            state.OwnerNetGuid ??= source.Owner;
-            _stateByAbilityActor[source.Owner.Value] = state;
+            state.OwnerNetGuid ??= owner.NetGuid;
+            _stateByAbilityActor[owner.NetGuid] = state;
         }
 
-        if (source.Instigator is > 0)
+        if (source.Instigator?.NetGuid is > 0)
         {
-            state.InstigatorNetGuid ??= source.Instigator;
+            state.InstigatorNetGuid ??= source.Instigator?.NetGuid;
         }
     }
 
@@ -215,7 +215,7 @@ internal sealed class ValorantNearsightEventEnricher : IReplayEventSink
             ?.Value;
         var contextActor = effect.ObjectValues
             .FirstOrDefault(value => value.Name?.TagName == "FXC.EffectContext")
-            ?.Value;
+            ?.Value?.NetGuid;
         if (duration is not { } durationValue || !float.IsFinite(durationValue) || contextActor is not > 0)
         {
             return;
@@ -241,7 +241,7 @@ internal sealed class ValorantNearsightEventEnricher : IReplayEventSink
                 durationValue >= 0 ? durationValue : null,
                 durationValue < 0,
                 effect.EffectId,
-                effect.EffectContainer,
+                effect.EffectContainer?.NetGuid,
                 contextActor.Value,
                 effect.StartMovementTime,
                 resolution.Correlation,
@@ -434,9 +434,9 @@ internal sealed class ValorantNearsightEventEnricher : IReplayEventSink
     private void TrackAgent(uint characterNetGuid, GenericAgentDescriptor agent)
     {
         _playerCharacters.Add(characterNetGuid);
-        if (agent.HasDecoded(nameof(GenericAgentDescriptor.PlayerState)) && agent.PlayerState != 0)
+        if (agent.HasDecoded(nameof(GenericAgentDescriptor.PlayerState)) && agent.PlayerState.NetGuid != 0)
         {
-            SetCharacterPlayerState(characterNetGuid, agent.PlayerState);
+            SetCharacterPlayerState(characterNetGuid, agent.PlayerState.NetGuid);
         }
     }
 
@@ -455,15 +455,15 @@ internal sealed class ValorantNearsightEventEnricher : IReplayEventSink
 
         if (playerState.HasDecoded(nameof(BombPlayerStateDescriptor.PossessedCharacter)))
         {
-            SetCharacterPlayerState(playerState.PossessedCharacter, playerStateNetGuid);
+            SetCharacterPlayerState(playerState.PossessedCharacter.NetGuid, playerStateNetGuid);
         }
         // Possession establishes ownership, not an agent body: cameras and drones
         // also appear as PossessedCharacter. Process SpawnedCharacter independently.
         if (playerState.HasDecoded(nameof(BombPlayerStateDescriptor.SpawnedCharacter)) &&
-            playerState.SpawnedCharacter != 0)
+            playerState.SpawnedCharacter.NetGuid != 0)
         {
-            _playerCharacters.Add(playerState.SpawnedCharacter);
-            SetCharacterPlayerState(playerState.SpawnedCharacter, playerStateNetGuid);
+            _playerCharacters.Add(playerState.SpawnedCharacter.NetGuid);
+            SetCharacterPlayerState(playerState.SpawnedCharacter.NetGuid, playerStateNetGuid);
         }
     }
 

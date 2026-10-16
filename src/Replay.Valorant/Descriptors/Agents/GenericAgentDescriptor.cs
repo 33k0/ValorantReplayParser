@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 
@@ -12,10 +13,10 @@ public abstract class GenericAgentDescriptor : ExportGroupDescriptor<GenericAgen
     public bool ReplicateMovement { get; set; }
     public uint Role { get; set; }
     public uint RemoteRole { get; set; }
-    public uint Owner { get; set; }
-    public uint Instigator { get; set; }
-    public uint PlayerState { get; set; }
-    public uint Controller { get; set; }
+    public NetObjectReference Owner { get; set; }
+    public NetObjectReference Instigator { get; set; }
+    public NetObjectReference PlayerState { get; set; }
+    public NetObjectReference Controller { get; set; }
     public float ReplayLastTransformUpdateTimeStamp { get; set; }
     public FVector ReplicatedGravityDirection { get; set; }
     public uint ReplicatedMovementMode { get; set; }

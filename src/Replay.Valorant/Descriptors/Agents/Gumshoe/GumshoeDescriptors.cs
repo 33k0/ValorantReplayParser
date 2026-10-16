@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Unreal.Parsing;
 
 namespace Replay.Valorant.Descriptors.Agents.Gumshoe;
@@ -46,6 +47,6 @@ public sealed class TripwireEnemyParameters : ExportGroupDescriptor<TripwireEnem
     public override ExportCategory Categories => ExportCategory.Ability;
     public override ExportGroupKind Kind => ExportGroupKind.ClassNetCache;
     public override FieldStreamGrammar Grammar => FieldStreamGrammar.FunctionParameters;
-    public uint? PairedWire { get; set; }
+    public NetObjectReference? PairedWire { get; set; }
     protected override void Configure() => AddPropertyHandle(0, x => x.PairedWire).ObjectNetGuid();
 }

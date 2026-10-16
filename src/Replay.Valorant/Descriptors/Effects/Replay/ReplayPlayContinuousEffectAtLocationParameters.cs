@@ -1,4 +1,5 @@
 using Replay.Models.Descriptors;
+using Replay.Models.Net;
 using Replay.Models.Unreal;
 using Replay.Unreal.Parsing;
 using Replay.Valorant.Combat;
@@ -15,12 +16,12 @@ public sealed class ReplayPlayContinuousEffectAtLocationParameters
     public override ExportGroupKind Kind => ExportGroupKind.ClassNetCache;
     public override FieldStreamGrammar Grammar => FieldStreamGrammar.FunctionParameters;
 
-    public uint? EffectContainer { get; set; }
+    public NetObjectReference? EffectContainer { get; set; }
     public ulong? EffectId { get; set; }
     public string? SourceId { get; set; }
     public bool? IsLocalEffect { get; set; }
     public bool? IsTransient { get; set; }
-    public uint? WaitOnReplicationActor { get; set; }
+    public NetObjectReference? WaitOnReplicationActor { get; set; }
     public EffectDataFloat[]? FloatValues { get; set; }
     public EffectDataVector[]? VectorValues { get; set; }
     public EffectDataObject[]? ObjectValues { get; set; }
@@ -88,7 +89,7 @@ public sealed class ReplayPlayContinuousEffectAtLocationParameters
         return FloatValues?.FirstOrDefault(value => value.Name?.TagName == tagName)?.Float;
     }
 
-    private uint? GetObject(string tagName)
+    private NetObjectReference? GetObject(string tagName)
     {
         return ObjectValues?.FirstOrDefault(value => value.Name?.TagName == tagName)?.Object;
     }

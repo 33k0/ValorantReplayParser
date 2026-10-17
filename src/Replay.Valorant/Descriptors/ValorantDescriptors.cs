@@ -139,6 +139,8 @@ public static class ValorantDescriptors
         catalog.Add(NoxDescriptors.CreateClassNetCacheDescriptors());
         catalog.Add(PandemicDescriptors.CreateDescriptors());
         catalog.Add(new DynamicVolume.GroundVolumeComponentDescriptor());
+        catalog.Add(new DynamicVolume.GroundVolumeClassNetCacheDescriptor());
+        catalog.AddSubobjectClassPath("PatchVolume", DynamicVolume.GroundVolumeComponentDescriptor.ExportPath);
         catalog.AddSubobjectClassPath("GroundVolume", DynamicVolume.GroundVolumeComponentDescriptor.ExportPath);
         catalog.Add(PandemicDescriptors.CreateClassNetCacheDescriptors());
         catalog.Add(PhoenixDescriptors.CreateDescriptors());

@@ -35,6 +35,13 @@ public sealed class GroundVolumeComponentDescriptor : ExportGroupDescriptor<Grou
         var bits = payload.ReadIntPacked();
         if (bits > payload.BitsRemaining) throw Invalid(payload, "Native delta exceeds its content block.");
         using var body = payload.ReadSubArchive(checked((int)bits));
+        ReadFragmentDelta(ref context, body);
+        payload.EnsureFullyConsumed(nameof(GroundVolumeComponentDescriptor));
+    }
+
+    /// <summary>The same native FastArray body also arrives as a standalone FragmentInfo entry.</summary>
+    public void ReadFragmentDelta(ref FieldDecodeContext context, FBitArchive body)
+    {
         if (!body.ReadBit()) throw Invalid(body, "Unsupported FastArray serialization mode.");
         var key = body.ReadInt32();
         var baseKey = body.ReadInt32();
@@ -55,7 +62,6 @@ public sealed class GroundVolumeComponentDescriptor : ExportGroupDescriptor<Grou
             updates[i].ReplicationId = id;
         }
         body.EnsureFullyConsumed(nameof(GroundVolumeComponentDescriptor));
-        payload.EnsureFullyConsumed(nameof(GroundVolumeComponentDescriptor));
         FragmentDelta = new(key, baseKey, deleted, updates);
         MarkDecoded(nameof(FragmentDelta));
     }
